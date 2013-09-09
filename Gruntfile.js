@@ -1,14 +1,17 @@
 'use strict';
+
 module.exports = function(grunt) {
   grunt.initConfig({
+
     pkg: grunt.file.readJSON('package.json'),
-    banner: '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - '                   +
-            '<%= grunt.template.today("yyyy-mm-dd") %>\n'                                 +
-            '<%= pkg.homepage ? "* " + pkg.homepage + "\\n" : "" %>'                      +
-            '* Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>;' +
-            ' Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %> */\n',
+    banner: '/* '                                                                          +
+            '<%= pkg.title || pkg.name %> v<%= pkg.version %>\n'                           +
+            '<%= pkg.homepage ? "*  " + pkg.homepage + "\\n" : "" %>'                      +
+            '*  Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>;' +
+            '  Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %> */\n',
+
     clean: {
-      src: ['dist']
+      src: ['dist/css', 'dist/font', 'dist/js']
     },
     concat: {
       options: {
@@ -16,26 +19,9 @@ module.exports = function(grunt) {
         stripBanners: true
       },
       dist: {
-        src: ['src/<%= pkg.name %>.js'],
-        dest: 'dist/<%= pkg.name %>.js'
+        src: ['js/<%= pkg.name %>.js'],
+        dest: 'dist/js/<%= pkg.name %>.js'
       },
-    },
-    uglify: {
-      options: {
-        banner: '<%= banner %>'
-      },
-      dist: {
-        src: '<%= concat.dist.dest %>',
-        dest: 'dist/<%= pkg.name %>.min.js'
-      },
-    },
-    connect: {
-      server: {
-        options: {
-          port: 3000,
-          base: '.'
-        }
-      }
     },
     qunit: {
       options: {
@@ -52,9 +38,9 @@ module.exports = function(grunt) {
       },
       src: {
         options: {
-          jshintrc: 'src/.jshintrc'
+          jshintrc: 'js/.jshintrc'
         },
-        src: ['src/**/*.js']
+        src: ['js/**/*.js']
       },
       test: {
         options: {
@@ -62,6 +48,73 @@ module.exports = function(grunt) {
         },
         src: ['test/**/*.js']
       },
+    },
+    sass: {
+        dist: {
+            files: {
+                'dist/css/<%= pkg.name %>.css': 'scss/<%= pkg.name %>.scss'
+            }
+        }
+    },
+    copy: {
+        main: {
+            files: [{
+                expand: true,
+                src: ["font/*"],
+                dest: 'dist/'
+            }, {
+                expand: true,
+                src: ["font/*"],
+                dest: 'release/'
+            }]
+        }
+    },
+
+    cssmin: {
+        add_banner: {
+            options: {
+                banner: '<%= banner %>'
+            },
+            files: {
+                'dist/css/<%= pkg.name %>.css': ['dist/css/<%= pkg.name %>.css']
+            }
+        },
+        minify: {
+            expand: true,
+            cwd: 'release/css/',
+            src: ['dist/css/<%= pkg.name %>.css'],
+            dest: 'release/css/',
+            ext: '.min.css'
+        }
+    },
+    uglify: {
+      options: {
+        banner: '<%= banner %>'
+      },
+      dist: {
+        src: '<%= concat.dist.dest %>',
+        dest: 'release/js/<%= pkg.name %>.min.js'
+      },
+    },
+
+    connect: {
+      server: {
+        options: {
+          port: 3000,
+          base: '.'
+        }
+      }
+    },
+    jekyll: {
+      docs: {}
+    },
+    validation: {
+      options: {
+        reset: true
+      },
+      files: {
+        src: ["_gh_pages/**/*.html"]
+      }
     },
     watch: {
       gruntfile: {
@@ -77,13 +130,21 @@ module.exports = function(grunt) {
         tasks: ['jshint:test', 'qunit']
       },
     },
+
   });
-  grunt.loadNpmTasks('grunt-contrib-clean');
-  grunt.loadNpmTasks('grunt-contrib-concat');
+
+  grunt.loadNpmTasks('grunt-contrib-clean'  );
+  grunt.loadNpmTasks('grunt-contrib-concat' );
   grunt.loadNpmTasks('grunt-contrib-connect');
-  grunt.loadNpmTasks('grunt-contrib-qunit');
-  grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.registerTask('default', ['jshint', 'connect', 'qunit', 'clean', 'concat', 'uglify']);
+  grunt.loadNpmTasks('grunt-contrib-copy'   );
+  grunt.loadNpmTasks('grunt-contrib-cssmin' );
+  grunt.loadNpmTasks('grunt-contrib-jshint' );
+  grunt.loadNpmTasks('grunt-contrib-qunit'  );
+  grunt.loadNpmTasks('grunt-contrib-sass'   );
+  grunt.loadNpmTasks('grunt-contrib-uglify' );
+  grunt.loadNpmTasks('grunt-contrib-watch'  );
+  grunt.loadNpmTasks('grunt-jekyll'         );
+
+  grunt.registerTask('default', ['jshint', 'qunit', 'clean', 'concat', 'sass', 'copy']);
+  grunt.registerTask('release', ['jshint', 'qunit', 'clean', 'concat', 'sass', 'copy', 'uglify', 'cssmin']);
 };
