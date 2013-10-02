@@ -7,7 +7,7 @@
  * NS.BR = NS.BRICK
  */
 (function (NS) {
-    "use strict";
+    'use strict';
     NS.BRICK = NS.BRICK || {};
 
     // alias
