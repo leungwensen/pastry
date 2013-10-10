@@ -11,7 +11,12 @@
     "eqnull"  : true,
     "node"    : true,
     "globals" : {
-        "BR"    : true,
-        "BRICK" : true
+        "BR"         : true,
+        "jasmine"    : true,
+        "describe"   : true,
+        "it"         : true,
+        "expect"     : true,
+        "beforeEach" : true,
+        "afterEach"  : true
     }
 }

@@ -3,8 +3,9 @@
  * @filename    : brick.validator.js
  * @requires    : [brick.js]
  */
-(function (BR) {
-    'use strict';
+'use strict';
+
+(function (BR, undefined) {
     BR.validator = BR.validator || {};
 
     /**
@@ -17,4 +18,4 @@
     BR.validator.isFunction = function (value) {
         return (typeof value === 'function');
     };
-}());
+}(BR));

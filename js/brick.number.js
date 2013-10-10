@@ -3,8 +3,9 @@
  * @filename    : brick.number.js
  * @requires    : [brick.js]
  */
-(function (BR) {
-    'use strict';
+'use strict';
+
+(function (BR, undefined) {
     BR.number = BR.number || Number;
 
     /**
@@ -29,11 +30,11 @@
             'integer' : 5,
             'zero'    : 0
         };
-        placeHolder = option.hasOwnProperty('zero') ? '0' : ' ';
+        placeHolder = (option.hasOwnProperty('zero') && option.zero !== 0) ? '0' : ' ';
         if (option.hasOwnProperty('decimal')) {
             strArr[1] = strArr[1] || '';
             strArr[1] = strArr[1].slice(0, option.decimal);
-            len = option.deciaml - strArr[1].length;
+            len = option.decimal - strArr[1].length;
             for (i = 0; i < len; i ++) {
                 strArr[1] += '0';
             }
@@ -44,7 +45,7 @@
                 strArr[0] = placeHolder + strArr[0];
             }
         }
-        if (option.hasOwnProperty('comma')) {
+        if (option.hasOwnProperty('comma') && option.comma !== 0) {
             strArr[0] = strArr[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
         }
         if (strArr[1] !== '') {
@@ -52,5 +53,4 @@
         }
         return strArr[0];
     };
-}());
-
+}(BR));

@@ -3,8 +3,9 @@
  * @filename    : brick.string.js
  * @requires    : [brick.js]
  */
-(function (BR) {
-    'use strict';
+'use strict';
+
+(function (BR, undefined) {
     BR.string = BR.string || String;
 
     // extend of Javascript 1.8.1
@@ -18,5 +19,4 @@
     BR.string.prototype.trim = BR.string.prototype.trim || function () {
         return this.replace(/^\s+|\s+$/g, '');
     };
-}());
-
+}(BR));

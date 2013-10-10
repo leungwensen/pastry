@@ -3,8 +3,9 @@
  * @filename    : brick.date.js
  * @requires    : [brick.js]
  */
-(function (BR) {
-    'use strict';
+'use strict';
+
+(function (BR, undefined) {
     BR.date = BR.date || Date;
 
     var padZero = function (n) {
@@ -21,18 +22,17 @@
     BR.date.prototype.toFormatString = BR.date.prototype.toFormatString || function (pattern) {
         var y, mo, d, h, mi, s;
         pattern = pattern || '{YYYY}-{MM}-{DD} {hh}:{mm}:{ss}';
-        return pattern.replace( '{YYYY}', y = String(this.getFullYear())    )
-                      .replace( '{MM}'  , padZero(mo = this.getMonth() + 1) )
-                      .replace( '{DD}'  , padZero(d  = this.getDate())      )
-                      .replace( '{hh}'  , padZero(h  = this.getHours())     )
-                      .replace( '{mm}'  , padZero(mi = this.getMinutes())   )
-                      .replace( '{ss}'  , padZero(s  = this.getSeconds())   )
+        return pattern.replace( '{YYYY}', y = String(this.getFullYear())  )
+                      .replace( '{MM}'  , padZero(mo = this.getMonth())   )
+                      .replace( '{DD}'  , padZero(d  = this.getDate())    )
+                      .replace( '{hh}'  , padZero(h  = this.getHours())   )
+                      .replace( '{mm}'  , padZero(mi = this.getMinutes()) )
+                      .replace( '{ss}'  , padZero(s  = this.getSeconds()) )
                       .replace( '{YY}'  , y.substring(2) )
-                      .replace( '{M}'   , mo + 1         )
+                      .replace( '{M}'   , mo             )
                       .replace( '{D}'   , d              )
                       .replace( '{h}'   , h              )
                       .replace( '{m}'   , mi             )
                       .replace( '{s}'   , s              );
     };
-}());
-
+}(BR));

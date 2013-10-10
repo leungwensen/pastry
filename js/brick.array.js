@@ -3,8 +3,9 @@
  * @filename    : brick.array.js
  * @requires    : [brick.js, brick.validator.js]
  */
-(function (BR) {
-    'use strict';
+'use strict';
+
+(function (BR, undefined) {
     BR.array = BR.array || Array;
 
     // prettify array index
@@ -287,6 +288,7 @@
             }
             current = Math.floor((start + end) / 2);
         }
+        current = (current === 0 && compareFunc(element, this[current]) !== 0) ? -1 : current;
         return current;
     };
     /**
@@ -349,7 +351,7 @@
             len = this.length >>> 0,
             resultArr = [];
         for (i = 0; i < len; i ++) {
-            if (that.hasElement(this[i])) {
+            if (that.hasElement(this[i]) && !resultArr.hasElement(this[i])) {
                 resultArr.push(this[i]);
             }
         }
@@ -369,7 +371,7 @@
             len = this.length >>> 0,
             resultArr = [];
         for (i = 0; i < len; i ++) {
-            if (!that.hasElement(this[i])) {
+            if (!that.hasElement(this[i]) && !resultArr.hasElement(this[i])) {
                 resultArr.push(this[i]);
             }
         }
@@ -403,4 +405,4 @@
         }
         return resultArr;
     };
-}());
+}(BR));
