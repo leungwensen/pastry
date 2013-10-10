@@ -1,10 +1,12 @@
 'use strict';
 
 module.exports = function(grunt) {
+    var pkg = grunt.file.readJSON('package.json');
+
     grunt.initConfig({
 
         // project settings
-        pkg: grunt.file.readJSON('package.json'),
+        pkg: pkg,
         banner: '/* ' +
                 '<%= pkg.title || pkg.name %> v<%= pkg.version %>\n' +
                 '<%= pkg.homepage ? "*  " + pkg.homepage + "\\n" : "" %>' +
@@ -16,13 +18,18 @@ module.exports = function(grunt) {
             src: ['dist/css', 'dist/font', 'dist/js']
         },
         concat: {
-            options: {
-                banner: '<%= banner %>',
-                stripBanners: true
-            },
             dist: {
-                jsrc: ['js/<%= pkg.name %>.js'],
-                jdest: 'dist/js/<%= pkg.name %>.js'
+                options: {
+                    banner: '<%= banner %>' + '\n"use strict";\n\n',
+                    stripBanners: true,
+                    process: function(src, filepath) {
+                        return src.replace(/(^|\n)[ \t]*('use strict'|"use strict");?\s*/g, '$1');
+                    },
+                },
+                files: {
+                    'dist/js/<%= pkg.name %>-<%= pkg.version %>.js': pkg.jsFiles,
+                }
+
             }
         },
         jshint: {
@@ -96,8 +103,8 @@ module.exports = function(grunt) {
                 banner: '<%= banner %>'
             },
             dist: {
-                src: '<%= concat.dist.dest %>',
-                dest: 'release/js/<%= pkg.name %>.min.js'
+                src: 'dist/js/<%= pkg.name %>-<%= pkg.version %>.js',
+                dest: 'release/js/<%= pkg.name %>-<%= pkg.version %>.min.js'
             }
         },
 
@@ -151,6 +158,7 @@ module.exports = function(grunt) {
 
     // grunt tasks
     grunt.registerTask('travis' , ['jshint', 'jasmine']);
-    grunt.registerTask('review' , ['jshint', 'clean', 'concat', 'sass', 'copy']);
-    grunt.registerTask('release', ['jshint', 'clean', 'concat', 'sass', 'copy', 'uglify', 'cssmin']);
+    grunt.registerTask('default', ['jshint', 'jasmine', 'clean', 'concat', 'sass', 'copy']);
+    grunt.registerTask('review' , ['jshint', 'jasmine', 'clean', 'concat', 'sass', 'copy']);
+    grunt.registerTask('release', ['jshint', 'jasmine', 'clean', 'concat', 'sass', 'copy', 'uglify', 'cssmin']);
 };

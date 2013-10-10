@@ -7,7 +7,7 @@
     "keywords"    : ["brick", "html5", "UI", "tookit"],
 
     "author"     : {
-        "name" : "builders",
+        "name" : "BR builders",
         "url"  : "https://github.com/leungwensen/brick/graphs/contributors"
     },
     "repository" : {
@@ -37,6 +37,15 @@
         "grunt-html-validation" : "~0.1.5",
         "grunt-jekyll"          : "~0.3.9"
     },
+
+    "jsFiles" : [
+        "js/brick.js",
+        "js/brick.validator.js",
+        "js/brick.array.js",
+        "js/brick.string.js",
+        "js/brick.number.js",
+        "js/brick.date.js"
+    ],
 
     "scripts" : {
         "test": "grunt travis --verbose"
