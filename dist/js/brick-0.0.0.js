@@ -7,21 +7,56 @@
 var BRICK, BR;
 BRICK = BR = {};
 (function () {
+    // getting the environment
     BR.GROUND = BR.GROUND || this;
 }());
 
 (function (BR, undefined) {
-    BR.validator = BR.validator || {};
+    BR.origin = BR.origin || {};
 
+    BR.origin.oneOf = BR.origin.oneOf || function (callbackList) {
+        var i, callback, returnValue;
+
+        for (i = 0; i < callbackList.length; i ++) {
+            callback = callbackList[i];
+            try {
+                returnValue = callback();
+                break;
+            } catch (e) {
+            }
+        }
+        return returnValue;
+    };
+}(BR));
+
+(function (BR, undefined) {
     /**
      * @description : isXxx, check if is Xxx.
      * @parameters  : {unknown} value, value to be tested.
      * @return      : {boolean} if test succeeded.
      * @syntax      : BR.validator.isXxx(value)
      */
-    BR.validator.isArray = Array.isArray;
-    BR.validator.isFunction = function (value) {
+    BR.isDefined = BR.isDefined || function (value) {
+        return (typeof value !== 'undefined');
+    };
+    BR.isFunction = BR.isFunction || function (value) {
         return (typeof value === 'function');
+    };
+    BR.isNumber = BR.isNumber || function (value) {
+        return (typeof value === 'number');
+    };
+    BR.isObject = BR.isObject || function (value) {
+        return (typeof value === 'object');
+    };
+    BR.isString = BR.isString || function (value) {
+        return (typeof value === 'string');
+    };
+    // extend of Javascript 1.8.5
+    /**
+     * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray
+     */
+    BR.isArray = BR.isArray || Array.isArray || function (value) {
+        return Object.prototype.toString.call(value) === "[object Array]";
     };
 }(BR));
 
@@ -106,7 +141,7 @@ BRICK = BR = {};
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/every
      */
     BR.array.prototype.every = BR.array.prototype.every || function (callback, thisObj) {
-        if (!BR.validator.isFunction(callback)) {
+        if (!BR.isFunction(callback)) {
             throw new TypeError();
         }
         var i,
@@ -128,7 +163,7 @@ BRICK = BR = {};
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter
      */
     BR.array.prototype.filter = BR.array.prototype.filter || function (callback, thisObj) {
-        if (!BR.validator.isFunction(callback)) {
+        if (!BR.isFunction(callback)) {
             throw new TypeError();
         }
         var i,
@@ -152,7 +187,7 @@ BRICK = BR = {};
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach
      */
     BR.array.prototype.forEach = BR.array.prototype.forEach || function(callback, thisObj) {
-        if (!BR.validator.isFunction(callback)) {
+        if (!BR.isFunction(callback)) {
             throw new TypeError();
         }
         var i,
@@ -163,6 +198,8 @@ BRICK = BR = {};
             }
         }
     };
+    // alias
+    BR.array.prototype.each = BR.array.prototype.each || BR.array.prototype.forEach;
     /**
      * @description : Creates a new array with the results of calling a provided function on every element in this array.
      * @parameters  : {function} callback , Function that produces an element of the new Array from an element of the current one.
@@ -173,7 +210,7 @@ BRICK = BR = {};
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map
      */
     BR.array.prototype.map = BR.array.prototype.map || function(callback, thisObj) {
-        if (!BR.validator.isFunction(callback)) {
+        if (!BR.isFunction(callback)) {
             throw new TypeError();
         }
         var i, kValue, mappedValue,
@@ -196,7 +233,7 @@ BRICK = BR = {};
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/some
      */
     BR.array.prototype.some = BR.array.prototype.some || function (callback, thisObj) {
-        if (!BR.validator.isFunction(callback)) {
+        if (!BR.isFunction(callback)) {
             throw new TypeError();
         }
         var i,
@@ -224,7 +261,7 @@ BRICK = BR = {};
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Reduce
      */
     BR.array.prototype.reduce = BR.array.prototype.reduce || function (callback, thisObj) {
-        if (!BR.validator.isFunction(callback)) {
+        if (!BR.isFunction(callback)) {
             throw new TypeError();
         }
         var i, value,
@@ -259,7 +296,7 @@ BRICK = BR = {};
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/ReduceRight
      */
     BR.array.prototype.reduceRight = BR.array.prototype.reduceRight || function (callback, thisObj) {
-        if (!BR.validator.isFunction(callback)) {
+        if (!BR.isFunction(callback)) {
             throw new TypeError();
         }
         var i, value,
@@ -294,7 +331,7 @@ BRICK = BR = {};
      * @syntax      : array.binarySearch(element, compareFunc)
      */
     BR.array.prototype.binarySearch = BR.array.prototype.binarySearch || function (element, compareFunc) {
-        if (!BR.validator.isFunction(compareFunc)) {
+        if (!BR.isFunction(compareFunc)) {
             throw new TypeError();
         }
         var start = 0,
@@ -364,7 +401,7 @@ BRICK = BR = {};
      * @syntax      : array.intersection(that)
      */
     BR.array.prototype.intersection = BR.array.prototype.intersection || function (that) {
-        if (!BR.validator.isArray(that)) {
+        if (!BR.isArray(that)) {
             throw new TypeError();
         }
         var i,
@@ -384,7 +421,7 @@ BRICK = BR = {};
      * @syntax      : array.complement(that)
      */
     BR.array.prototype.complement = BR.array.prototype.complement || function (that) {
-        if (!BR.validator.isArray(that)) {
+        if (!BR.isArray(that)) {
             throw new TypeError();
         }
         var i,
@@ -404,7 +441,7 @@ BRICK = BR = {};
      * @syntax      : array.intersection(that)
      */
     BR.array.prototype.union = BR.array.prototype.union || function (that) {
-        if (!BR.validator.isArray(that)) {
+        if (!BR.isArray(that)) {
             throw new TypeError();
         }
         return this.concat(that).uniq();
@@ -428,19 +465,7 @@ BRICK = BR = {};
 }(BR));
 
 (function (BR, undefined) {
-    BR.string = BR.string || String;
-
-    // extend of Javascript 1.8.1
-    /**
-     * @description : Removes whitespace from both ends of the string.
-     * @return      : {string} result string.
-     * @syntax      : string.trim()
-     *
-     * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/Trim
-     */
-    BR.string.prototype.trim = BR.string.prototype.trim || function () {
-        return this.replace(/^\s+|\s+$/g, '');
-    };
+    BR.bool = BR.bool || Boolean;
 }(BR));
 
 (function (BR, undefined) {
@@ -522,5 +547,197 @@ BRICK = BR = {};
                       .replace( '{h}'   , h              )
                       .replace( '{m}'   , mi             )
                       .replace( '{s}'   , s              );
+    };
+}(BR));
+
+(function (BR, undefined) {
+    BR.string = BR.string || String;
+
+    // extend of Javascript 1.8.1
+    /**
+     * @description : Removes whitespace from both ends of the string.
+     * @return      : {string} result string.
+     * @syntax      : string.trim()
+     *
+     * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/Trim
+     */
+    BR.string.prototype.trim = BR.string.prototype.trim || function () {
+        return this.replace(/^\s+|\s+$/g, '');
+    };
+}(BR));
+
+(function (BR, undefined) {
+    BR.object = BR.object || Object;
+
+    // extend of Javascript 1.8.x
+    /**
+     * @description : Executes a provided function once per object element.
+     * @parameters  : {function} callback , Function to execute for each element.
+     *                {object  } thisObj  , Object to use as this when executing callback.
+     * @syntax      : object.forEach(callback[, thisObj])
+     */
+    BR.object.prototype.forEach = BR.object.prototype.forEach || function(callback, thisObj){
+        var key;
+        for (key in this){
+            if (this.hasOwnProperty(key)) {
+                callback.call(thisObj, this[key], key, this);
+            }
+        }
+    };
+    // alias
+    BR.object.prototype.each = BR.object.prototype.each || BR.object.prototype.forEach;
+}(BR));
+
+(function (BR, undefined) {
+    BR.JSON = BR.JSON || {};
+    var _originJSON = BR.origin.oneOf([
+            function () { return JSON; },
+            function () { return BR.GROUND.JSON; }
+        ]);
+    if (BR.isDefined(_originJSON)) {
+        BR.JSON = _originJSON;
+        return;
+    }
+
+    var gap, indent, rep,
+        cx = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
+        escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
+        meta = {    // table of character substitutions
+            '\b': '\\b',
+            '\t': '\\t',
+            '\n': '\\n',
+            '\f': '\\f',
+            '\r': '\\r',
+            '"' : '\\"',
+            '\\': '\\\\'
+        },
+        _toJSON = function () {
+            return this.valueOf();
+        },
+        quote = function (string) {
+            escapable.lastIndex = 0;
+            return escapable.test(string) ? '"' + string.replace(escapable, function (a) {
+                var c = meta[a];
+                return BR.isString(c) ? c : '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
+            }) + '"' : '"' + string + '"';
+        },
+        str = function (key, holder) {
+            var i, k, v, length, partial,
+                mind = gap,
+                value = holder[key];
+            if (value && BR.isObject(value) && BR.isFunction(value.toJSON)) {
+                value = value.toJSON(key);
+            }
+            if (BR.isFunction(rep)) {
+                value = rep.call(holder, key, value);
+            }
+            switch (typeof value) {
+                case 'string':
+                    return quote(value);
+                case 'number':
+                    return isFinite(value) ? String(value) : 'null';
+                case 'boolean':
+                case 'null':
+                    return String(value);
+                case 'object':
+                    if (!value) {
+                        return 'null';
+                    }
+                    gap += indent;
+                    partial = [];
+                    if (Object.prototype.toString.apply(value) === '[object Array]') {
+                        length = value.length;
+                        for (i = 0; i < length; i += 1) {
+                            partial[i] = str(i, value) || 'null';
+                        }
+                        v = (partial.length === 0) ? '[]' : gap ? '[\n' + gap + partial.join(',\n' + gap) + '\n' + mind + ']' : '[' + partial.join(',') + ']';
+                        gap = mind;
+                        return v;
+                    }
+                    if (rep && BR.isObject(rep)) {
+                        length = rep.length;
+                        for (i = 0; i < length; i += 1) {
+                            if (BR.isString(rep[i])) {
+                                k = rep[i];
+                                v = str(k, value);
+                                if (v) {
+                                    partial.push(quote(k) + (gap ? ': ' : ':') + v);
+                                }
+                            }
+                        }
+                    } else {
+                        for (k in value) {
+                            if (Object.prototype.hasOwnProperty.call(value, k)) {
+                                v = str(k, value);
+                                if (v) {
+                                    partial.push(quote(k) + (gap ? ': ' : ':') + v);
+                                }
+                            }
+                        }
+                    }
+                    v = (partial.length === 0) ? '{}' : gap ? '{\n' + gap + partial.join(',\n' + gap) + '\n' + mind + '}' : '{' + partial.join(',') + '}';
+                    gap = mind;
+                    return v;
+            }
+        };
+
+    String.prototype.toJSON  = String.prototype.toJSON  || _toJSON;
+    Number.prototype.toJSON  = Number.prototype.toJSON  || _toJSON;
+    Boolean.prototype.toJSON = Boolean.prototype.toJSON || _toJSON;
+    Date.prototype.toJSON    = Date.prototype.toJSON    || function () {
+        return isFinite(this.valueOf()) ? this.toFormatString('{YYY}-{MM}-{DD}T{hh}:{mm}:{ss}Z') : null;
+    };
+
+    BR.JSON.stringify = BR.JSON.stringify || function (value, replacer, space) {
+        var i;
+        gap = '';
+        indent = '';
+        rep = replacer;
+
+        if (BR.isNumber(space)) {
+            for (i = 0; i < space; i += 1) {
+                indent += ' ';
+            }
+        } else if (BR.isString(space)) {
+            indent = space;
+        }
+        if (replacer && !BR.isFunction(replacer) && (!BR.isObject(replacer) || !BR.isNumber(replacer.length))) {
+            throw new Error('JSON.stringify');
+        }
+        return str('', {'': value});
+    };
+    BR.JSON.parse = BR.JSON.parse || function (text, reviver) {
+        var j,
+            walk = function (holder, key) {
+                var k, v,
+                    value = holder[key];
+                if (value && BR.isObject(value)) {
+                    for (k in value) {
+                        if (Object.prototype.hasOwnProperty.call(value, k)) {
+                            v = walk(value, k);
+                            if (v !== undefined) {
+                                value[k] = v;
+                            } else {
+                                delete value[k];
+                            }
+                        }
+                    }
+                }
+                return reviver.call(holder, key, value);
+            };
+        text = String(text);
+        cx.lastIndex = 0;
+        if (cx.test(text)) {
+            text = text.replace(cx, function (a) {
+                return '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
+            });
+        }
+        if (/^[\],:{}\s]*$/.test(text.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, '@')
+                                     .replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']')
+                                     .replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
+            /*jshint -W061 */ j = eval('(' + text + ')');
+            return (BR.isFunction(reviver)) ? walk({'': j}, '') : j;
+        }
+        throw new SyntaxError('JSON.parse');
     };
 }(BR));

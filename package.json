@@ -40,11 +40,15 @@
 
     "jsFiles" : [
         "js/brick.js",
+        "js/brick.origin.js",
         "js/brick.validator.js",
         "js/brick.array.js",
-        "js/brick.string.js",
+        "js/brick.bool.js",
         "js/brick.number.js",
-        "js/brick.date.js"
+        "js/brick.date.js",
+        "js/brick.string.js",
+        "js/brick.object.js",
+        "js/brick.json.js"
     ],
 
     "scripts" : {

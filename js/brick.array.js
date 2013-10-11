@@ -86,7 +86,7 @@
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/every
      */
     BR.array.prototype.every = BR.array.prototype.every || function (callback, thisObj) {
-        if (!BR.validator.isFunction(callback)) {
+        if (!BR.isFunction(callback)) {
             throw new TypeError();
         }
         var i,
@@ -108,7 +108,7 @@
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter
      */
     BR.array.prototype.filter = BR.array.prototype.filter || function (callback, thisObj) {
-        if (!BR.validator.isFunction(callback)) {
+        if (!BR.isFunction(callback)) {
             throw new TypeError();
         }
         var i,
@@ -132,7 +132,7 @@
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach
      */
     BR.array.prototype.forEach = BR.array.prototype.forEach || function(callback, thisObj) {
-        if (!BR.validator.isFunction(callback)) {
+        if (!BR.isFunction(callback)) {
             throw new TypeError();
         }
         var i,
@@ -143,6 +143,8 @@
             }
         }
     };
+    // alias
+    BR.array.prototype.each = BR.array.prototype.each || BR.array.prototype.forEach;
     /**
      * @description : Creates a new array with the results of calling a provided function on every element in this array.
      * @parameters  : {function} callback , Function that produces an element of the new Array from an element of the current one.
@@ -153,7 +155,7 @@
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map
      */
     BR.array.prototype.map = BR.array.prototype.map || function(callback, thisObj) {
-        if (!BR.validator.isFunction(callback)) {
+        if (!BR.isFunction(callback)) {
             throw new TypeError();
         }
         var i, kValue, mappedValue,
@@ -176,7 +178,7 @@
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/some
      */
     BR.array.prototype.some = BR.array.prototype.some || function (callback, thisObj) {
-        if (!BR.validator.isFunction(callback)) {
+        if (!BR.isFunction(callback)) {
             throw new TypeError();
         }
         var i,
@@ -204,7 +206,7 @@
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Reduce
      */
     BR.array.prototype.reduce = BR.array.prototype.reduce || function (callback, thisObj) {
-        if (!BR.validator.isFunction(callback)) {
+        if (!BR.isFunction(callback)) {
             throw new TypeError();
         }
         var i, value,
@@ -239,7 +241,7 @@
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/ReduceRight
      */
     BR.array.prototype.reduceRight = BR.array.prototype.reduceRight || function (callback, thisObj) {
-        if (!BR.validator.isFunction(callback)) {
+        if (!BR.isFunction(callback)) {
             throw new TypeError();
         }
         var i, value,
@@ -274,7 +276,7 @@
      * @syntax      : array.binarySearch(element, compareFunc)
      */
     BR.array.prototype.binarySearch = BR.array.prototype.binarySearch || function (element, compareFunc) {
-        if (!BR.validator.isFunction(compareFunc)) {
+        if (!BR.isFunction(compareFunc)) {
             throw new TypeError();
         }
         var start = 0,
@@ -344,7 +346,7 @@
      * @syntax      : array.intersection(that)
      */
     BR.array.prototype.intersection = BR.array.prototype.intersection || function (that) {
-        if (!BR.validator.isArray(that)) {
+        if (!BR.isArray(that)) {
             throw new TypeError();
         }
         var i,
@@ -364,7 +366,7 @@
      * @syntax      : array.complement(that)
      */
     BR.array.prototype.complement = BR.array.prototype.complement || function (that) {
-        if (!BR.validator.isArray(that)) {
+        if (!BR.isArray(that)) {
             throw new TypeError();
         }
         var i,
@@ -384,7 +386,7 @@
      * @syntax      : array.intersection(that)
      */
     BR.array.prototype.union = BR.array.prototype.union || function (that) {
-        if (!BR.validator.isArray(that)) {
+        if (!BR.isArray(that)) {
             throw new TypeError();
         }
         return this.concat(that).uniq();

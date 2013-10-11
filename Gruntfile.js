@@ -53,16 +53,16 @@ module.exports = function(grunt) {
             }
         },
         jasmine: {
-            src : 'js/brick.*.js',
+            src : 'dist/js/*.js',
             options : {
                 specs  : 'spec/brick.*.spec.js',
-                vendor : 'js/brick.js'
+                vendor : 'dist/js/*.js'
             }
         },
         sass: {
             dist: {
                 files: {
-                    'dist/css/<%= pkg.name %>.css': 'scss/<%= pkg.name %>.scss'
+                    'dist/css/<%= pkg.name %>-<%= pkg.version %>.css': 'scss/<%= pkg.name %>.scss'
                 }
             }
         },
@@ -87,7 +87,9 @@ module.exports = function(grunt) {
                     banner: '<%= banner %>'
                 },
                 files: {
-                    'dist/css/<%= pkg.name %>.css': ['dist/css/<%= pkg.name %>.css']
+                    'release/css/<%= pkg.name %>-<%= pkg.version %>.min.css': [
+                        'dist/css/<%= pkg.name %>-<%= pkg.version %>.css'
+                    ]
                 }
             },
             minify: {
@@ -157,8 +159,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-jekyll'         );
 
     // grunt tasks
-    grunt.registerTask('travis' , ['jshint', 'jasmine']);
-    grunt.registerTask('default', ['jshint', 'jasmine', 'clean', 'concat', 'sass', 'copy']);
-    grunt.registerTask('review' , ['jshint', 'jasmine', 'clean', 'concat', 'sass', 'copy']);
-    grunt.registerTask('release', ['jshint', 'jasmine', 'clean', 'concat', 'sass', 'copy', 'uglify', 'cssmin']);
+    grunt.registerTask('travis' , ['jshint', 'concat', 'jasmine']);
+    grunt.registerTask('default', ['jshint', 'concat', 'jasmine', 'clean', 'sass', 'copy']);
+    grunt.registerTask('release', ['jshint', 'concat', 'jasmine', 'clean', 'sass', 'copy', 'uglify', 'cssmin']);
 };

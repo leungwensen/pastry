@@ -8,5 +8,6 @@
 var BRICK, BR;
 BRICK = BR = {};
 (function () {
+    // getting the environment
     BR.GROUND = BR.GROUND || this;
 }());
