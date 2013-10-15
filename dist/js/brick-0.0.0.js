@@ -8,12 +8,20 @@ var BRICK, BR;
 BRICK = BR = {};
 (function () {
     // getting the environment
+    /*
+     * @syntax : BR.GROUND
+     */
     BR.GROUND = BR.GROUND || this;
 }());
 
 (function (BR) {
     BR.origin = BR.origin || {};
 
+    /*
+     * @param  : {array  } callbackList, list of callback functions.
+     * @return : {unknown} value the callback functions try to return.
+     * @syntax : BR.origin.tryOneOf(callbackList)
+     */
     BR.origin.tryOneOf = BR.origin.tryOneOf || function (callbackList) {
         var i, callback, returnValue;
 
@@ -34,35 +42,54 @@ BRICK = BR = {};
      * @description : isXxx, check if is Xxx.
      * @parameters  : {unknown} value, value to be tested.
      * @return      : {boolean} if test succeeded.
-     * @syntax      : BR.validator.isXxx(value)
+     * @syntax      : BR.isXxx(value)
      */
 
+    /**
+     * @syntax : BR.isDefined(value)
+     */
     BR.isDefined = BR.isDefined || function (value) {
         return (typeof value !== 'undefined');
     };
+    /**
+     * @syntax : BR.isUndefined(value)
+     */
     BR.isUndefined = BR.isUndefined || function (value) {
         return (typeof value === 'undefined');
     };
 
+    /**
+     * @syntax : BR.isFunction(value)
+     */
     BR.isFunction = BR.isFunction || function (value) {
         return (typeof value === 'function');
     };
 
+    /**
+     * @syntax : BR.isFunction(value)
+     */
     BR.isNumber = BR.isNumber || function (value) {
         return (typeof value === 'number');
     };
 
+    /**
+     * @syntax : BR.isObject(value)
+     */
     BR.isObject = BR.isObject || function (value) {
         return (typeof value === 'object');
     };
 
+    /**
+     * @syntax : BR.isString(value)
+     */
     BR.isString = BR.isString || function (value) {
         return (typeof value === 'string');
     };
 
     // extend of Javascript 1.8.5
     /**
-     * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray
+     * @syntax     : BR.isArray(value)
+     * @refference : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray
      */
     BR.isArray = BR.isArray || Array.isArray || function (value) {
         return Object.prototype.toString.call(value) === "[object Array]";
@@ -76,11 +103,10 @@ BRICK = BR = {};
     // extend of Javascript 1.6
     /**
      * @description : Returns the first index at which a given element can be found in the array, or -1 if it is not present.
-     * @parameters  : {object} searchElement , Element to locate in the array.
-     *                {number} fromIndex     , The index to start the search at. Default: 0 (Entire array is searched).
+     * @param       : {object} searchElement , Element to locate in the array.
+     * @param       : {number} fromIndex     , The index to start the search at. Default: 0 (Entire array is searched).
      * @return      : {number} index of element.
      * @syntax      : array.indexOf(searchElement[, fromIndex])
-     *
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf
      */
     BR.array.prototype.indexOf = BR.array.prototype.indexOf || function (searchElement, fromIndex) {
@@ -104,11 +130,10 @@ BRICK = BR = {};
     };
     /**
      * @description : Returns the last index at which a given element can be found in the array, or -1 if it is not present. The array is searched backwards, starting at fromIndex.
-     * @parameters  : {object} searchElement , Element to locate in the array.
-     *                {number} fromIndex     , The index at which to start searching backwards. Defaults to the array's length.
+     * @param       : {object} searchElement , Element to locate in the array.
+     * @param       : {number} fromIndex     , The index at which to start searching backwards. Defaults to the array's length.
      * @return      : {number} index of element.
      * @syntax      : array.lastIndexOf(searchElement[, fromIndex])
-     *
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/lastIndexOf
      */
     BR.array.prototype.lastIndexOf = BR.array.prototype.lastIndexOf || function (searchElement, fromIndex) {
@@ -129,11 +154,10 @@ BRICK = BR = {};
     };
     /**
      * @description : Tests whether all elements in the array pass the test implemented by the provided function.
-     * @parameters  : {function} callback , Function to test for each element.
-     *                {object  } thisObj  , Object to use as this when executing callback.
+     * @param       : {function} callback , Function to test for each element.
+     * @param       : {object  } thisObj  , Object to use as this when executing callback.
      * @return      : {boolean } if test succeeded or not.
      * @syntax      : array.every(callback[, thisObj])
-     *
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/every
      */
     BR.array.prototype.every = BR.array.prototype.every || function (callback, thisObj) {
@@ -148,11 +172,10 @@ BRICK = BR = {};
     };
     /**
      * @description : Creates a new array with all elements that pass the test implemented by the provided function.
-     * @parameters  : {function} callback , Function to test each element of the array.
-     *                {object  } thisObj  , Object to use as this when executing callback.
+     * @param       : {function} callback , Function to test each element of the array.
+     * @param       : {object  } thisObj  , Object to use as this when executing callback.
      * @return      : {array   } result array.
      * @syntax      : array.filter(callback[, thisObj])
-     *
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter
      */
     BR.array.prototype.filter = BR.array.prototype.filter || function (callback, thisObj) {
@@ -170,10 +193,9 @@ BRICK = BR = {};
     };
     /**
      * @description : Executes a provided function once per array element.
-     * @parameters  : {function} callback , Function to execute for each element.
-     *                {object  } thisObj  , Object to use as this when executing callback.
+     * @param       : {function} callback , Function to execute for each element.
+     * @param       : {object  } thisObj  , Object to use as this when executing callback.
      * @syntax      : array.forEach(callback[, thisObj])
-     *
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach
      */
     BR.array.prototype.forEach = BR.array.prototype.forEach || function(callback, thisObj) {
@@ -189,11 +211,10 @@ BRICK = BR = {};
     BR.array.prototype.each = BR.array.prototype.each || BR.array.prototype.forEach;
     /**
      * @description : Creates a new array with the results of calling a provided function on every element in this array.
-     * @parameters  : {function} callback , Function that produces an element of the new Array from an element of the current one.
-     *                {object  } thisObj  , Object to use as this when executing callback.
+     * @param       : {function} callback , Function that produces an element of the new Array from an element of the current one.
+     * @param       : {object  } thisObj  , Object to use as this when executing callback.
      * @return      : {array   } result array.
      * @syntax      : array.map(callback[, thisObj])
-     *
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map
      */
     BR.array.prototype.map = BR.array.prototype.map || function(callback, thisObj) {
@@ -209,11 +230,10 @@ BRICK = BR = {};
     };
     /**
      * @description : Tests whether some element in the array passes the test implemented by the provided function.
-     * @parameters  : {function} callback , Function to test for each element.
-     *                {object  } thisObj  , Object to use as this when executing callback.
+     * @param       : {function} callback , Function to test for each element.
+     * @param       : {object  } thisObj  , Object to use as this when executing callback.
      * @return      : {boolean } if test succeeded or not.
      * @syntax      : array.some(callback[, thisObj])
-     *
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/some
      */
     BR.array.prototype.some = BR.array.prototype.some || function (callback, thisObj) {
@@ -229,17 +249,16 @@ BRICK = BR = {};
 
     // extend of Javascript 1.8
     /**
-     * @description : Apply a function against an accumulator and each value of the array (from left-to-right) as to reduce it to a single value.
-     * @parameters  : {function} callback , Function to execute on each value in the array, taking four arguments:
-     *                    {object} previousValue , The value previously returned in the last invocation of the callback, or initialValue, if supplied.
-     *                    {object} currentValue  , The current element being processed in the array.
-     *                    {number} index         , The index of the current element being processed in the array.
-     *                    {array } array         , The array reduce was called upon.
-     *                {object  } thisObj  , Object to use as the first argument to the first call of the callback.
-     * @return      : {object  } result value.
-     * @syntax      : array.reduce(callback[, thisObj])
-     *
-     * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Reduce
+     * @description     : Apply a function against an accumulator and each value of the array (from left-to-right) as to reduce it to a single value.
+     * @param           : {function} callback      , Function to execute on each value in the array, taking four arguments:
+     * @param           : {object  } thisObj       , Object to use as the first argument to the first call of the callback.
+     * @paramOfCallback : {object  } previousValue , The value previously returned in the last invocation of the callback, or initialValue, if supplied.
+     * @paramOfCallback : {object  } currentValue  , The current element being processed in the array.
+     * @paramOfCallback : {number  } index         , The index of the current element being processed in the array.
+     * @paramOfCallback : {array   } array         , The array reduce was called upon.
+     * @return          : {object  } result value.
+     * @syntax          : array.reduce(callback[, thisObj])
+     * @refference      : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Reduce
      */
     BR.array.prototype.reduce = BR.array.prototype.reduce || function (callback, thisObj) {
         var i, value,
@@ -266,11 +285,10 @@ BRICK = BR = {};
     };
     /**
      * @description : Apply a function simultaneously against two values of the array (from right-to-left) as to reduce it to a single value.
-     * @parameters  : {function} callback , Function to execute on each value in the array.
-     *                {object  } thisObj  , Object to use as the first argument to the first call of the callback.
+     * @param       : {function} callback , Function to execute on each value in the array.
+     * @param       : {object  } thisObj  , Object to use as the first argument to the first call of the callback.
      * @return      : {object  } result value.
      * @syntax      : array.reduceRight(callback[, thisObj])
-     *
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/ReduceRight
      */
     BR.array.prototype.reduceRight = BR.array.prototype.reduceRight || function (callback, thisObj) {
@@ -300,8 +318,8 @@ BRICK = BR = {};
     // extend of Brick
     /**
      * @description : binarySearch.
-     * @parameters  : {object  } element     , element to be searched.
-     *                {function} compareFunc , compare function executed when searching.
+     * @param       : {object  } element     , element to be searched.
+     * @param       : {function} compareFunc , compare function executed when searching.
      * @return      : {number  } result index.
      * @syntax      : array.binarySearch(element, compareFunc)
      */
@@ -322,10 +340,9 @@ BRICK = BR = {};
     };
     /**
      * @description : Remove elements according to the given fromIndex and toIndex, and return the rest array.
-     * @parameters  : {number} fromIndex , index to remove from.
-     *                {number} toIndex   , index to remove to.
+     * @param       : {number} fromIndex , index to remove from.
+     * @param       : {number} toIndex   , index to remove to.
      * @syntax      : array.remove([fromIndex[, toIndex]])
-     *
      * @refference  : Array Remove - By John Resig (MIT Licensed)
      */
     BR.array.prototype.remove = BR.array.prototype.remove || function (fromIndex, toIndex) {
@@ -338,8 +355,8 @@ BRICK = BR = {};
     };
     /**
      * @description : replace.
-     * @parameters  : {object} element     , element to be replaced.
-     *                {object} withElement , element to replace with.
+     * @param       : {object} element     , element to be replaced.
+     * @param       : {object} withElement , element to replace with.
      * @syntax      : array.replace(element, withElement)
      */
     BR.array.prototype.replace = BR.array.prototype.replace || function (element, withElement) {
@@ -354,16 +371,16 @@ BRICK = BR = {};
 
     /**
      * @description : test if array has an element.
-     * @parameters  : {object } element, element to be tested.
+     * @param       : {object } element, element to be tested.
      * @return      : {boolean} if array has the element.
-     * @syntax      : array.ifContain
+     * @syntax      : array.hasElement(element)
      */
     BR.array.prototype.hasElement = BR.array.prototype.hasElement || function (element) {
         return (this.indexOf(element) > -1);
     };
     /**
      * @description : intersection set of two arrays (this ∩ that)
-     * @parameters  : {array} that, the array to get intersection set with.
+     * @param       : {array} that, the array to get intersection set with.
      * @return      : {array} result array.
      * @syntax      : array.intersection(that)
      */
@@ -380,7 +397,7 @@ BRICK = BR = {};
     };
     /**
      * @description : complement set of two arrays (this - that)
-     * @parameters  : {array} that, the array to get complement set with.
+     * @param       : {array} that, the array to get complement set with.
      * @return      : {array} result array.
      * @syntax      : array.complement(that)
      */
@@ -397,7 +414,7 @@ BRICK = BR = {};
     };
     /**
      * @description : union set of two arrays (this U that)
-     * @parameters  : {array} that, the array to get union set with.
+     * @param       : {array} that, the array to get union set with.
      * @return      : {array} result array.
      * @syntax      : array.intersection(that)
      */
@@ -431,13 +448,8 @@ BRICK = BR = {};
 
     /**
      * @description : return stringified number according to given pattern.
-     * @parameters  : {object} option, defines pattern for stringify.
-     *                    {
-     *                        comma   : {1|0},
-     *                        decimal : {>=0},
-     *                        integer : {>=0},
-     *                        zero    : {1|0},
-     *                    }
+     * @param       : {object} option, defines pattern for stringify.
+     * @example     : {"comma": "1|0", "decimal": ">=0", "integer" : ">=0", "zero": "1|0"}
      * @return      : {string} result string.
      * @syntax      : number.toFormatString([option])
      */
@@ -484,11 +496,11 @@ BRICK = BR = {};
     };
     /**
      * @description : return stringified date according to given pattern.
-     * @parameters  : {string} pattern, defines pattern for stringify.
-     *                    default : '{YYYY}-{MM}-{DD} {hh}:{mm}:{ss}' => '2013-10-03 00:57::13'
-     *                    other   : '{YY}-{M}-{D} {h}:{m}:{s}'        => '2013-10-3 0:57::13'
+     * @param       : {string} pattern, defines pattern for stringify.
      * @return      : {string} result string.
      * @syntax      : date.toFormatString([pattern])
+     * @example     : '{YYYY}-{MM}-{DD} {hh}:{mm}:{ss}' => '2013-10-03 00:57::13'
+     * @example     : '{YY}-{M}-{D} {h}:{m}:{s}'        => '2013-10-3 0:57::13'
      */
     BR.date.prototype.toFormatString = BR.date.prototype.toFormatString || function (pattern) {
         var y, mo, d, h, mi, s;
@@ -516,7 +528,6 @@ BRICK = BR = {};
      * @description : Removes whitespace from both ends of the string.
      * @return      : {string} result string.
      * @syntax      : string.trim()
-     *
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/Trim
      */
     BR.string.prototype.trim = BR.string.prototype.trim || function () {
@@ -530,8 +541,8 @@ BRICK = BR = {};
     // extend of Javascript 1.8.x
     /**
      * @description : Executes a provided function once per object element.
-     * @parameters  : {function} callback , Function to execute for each element.
-     *                {object  } thisObj  , Object to use as this when executing callback.
+     * @param       : {function} callback , Function to execute for each element.
+     * @param       : {object  } thisObj  , Object to use as this when executing callback.
      * @syntax      : object.forEach(callback[, thisObj])
      */
     BR.object.prototype.forEach = BR.object.prototype.forEach || function (callback, thisObj) {
@@ -546,7 +557,7 @@ BRICK = BR = {};
     BR.object.prototype.each = BR.object.prototype.each || BR.object.prototype.forEach;
     /**
      * @description : returns an array whose elements are strings corresponding to the enumerable properties found directly upon object.
-     * @parameters  : {object} obj, Object to get keys from.
+     * @param       : {object} obj, Object to get keys from.
      * @syntax      : BR.object.keys(obj)
      */
     BR.object.keys = BR.object.keys || function (obj) {
@@ -578,7 +589,7 @@ BRICK = BR = {};
     };
     /**
      * @description : returns an array whose elements are values of the object.
-     * @parameters  : {object} obj, Object to get values from.
+     * @param       : {object} obj, Object to get values from.
      * @syntax      : BR.object.values(obj)
      */
     BR.object.values = BR.object.values || function (obj) {
@@ -600,7 +611,7 @@ BRICK = BR = {};
     };
     /**
      * @description : check if the object has the key
-     * @parameters  : {string} key, key to check
+     * @param       : {string} key, key to check
      * @syntax      : object.hasKey(key)
      */
     BR.object.prototype.hasKey = BR.object.prototype.hasKey || function (key) {
@@ -608,8 +619,8 @@ BRICK = BR = {};
     };
     /**
      * @description : check if the object has the value
-     * @parameters  : {unknown} value, value to check.
-     * @syntax : object.hasValue(value)
+     * @param       : {unknown} value, value to check.
+     * @syntax      : object.hasValue(value)
      */
     BR.object.prototype.hasValue = BR.object.prototype.hasValue || function (value) {
         return (this.values().indexOf(value) > -1);
@@ -716,6 +727,12 @@ BRICK = BR = {};
         return isFinite(this.valueOf()) ? this.toFormatString('{YYY}-{MM}-{DD}T{hh}:{mm}:{ss}Z') : null;
     };
 
+    /**
+     * @description : stringify a JSON object.
+     * @param       : {unknown} value, value to be stringified
+     * @return      : {string } result string.
+     * @syntax      : BR.JSON.stringify(value).
+     */
     BR.JSON.stringify = BR.JSON.stringify || function (value, replacer, space) {
         var i;
         gap = '';
@@ -734,6 +751,13 @@ BRICK = BR = {};
         }
         return str('', {'': value});
     };
+
+    /**
+     * @description : parse a string to JSON object
+     * @param       : {string } string, string to parse
+     * @return      : {unknown} result object.
+     * @syntax      : BR.JSON.parse(string).
+     */
     BR.JSON.parse = BR.JSON.parse || function (text, reviver) {
         var j,
             walk = function (holder, key) {
@@ -763,7 +787,7 @@ BRICK = BR = {};
         if (/^[\],:{}\s]*$/.test(text.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, '@')
                                      .replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']')
                                      .replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
-            /*jshint -W061 */ j = eval('(' + text + ')');
+            /* jshint -W061 */ j = eval('(' + text + ')');
             return (BR.isFunction(reviver)) ? walk({'': j}, '') : j;
         }
         throw new SyntaxError('JSON.parse');

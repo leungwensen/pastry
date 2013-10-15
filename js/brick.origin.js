@@ -8,6 +8,11 @@
 (function (BR) {
     BR.origin = BR.origin || {};
 
+    /*
+     * @param  : {array  } callbackList, list of callback functions.
+     * @return : {unknown} value the callback functions try to return.
+     * @syntax : BR.origin.tryOneOf(callbackList)
+     */
     BR.origin.tryOneOf = BR.origin.tryOneOf || function (callbackList) {
         var i, callback, returnValue;
 

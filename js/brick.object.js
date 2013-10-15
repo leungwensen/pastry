@@ -11,8 +11,8 @@
     // extend of Javascript 1.8.x
     /**
      * @description : Executes a provided function once per object element.
-     * @parameters  : {function} callback , Function to execute for each element.
-     *                {object  } thisObj  , Object to use as this when executing callback.
+     * @param       : {function} callback , Function to execute for each element.
+     * @param       : {object  } thisObj  , Object to use as this when executing callback.
      * @syntax      : object.forEach(callback[, thisObj])
      */
     BR.object.prototype.forEach = BR.object.prototype.forEach || function (callback, thisObj) {
@@ -27,7 +27,7 @@
     BR.object.prototype.each = BR.object.prototype.each || BR.object.prototype.forEach;
     /**
      * @description : returns an array whose elements are strings corresponding to the enumerable properties found directly upon object.
-     * @parameters  : {object} obj, Object to get keys from.
+     * @param       : {object} obj, Object to get keys from.
      * @syntax      : BR.object.keys(obj)
      */
     BR.object.keys = BR.object.keys || function (obj) {
@@ -59,7 +59,7 @@
     };
     /**
      * @description : returns an array whose elements are values of the object.
-     * @parameters  : {object} obj, Object to get values from.
+     * @param       : {object} obj, Object to get values from.
      * @syntax      : BR.object.values(obj)
      */
     BR.object.values = BR.object.values || function (obj) {
@@ -81,7 +81,7 @@
     };
     /**
      * @description : check if the object has the key
-     * @parameters  : {string} key, key to check
+     * @param       : {string} key, key to check
      * @syntax      : object.hasKey(key)
      */
     BR.object.prototype.hasKey = BR.object.prototype.hasKey || function (key) {
@@ -89,8 +89,8 @@
     };
     /**
      * @description : check if the object has the value
-     * @parameters  : {unknown} value, value to check.
-     * @syntax : object.hasValue(value)
+     * @param       : {unknown} value, value to check.
+     * @syntax      : object.hasValue(value)
      */
     BR.object.prototype.hasValue = BR.object.prototype.hasValue || function (value) {
         return (this.values().indexOf(value) > -1);

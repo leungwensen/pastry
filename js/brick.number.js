@@ -10,13 +10,8 @@
 
     /**
      * @description : return stringified number according to given pattern.
-     * @parameters  : {object} option, defines pattern for stringify.
-     *                    {
-     *                        comma   : {1|0},
-     *                        decimal : {>=0},
-     *                        integer : {>=0},
-     *                        zero    : {1|0},
-     *                    }
+     * @param       : {object} option, defines pattern for stringify.
+     * @example     : {"comma": "1|0", "decimal": ">=0", "integer" : ">=0", "zero": "1|0"}
      * @return      : {string} result string.
      * @syntax      : number.toFormatString([option])
      */

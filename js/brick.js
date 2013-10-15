@@ -9,5 +9,8 @@ var BRICK, BR;
 BRICK = BR = {};
 (function () {
     // getting the environment
+    /*
+     * @syntax : BR.GROUND
+     */
     BR.GROUND = BR.GROUND || this;
 }());

@@ -23,6 +23,7 @@
     "dependencies"    : { },
     "devDependencies" : {
         "browserstack-runner"   : "~0.0.12",
+        "commander"             : "~2.0.0",
         "grunt"                 : "~0.4.1",
         "grunt-contrib-clean"   : "~0.5.0",
         "grunt-contrib-connect" : "~0.4.1",
@@ -52,7 +53,6 @@
     ],
 
     "scripts" : {
-        "test"    : "grunt travis --verbose",
-        "release" : "grunt release"
+        "test"    : "grunt travis --verbose"
     }
 }

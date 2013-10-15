@@ -13,11 +13,11 @@
     };
     /**
      * @description : return stringified date according to given pattern.
-     * @parameters  : {string} pattern, defines pattern for stringify.
-     *                    default : '{YYYY}-{MM}-{DD} {hh}:{mm}:{ss}' => '2013-10-03 00:57::13'
-     *                    other   : '{YY}-{M}-{D} {h}:{m}:{s}'        => '2013-10-3 0:57::13'
+     * @param       : {string} pattern, defines pattern for stringify.
      * @return      : {string} result string.
      * @syntax      : date.toFormatString([pattern])
+     * @example     : '{YYYY}-{MM}-{DD} {hh}:{mm}:{ss}' => '2013-10-03 00:57::13'
+     * @example     : '{YY}-{M}-{D} {h}:{m}:{s}'        => '2013-10-3 0:57::13'
      */
     BR.date.prototype.toFormatString = BR.date.prototype.toFormatString || function (pattern) {
         var y, mo, d, h, mi, s;

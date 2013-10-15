@@ -2,7 +2,6 @@
  * @description : extend for JSON
  * @filename    : brick.json.js
  * @requires    : [brick.js, brick.validator.js, brick.origin.js]
- *
  * @refference  : https://github.com/douglascrockford/JSON-js/blob/master/json2.js
  */
 'use strict';
@@ -107,6 +106,12 @@
         return isFinite(this.valueOf()) ? this.toFormatString('{YYY}-{MM}-{DD}T{hh}:{mm}:{ss}Z') : null;
     };
 
+    /**
+     * @description : stringify a JSON object.
+     * @param       : {unknown} value, value to be stringified
+     * @return      : {string } result string.
+     * @syntax      : BR.JSON.stringify(value).
+     */
     BR.JSON.stringify = BR.JSON.stringify || function (value, replacer, space) {
         var i;
         gap = '';
@@ -125,6 +130,13 @@
         }
         return str('', {'': value});
     };
+
+    /**
+     * @description : parse a string to JSON object
+     * @param       : {string } string, string to parse
+     * @return      : {unknown} result object.
+     * @syntax      : BR.JSON.parse(string).
+     */
     BR.JSON.parse = BR.JSON.parse || function (text, reviver) {
         var j,
             walk = function (holder, key) {
@@ -154,7 +166,7 @@
         if (/^[\],:{}\s]*$/.test(text.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, '@')
                                      .replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']')
                                      .replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
-            /*jshint -W061 */ j = eval('(' + text + ')');
+            /* jshint -W061 */ j = eval('(' + text + ')');
             return (BR.isFunction(reviver)) ? walk({'': j}, '') : j;
         }
         throw new SyntaxError('JSON.parse');
