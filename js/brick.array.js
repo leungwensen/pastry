@@ -5,18 +5,8 @@
  */
 'use strict';
 
-(function (BR, undefined) {
+(function (BR) {
     BR.array = BR.array || Array;
-
-    // prettify array index
-    var prettifyArrayIndex = function (index) {
-        if (isNaN(index)) {
-            index = 0;
-        } else if (index !== 0 && index !== Infinity && index !== -Infinity) {
-            index = (index > 0 || -1) * Math.floor(Math.abs(index));
-        }
-        return index;
-    };
 
     // extend of Javascript 1.6
     /**
@@ -34,9 +24,7 @@
         if (len === 0) {
             return -1;
         }
-        if (fromIndex) {
-            fromIndex = prettifyArrayIndex(fromIndex);
-        } else {
+        if (BR.isUndefined(fromIndex)) {
             fromIndex = 0;
         }
         if (fromIndex >= len) {
@@ -64,9 +52,7 @@
         if (len === 0) {
             return -1;
         }
-        if (fromIndex) {
-            fromIndex = prettifyArrayIndex(fromIndex);
-        } else {
+        if (BR.isUndefined(fromIndex)) {
             fromIndex = len;
         }
         for (i = fromIndex >= 0 ? Math.min(fromIndex, len - 1) : len - Math.abs(fromIndex); i >= 0; i --) {
@@ -86,9 +72,6 @@
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/every
      */
     BR.array.prototype.every = BR.array.prototype.every || function (callback, thisObj) {
-        if (!BR.isFunction(callback)) {
-            throw new TypeError();
-        }
         var i,
             len = this.length >>> 0;
         for (i = 0; i < len; i ++) {
@@ -108,9 +91,6 @@
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter
      */
     BR.array.prototype.filter = BR.array.prototype.filter || function (callback, thisObj) {
-        if (!BR.isFunction(callback)) {
-            throw new TypeError();
-        }
         var i,
             res = [],
             len = this.length >>> 0;
@@ -132,9 +112,6 @@
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach
      */
     BR.array.prototype.forEach = BR.array.prototype.forEach || function(callback, thisObj) {
-        if (!BR.isFunction(callback)) {
-            throw new TypeError();
-        }
         var i,
             len = this.length >>> 0;
         for (i = 0; i < len; i ++) {
@@ -155,9 +132,6 @@
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map
      */
     BR.array.prototype.map = BR.array.prototype.map || function(callback, thisObj) {
-        if (!BR.isFunction(callback)) {
-            throw new TypeError();
-        }
         var i, kValue, mappedValue,
             res = [],
             len = this.length >>> 0;
@@ -178,9 +152,6 @@
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/some
      */
     BR.array.prototype.some = BR.array.prototype.some || function (callback, thisObj) {
-        if (!BR.isFunction(callback)) {
-            throw new TypeError();
-        }
         var i,
             len = this.length >>> 0;
         for (i = 0; i < len; i ++) {
@@ -206,9 +177,6 @@
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Reduce
      */
     BR.array.prototype.reduce = BR.array.prototype.reduce || function (callback, thisObj) {
-        if (!BR.isFunction(callback)) {
-            throw new TypeError();
-        }
         var i, value,
             len = this.length >>> 0,
             isValueSet = false;
@@ -241,9 +209,6 @@
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/ReduceRight
      */
     BR.array.prototype.reduceRight = BR.array.prototype.reduceRight || function (callback, thisObj) {
-        if (!BR.isFunction(callback)) {
-            throw new TypeError();
-        }
         var i, value,
             len = this.length >>> 0,
             isValueSet = false;
@@ -276,9 +241,6 @@
      * @syntax      : array.binarySearch(element, compareFunc)
      */
     BR.array.prototype.binarySearch = BR.array.prototype.binarySearch || function (element, compareFunc) {
-        if (!BR.isFunction(compareFunc)) {
-            throw new TypeError();
-        }
         var start = 0,
             end = this.length,
             current = Math.floor(this.length/2);
@@ -302,13 +264,8 @@
      * @refference  : Array Remove - By John Resig (MIT Licensed)
      */
     BR.array.prototype.remove = BR.array.prototype.remove || function (fromIndex, toIndex) {
-        if (fromIndex) {
-            fromIndex = prettifyArrayIndex(fromIndex);
-        } else {
+        if (BR.isUndefined(fromIndex)) {
             return this;
-        }
-        if (toIndex) {
-            toIndex = prettifyArrayIndex(toIndex);
         }
         var rest = this.slice((toIndex || fromIndex) + 1 || this.length);
         this.length = fromIndex < 0 ? this.length + fromIndex : fromIndex;
@@ -346,9 +303,6 @@
      * @syntax      : array.intersection(that)
      */
     BR.array.prototype.intersection = BR.array.prototype.intersection || function (that) {
-        if (!BR.isArray(that)) {
-            throw new TypeError();
-        }
         var i,
             len = this.length >>> 0,
             resultArr = [];
@@ -366,9 +320,6 @@
      * @syntax      : array.complement(that)
      */
     BR.array.prototype.complement = BR.array.prototype.complement || function (that) {
-        if (!BR.isArray(that)) {
-            throw new TypeError();
-        }
         var i,
             len = this.length >>> 0,
             resultArr = [];
@@ -386,9 +337,6 @@
      * @syntax      : array.intersection(that)
      */
     BR.array.prototype.union = BR.array.prototype.union || function (that) {
-        if (!BR.isArray(that)) {
-            throw new TypeError();
-        }
         return this.concat(that).uniq();
     };
     /**

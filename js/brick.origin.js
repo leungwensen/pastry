@@ -5,10 +5,10 @@
  */
 'use strict';
 
-(function (BR, undefined) {
+(function (BR) {
     BR.origin = BR.origin || {};
 
-    BR.origin.oneOf = BR.origin.oneOf || function (callbackList) {
+    BR.origin.tryOneOf = BR.origin.tryOneOf || function (callbackList) {
         var i, callback, returnValue;
 
         for (i = 0; i < callbackList.length; i ++) {

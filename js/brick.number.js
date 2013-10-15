@@ -5,7 +5,7 @@
  */
 'use strict';
 
-(function (BR, undefined) {
+(function (BR) {
     BR.number = BR.number || Number;
 
     /**
@@ -13,8 +13,8 @@
      * @parameters  : {object} option, defines pattern for stringify.
      *                    {
      *                        comma   : {1|0},
-     *                        decimal : {0-9},
-     *                        integer : {0-9},
+     *                        decimal : {>=0},
+     *                        integer : {>=0},
      *                        zero    : {1|0},
      *                    }
      * @return      : {string} result string.
@@ -30,8 +30,8 @@
             'integer' : 5,
             'zero'    : 0
         };
-        placeHolder = (option.hasOwnProperty('zero') && option.zero !== 0) ? '0' : ' ';
-        if (option.hasOwnProperty('decimal')) {
+        placeHolder = (option.hasOwnProperty('zero') && option.zero > 0) ? '0' : ' ';
+        if (option.hasOwnProperty('decimal') && option.decimal > 0) {
             strArr[1] = strArr[1] || '';
             strArr[1] = strArr[1].slice(0, option.decimal);
             len = option.decimal - strArr[1].length;
@@ -39,7 +39,7 @@
                 strArr[1] += '0';
             }
         }
-        if (option.hasOwnProperty('integer')) {
+        if (option.hasOwnProperty('integer') && option.integer > 0) {
             len = option.integer - strArr[0].length;
             for (i = 0; i < len; i ++) {
                 strArr[0] = placeHolder + strArr[0];

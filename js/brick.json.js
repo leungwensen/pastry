@@ -7,9 +7,9 @@
  */
 'use strict';
 
-(function (BR, undefined) {
+(function (BR) {
     BR.JSON = BR.JSON || {};
-    var _originJSON = BR.origin.oneOf([
+    var _originJSON = BR.origin.tryOneOf([
             function () { return JSON; },
             function () { return BR.GROUND.JSON; }
         ]);

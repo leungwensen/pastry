@@ -11,10 +11,10 @@ BRICK = BR = {};
     BR.GROUND = BR.GROUND || this;
 }());
 
-(function (BR, undefined) {
+(function (BR) {
     BR.origin = BR.origin || {};
 
-    BR.origin.oneOf = BR.origin.oneOf || function (callbackList) {
+    BR.origin.tryOneOf = BR.origin.tryOneOf || function (callbackList) {
         var i, callback, returnValue;
 
         for (i = 0; i < callbackList.length; i ++) {
@@ -29,28 +29,37 @@ BRICK = BR = {};
     };
 }(BR));
 
-(function (BR, undefined) {
+(function (BR) {
     /**
      * @description : isXxx, check if is Xxx.
      * @parameters  : {unknown} value, value to be tested.
      * @return      : {boolean} if test succeeded.
      * @syntax      : BR.validator.isXxx(value)
      */
+
     BR.isDefined = BR.isDefined || function (value) {
         return (typeof value !== 'undefined');
     };
+    BR.isUndefined = BR.isUndefined || function (value) {
+        return (typeof value === 'undefined');
+    };
+
     BR.isFunction = BR.isFunction || function (value) {
         return (typeof value === 'function');
     };
+
     BR.isNumber = BR.isNumber || function (value) {
         return (typeof value === 'number');
     };
+
     BR.isObject = BR.isObject || function (value) {
         return (typeof value === 'object');
     };
+
     BR.isString = BR.isString || function (value) {
         return (typeof value === 'string');
     };
+
     // extend of Javascript 1.8.5
     /**
      * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray
@@ -58,20 +67,11 @@ BRICK = BR = {};
     BR.isArray = BR.isArray || Array.isArray || function (value) {
         return Object.prototype.toString.call(value) === "[object Array]";
     };
+
 }(BR));
 
-(function (BR, undefined) {
+(function (BR) {
     BR.array = BR.array || Array;
-
-    // prettify array index
-    var prettifyArrayIndex = function (index) {
-        if (isNaN(index)) {
-            index = 0;
-        } else if (index !== 0 && index !== Infinity && index !== -Infinity) {
-            index = (index > 0 || -1) * Math.floor(Math.abs(index));
-        }
-        return index;
-    };
 
     // extend of Javascript 1.6
     /**
@@ -89,9 +89,7 @@ BRICK = BR = {};
         if (len === 0) {
             return -1;
         }
-        if (fromIndex) {
-            fromIndex = prettifyArrayIndex(fromIndex);
-        } else {
+        if (BR.isUndefined(fromIndex)) {
             fromIndex = 0;
         }
         if (fromIndex >= len) {
@@ -119,9 +117,7 @@ BRICK = BR = {};
         if (len === 0) {
             return -1;
         }
-        if (fromIndex) {
-            fromIndex = prettifyArrayIndex(fromIndex);
-        } else {
+        if (BR.isUndefined(fromIndex)) {
             fromIndex = len;
         }
         for (i = fromIndex >= 0 ? Math.min(fromIndex, len - 1) : len - Math.abs(fromIndex); i >= 0; i --) {
@@ -141,9 +137,6 @@ BRICK = BR = {};
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/every
      */
     BR.array.prototype.every = BR.array.prototype.every || function (callback, thisObj) {
-        if (!BR.isFunction(callback)) {
-            throw new TypeError();
-        }
         var i,
             len = this.length >>> 0;
         for (i = 0; i < len; i ++) {
@@ -163,9 +156,6 @@ BRICK = BR = {};
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter
      */
     BR.array.prototype.filter = BR.array.prototype.filter || function (callback, thisObj) {
-        if (!BR.isFunction(callback)) {
-            throw new TypeError();
-        }
         var i,
             res = [],
             len = this.length >>> 0;
@@ -187,9 +177,6 @@ BRICK = BR = {};
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach
      */
     BR.array.prototype.forEach = BR.array.prototype.forEach || function(callback, thisObj) {
-        if (!BR.isFunction(callback)) {
-            throw new TypeError();
-        }
         var i,
             len = this.length >>> 0;
         for (i = 0; i < len; i ++) {
@@ -210,9 +197,6 @@ BRICK = BR = {};
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map
      */
     BR.array.prototype.map = BR.array.prototype.map || function(callback, thisObj) {
-        if (!BR.isFunction(callback)) {
-            throw new TypeError();
-        }
         var i, kValue, mappedValue,
             res = [],
             len = this.length >>> 0;
@@ -233,9 +217,6 @@ BRICK = BR = {};
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/some
      */
     BR.array.prototype.some = BR.array.prototype.some || function (callback, thisObj) {
-        if (!BR.isFunction(callback)) {
-            throw new TypeError();
-        }
         var i,
             len = this.length >>> 0;
         for (i = 0; i < len; i ++) {
@@ -261,9 +242,6 @@ BRICK = BR = {};
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Reduce
      */
     BR.array.prototype.reduce = BR.array.prototype.reduce || function (callback, thisObj) {
-        if (!BR.isFunction(callback)) {
-            throw new TypeError();
-        }
         var i, value,
             len = this.length >>> 0,
             isValueSet = false;
@@ -296,9 +274,6 @@ BRICK = BR = {};
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/ReduceRight
      */
     BR.array.prototype.reduceRight = BR.array.prototype.reduceRight || function (callback, thisObj) {
-        if (!BR.isFunction(callback)) {
-            throw new TypeError();
-        }
         var i, value,
             len = this.length >>> 0,
             isValueSet = false;
@@ -331,9 +306,6 @@ BRICK = BR = {};
      * @syntax      : array.binarySearch(element, compareFunc)
      */
     BR.array.prototype.binarySearch = BR.array.prototype.binarySearch || function (element, compareFunc) {
-        if (!BR.isFunction(compareFunc)) {
-            throw new TypeError();
-        }
         var start = 0,
             end = this.length,
             current = Math.floor(this.length/2);
@@ -357,13 +329,8 @@ BRICK = BR = {};
      * @refference  : Array Remove - By John Resig (MIT Licensed)
      */
     BR.array.prototype.remove = BR.array.prototype.remove || function (fromIndex, toIndex) {
-        if (fromIndex) {
-            fromIndex = prettifyArrayIndex(fromIndex);
-        } else {
+        if (BR.isUndefined(fromIndex)) {
             return this;
-        }
-        if (toIndex) {
-            toIndex = prettifyArrayIndex(toIndex);
         }
         var rest = this.slice((toIndex || fromIndex) + 1 || this.length);
         this.length = fromIndex < 0 ? this.length + fromIndex : fromIndex;
@@ -401,9 +368,6 @@ BRICK = BR = {};
      * @syntax      : array.intersection(that)
      */
     BR.array.prototype.intersection = BR.array.prototype.intersection || function (that) {
-        if (!BR.isArray(that)) {
-            throw new TypeError();
-        }
         var i,
             len = this.length >>> 0,
             resultArr = [];
@@ -421,9 +385,6 @@ BRICK = BR = {};
      * @syntax      : array.complement(that)
      */
     BR.array.prototype.complement = BR.array.prototype.complement || function (that) {
-        if (!BR.isArray(that)) {
-            throw new TypeError();
-        }
         var i,
             len = this.length >>> 0,
             resultArr = [];
@@ -441,9 +402,6 @@ BRICK = BR = {};
      * @syntax      : array.intersection(that)
      */
     BR.array.prototype.union = BR.array.prototype.union || function (that) {
-        if (!BR.isArray(that)) {
-            throw new TypeError();
-        }
         return this.concat(that).uniq();
     };
     /**
@@ -464,11 +422,11 @@ BRICK = BR = {};
     };
 }(BR));
 
-(function (BR, undefined) {
+(function (BR) {
     BR.bool = BR.bool || Boolean;
 }(BR));
 
-(function (BR, undefined) {
+(function (BR) {
     BR.number = BR.number || Number;
 
     /**
@@ -476,8 +434,8 @@ BRICK = BR = {};
      * @parameters  : {object} option, defines pattern for stringify.
      *                    {
      *                        comma   : {1|0},
-     *                        decimal : {0-9},
-     *                        integer : {0-9},
+     *                        decimal : {>=0},
+     *                        integer : {>=0},
      *                        zero    : {1|0},
      *                    }
      * @return      : {string} result string.
@@ -493,8 +451,8 @@ BRICK = BR = {};
             'integer' : 5,
             'zero'    : 0
         };
-        placeHolder = (option.hasOwnProperty('zero') && option.zero !== 0) ? '0' : ' ';
-        if (option.hasOwnProperty('decimal')) {
+        placeHolder = (option.hasOwnProperty('zero') && option.zero > 0) ? '0' : ' ';
+        if (option.hasOwnProperty('decimal') && option.decimal > 0) {
             strArr[1] = strArr[1] || '';
             strArr[1] = strArr[1].slice(0, option.decimal);
             len = option.decimal - strArr[1].length;
@@ -502,7 +460,7 @@ BRICK = BR = {};
                 strArr[1] += '0';
             }
         }
-        if (option.hasOwnProperty('integer')) {
+        if (option.hasOwnProperty('integer') && option.integer > 0) {
             len = option.integer - strArr[0].length;
             for (i = 0; i < len; i ++) {
                 strArr[0] = placeHolder + strArr[0];
@@ -518,7 +476,7 @@ BRICK = BR = {};
     };
 }(BR));
 
-(function (BR, undefined) {
+(function (BR) {
     BR.date = BR.date || Date;
 
     var padZero = function (n) {
@@ -542,15 +500,15 @@ BRICK = BR = {};
                       .replace( '{mm}'  , padZero(mi = this.getMinutes()) )
                       .replace( '{ss}'  , padZero(s  = this.getSeconds()) )
                       .replace( '{YY}'  , y.substring(2) )
-                      .replace( '{M}'   , mo             )
-                      .replace( '{D}'   , d              )
-                      .replace( '{h}'   , h              )
-                      .replace( '{m}'   , mi             )
-                      .replace( '{s}'   , s              );
+                      .replace( '{M}'   , mo )
+                      .replace( '{D}'   , d  )
+                      .replace( '{h}'   , h  )
+                      .replace( '{m}'   , mi )
+                      .replace( '{s}'   , s  );
     };
 }(BR));
 
-(function (BR, undefined) {
+(function (BR) {
     BR.string = BR.string || String;
 
     // extend of Javascript 1.8.1
@@ -566,7 +524,7 @@ BRICK = BR = {};
     };
 }(BR));
 
-(function (BR, undefined) {
+(function (BR) {
     BR.object = BR.object || Object;
 
     // extend of Javascript 1.8.x
@@ -576,7 +534,7 @@ BRICK = BR = {};
      *                {object  } thisObj  , Object to use as this when executing callback.
      * @syntax      : object.forEach(callback[, thisObj])
      */
-    BR.object.prototype.forEach = BR.object.prototype.forEach || function(callback, thisObj){
+    BR.object.prototype.forEach = BR.object.prototype.forEach || function (callback, thisObj) {
         var key;
         for (key in this){
             if (this.hasOwnProperty(key)) {
@@ -586,11 +544,81 @@ BRICK = BR = {};
     };
     // alias
     BR.object.prototype.each = BR.object.prototype.each || BR.object.prototype.forEach;
+    /**
+     * @description : returns an array whose elements are strings corresponding to the enumerable properties found directly upon object.
+     * @parameters  : {object} obj, Object to get keys from.
+     * @syntax      : BR.object.keys(obj)
+     */
+    BR.object.keys = BR.object.keys || function (obj) {
+        var i, key,
+            keys = [];
+        if (BR.isFunction(obj)) {
+            for (key in obj) {
+                if (obj.hasOwnProperty(key) && key !== 'prototype') {
+                    keys.push(key);
+                }
+            }
+        } else {
+            for (key in obj) {
+                if (obj.hasOwnProperty(key)) {
+                    keys.push(key);
+                }
+            }
+        }
+        return keys;
+    };
+
+    // extend of Brick
+    /**
+     * @description : returns keys of an object
+     * @syntax      : object.keys()
+     */
+    BR.object.prototype.keys = BR.object.prototype.keys || function () {
+        return Object.keys(this);
+    };
+    /**
+     * @description : returns an array whose elements are values of the object.
+     * @parameters  : {object} obj, Object to get values from.
+     * @syntax      : BR.object.values(obj)
+     */
+    BR.object.values = BR.object.values || function (obj) {
+        var i,
+            keys = BR.object.keys(obj),
+            len = keys.length,
+            values = [];
+        for (i = 0; i < len; i ++) {
+            values.push(obj[keys[i]]);
+        }
+        return values;
+    };
+    /**
+     * @description : returns values of an object
+     * @syntax      : object.values()
+     */
+    BR.object.prototype.values = BR.object.prototype.values || function () {
+        return Object.values(this);
+    };
+    /**
+     * @description : check if the object has the key
+     * @parameters  : {string} key, key to check
+     * @syntax      : object.hasKey(key)
+     */
+    BR.object.prototype.hasKey = BR.object.prototype.hasKey || function (key) {
+        return this.hasOwnProperty(key);
+    };
+    /**
+     * @description : check if the object has the value
+     * @parameters  : {unknown} value, value to check.
+     * @syntax : object.hasValue(value)
+     */
+    BR.object.prototype.hasValue = BR.object.prototype.hasValue || function (value) {
+        return (this.values().indexOf(value) > -1);
+    };
 }(BR));
 
-(function (BR, undefined) {
+(function (BR) {
     BR.JSON = BR.JSON || {};
-    var _originJSON = BR.origin.oneOf([
+    var _originJSON = BR.origin.tryOneOf([
             function () { return JSON; },
             function () { return BR.GROUND.JSON; }
         ]);

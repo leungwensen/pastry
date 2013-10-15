@@ -5,7 +5,7 @@
  */
 'use strict';
 
-(function (BR, undefined) {
+(function (BR) {
     BR.string = BR.string || String;
 
     // extend of Javascript 1.8.1

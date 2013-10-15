@@ -5,6 +5,6 @@
  */
 'use strict';
 
-(function (BR, undefined) {
+(function (BR) {
     BR.bool = BR.bool || Boolean;
 }(BR));

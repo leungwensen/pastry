@@ -1,6 +1,5 @@
 'use strict';
 
-
 var arrA, arrB, arrC;
 
 describe('brick.array.js', function () {

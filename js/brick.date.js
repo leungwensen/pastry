@@ -5,7 +5,7 @@
  */
 'use strict';
 
-(function (BR, undefined) {
+(function (BR) {
     BR.date = BR.date || Date;
 
     var padZero = function (n) {
@@ -29,10 +29,10 @@
                       .replace( '{mm}'  , padZero(mi = this.getMinutes()) )
                       .replace( '{ss}'  , padZero(s  = this.getSeconds()) )
                       .replace( '{YY}'  , y.substring(2) )
-                      .replace( '{M}'   , mo             )
-                      .replace( '{D}'   , d              )
-                      .replace( '{h}'   , h              )
-                      .replace( '{m}'   , mi             )
-                      .replace( '{s}'   , s              );
+                      .replace( '{M}'   , mo )
+                      .replace( '{D}'   , d  )
+                      .replace( '{h}'   , h  )
+                      .replace( '{m}'   , mi )
+                      .replace( '{s}'   , s  );
     };
 }(BR));

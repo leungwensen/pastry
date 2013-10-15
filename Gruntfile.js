@@ -160,6 +160,6 @@ module.exports = function(grunt) {
 
     // grunt tasks
     grunt.registerTask('travis' , ['jshint', 'concat', 'jasmine']);
-    grunt.registerTask('default', ['jshint', 'concat', 'jasmine', 'clean', 'sass', 'copy']);
-    grunt.registerTask('release', ['jshint', 'concat', 'jasmine', 'clean', 'sass', 'copy', 'uglify', 'cssmin']);
+    grunt.registerTask('default', ['jshint', 'concat', 'jasmine', 'sass', 'copy']);
+    grunt.registerTask('release', ['jshint', 'concat', 'jasmine', 'sass', 'copy', 'uglify', 'cssmin']);
 };
