@@ -8,13 +8,13 @@ String.prototype.trim = String.prototype.trim || function () {
 
 var genJSON = require('commander'),
     fs = require('fs'),
-    list = function (val) {
+    list = function (val) {      // for commander
         return val.split(' ');
     },
-    stringify = function (val) {
+    stringify = function (val) { // for commander
         return val;
     },
-    str2arr = function (str) {
+    str2arr = function (str) {   // '[xxx, xxx]' => ['xxx', 'xxx']
         var i,
             arr = str.replace(/\[|\]/gm, '').split(','),
             len = arr.length;
@@ -144,9 +144,10 @@ var genJSON = require('commander'),
     };
 
 genJSON.version('0.0.1')
-      .option('-f, --files <items>', 'source files'    , list)
-      .option('-d, --directory <s>', 'output directory', stringify)
-      .parse(process.argv);
+       .option('-f, --files <items>', 'source files'    , list)
+       .option('-d, --directory <s>', 'output directory', stringify)
+       .parse(process.argv);
+
 genJSON.files      = genJSON.files     || ['js/'];
 genJSON.directory  = genJSON.directory || 'doc';
 genJSON.directory += /\/$/.test(genJSON.directory) ? '' : '/';
