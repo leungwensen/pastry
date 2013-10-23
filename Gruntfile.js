@@ -33,22 +33,28 @@ module.exports = function(grunt) {
             }
         },
         jshint: {
-            json: {
-                src: ['doc/*.json', 'package.json']
-            },
             gruntfile: {
                 options: {
                     jshintrc: '.jshintrc'
                 },
                 src: 'Gruntfile.js'
             },
-            src: {
+            bin: {
+                options: {
+                    jshintrc: 'bin/js/.jshintrc'
+                },
+                src: ['bin/js/*.js']
+            },
+            doc: {
+                src: ['doc/*.json', 'package.json']
+            },
+            js: {
                 options: {
                     jshintrc: 'js/.jshintrc'
                 },
                 src: ['js/**/*.js']
             },
-            test: {
+            spec: {
                 options: {
                     jshintrc: 'spec/.jshintrc'
                 },

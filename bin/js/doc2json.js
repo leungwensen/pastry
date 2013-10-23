@@ -8,10 +8,10 @@ String.prototype.trim = String.prototype.trim || function () {
 
 var genJSON = require('commander'),
     fs = require('fs'),
-    list = function (val) {      // for commander
+    list = function (val) {      // for commander, get an array of strings
         return val.split(' ');
     },
-    stringify = function (val) { // for commander
+    stringify = function (val) { // for commander, get a string
         return val;
     },
     str2arr = function (str) {   // '[xxx, xxx]' => ['xxx', 'xxx']
@@ -24,6 +24,9 @@ var genJSON = require('commander'),
         return arr;
     },
     embellishParam = function (val) {
+        /*
+         * @param : {type} name , description
+         */
         var parts,
             type = val.match(/\{\w+\s*\}/)[0];
         val = val.replace(type, '');
@@ -35,6 +38,9 @@ var genJSON = require('commander'),
         };
     },
     embellishReturn = function (val) {
+        /*
+         * @return : {type} description
+         */
         var type = val.match(/\{\w+\s*\}/)[0],
             description = val.replace(type, '');
         return {
@@ -43,6 +49,9 @@ var genJSON = require('commander'),
         };
     },
     embellishValue = function (val) {
+        /*
+         * @any : {this is what will be dealed with}
+         */
         val = String(val);
         try {
             var jsonObj = JSON.parse(val);
@@ -62,6 +71,9 @@ var genJSON = require('commander'),
         return val;
     },
     addComment = function (ret, key, value) {
+        /*
+         * @description: every line of comment like this one would be parsed as an object and added into the result list
+         */
         switch (key) {
             case 'param':
                 ret[key] = ret[key] || [];
@@ -93,6 +105,10 @@ var genJSON = require('commander'),
         }
     },
     doc2JSON = function (doc) {
+        /*
+         * @name        : doc2JSON
+         * @description : turn comments like this into a JSON-string
+         */
         if (doc.match(/\/\/(.*)$/)) {
             return doc.replace(/\/\/\s+/, '');
         }
@@ -119,8 +135,10 @@ var genJSON = require('commander'),
             }
         });
         return ret;
-    },
-    genJSONFromFile = function (filename) {
+    }, genJSONFromFile = function (filename) {
+        /*
+         * @description : generate JSON-format string from a single file
+         */
         fs.readFile(filename, function (err, data) {
             if (err) {
                 console.log('reading from ' + filename + " failed:\n" + err );
@@ -143,19 +161,24 @@ var genJSON = require('commander'),
         });
     };
 
+// parse argv
 genJSON.version('0.0.1')
-       .option('-f, --files <items>', 'source files'    , list)
+       .option('-f, --files <items>', 'source files', list)
        .option('-d, --directory <s>', 'output directory', stringify)
        .parse(process.argv);
 
+// prepare source files and target directory
 genJSON.files      = genJSON.files     || ['js/'];
 genJSON.directory  = genJSON.directory || 'doc';
 genJSON.directory += /\/$/.test(genJSON.directory) ? '' : '/';
 
+// deal with each source file
 genJSON.files.forEach(function (path) {
     if (/\.js$/.test(path)) {
+        // when path is a .js source file already
         genJSONFromFile(path);
     } else {
+        // when path is a directory
         fs.readdir(path, function (err, files) {
             if (err) {
                 console.log('reading directory ' + path + " failed:\n" + err);
