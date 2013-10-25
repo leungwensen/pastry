@@ -17,8 +17,9 @@ describe('brick.object.js', function () {
         expect(objB).toEqual({'world': 1});
     });
     it('Object.keys', function () {
-        expect(BR.object.keys(['a', 'b', 'c'])).toEqual(['0', '1', '2']);
-        expect(BR.object.keys(objA)).toEqual(['hello']);
+        expect(Object.keys(['a', 'b', 'c'])).toEqual(['0', '1', '2']);
+        expect(Object.keys(objA)).toEqual(['hello']);
+        expect(objA.keys()).toEqual(['hello']);
     });
 });
 
@@ -27,7 +28,7 @@ describe('brick.object.js', function () {
         expect(objA.keys()).toEqual(['hello']);
     });
     it('Object.values', function () {
-        expect(BR.object.values(objA)).toEqual(['world']);
+        expect(Object.values(objA)).toEqual(['world']);
     });
     it('object.values', function () {
         expect(objA.values()).toEqual(['world']);

@@ -1,12 +1,12 @@
 /**
  * @description : extend for Array
  * @filename    : brick.array.js
- * @requires    : [brick.js, brick.validator.js]
+ * @requires    : [brick.js, brick.validator.js, brick.object.js]
  */
 'use strict';
 
 (function (BR) {
-    BR.array = BR.array || Array;
+    var p = Array.prototype;
 
     // extend of Javascript 1.6
     /**
@@ -17,20 +17,21 @@
      * @syntax      : array.indexOf(searchElement[, fromIndex])
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf
      */
-    BR.array.prototype.indexOf = BR.array.prototype.indexOf || function (searchElement, fromIndex) {
+    p.indexOf = p.indexOf || function (searchElement, fromIndex) {
         var i,
-            len = this.length >>> 0;
+            a = this,
+            len = a.length >>> 0;
         if (len === 0) {
             return -1;
         }
-        if (BR.isUndefined(fromIndex)) {
+        if (!BR.isDef(fromIndex)) {
             fromIndex = 0;
         }
         if (fromIndex >= len) {
             return -1;
         }
         for (i = fromIndex >= 0 ? fromIndex : Math.max(len - Math.abs(fromIndex), 0); i < len; i ++) {
-            if (this.hasOwnProperty(i) && this[i] === searchElement) {
+            if (a.has(i) && a[i] === searchElement) {
                 return i;
             }
         }
@@ -44,17 +45,18 @@
      * @syntax      : array.lastIndexOf(searchElement[, fromIndex])
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/lastIndexOf
      */
-    BR.array.prototype.lastIndexOf = BR.array.prototype.lastIndexOf || function (searchElement, fromIndex) {
+    p.lastIndexOf = p.lastIndexOf || function (searchElement, fromIndex) {
         var i,
-            len = this.length >>> 0;
+            a = this,
+            len = a.length >>> 0;
         if (len === 0) {
             return -1;
         }
-        if (BR.isUndefined(fromIndex)) {
+        if (!BR.isDef(fromIndex)) {
             fromIndex = len;
         }
         for (i = fromIndex >= 0 ? Math.min(fromIndex, len - 1) : len - Math.abs(fromIndex); i >= 0; i --) {
-            if (this.hasOwnProperty(i) && this[i] === searchElement) {
+            if (a.has(i) && a[i] === searchElement) {
                 return i;
             }
         }
@@ -68,11 +70,11 @@
      * @syntax      : array.every(callback[, thisObj])
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/every
      */
-    BR.array.prototype.every = BR.array.prototype.every || function (callback, thisObj) {
+    p.every = p.every || function (callback, thisObj) {
         var i,
-            len = this.length >>> 0;
-        for (i = 0; i < len; i ++) {
-            if (this.hasOwnProperty(i) && !callback.call(thisObj, this[i], i, this)) {
+            a = this;
+        for (i = 0; i < a.length; i ++) {
+            if (a.has(i) && !callback.call(thisObj, a[i], i, a)) {
                 return false;
             }
         }
@@ -86,37 +88,24 @@
      * @syntax      : array.filter(callback[, thisObj])
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter
      */
-    BR.array.prototype.filter = BR.array.prototype.filter || function (callback, thisObj) {
-        var i,
-            res = [],
-            len = this.length >>> 0;
-        for (i in this) {
-            if (this.hasOwnProperty(i)) {
-                if (callback.call(thisObj, this[i], i, this)) {
-                    res.push(this[i]);
-                }
+    p.filter = p.filter || function (callback, thisObj) {
+        var a = this,
+            res = [];
+        a.each(function (element, key) {
+            if (callback.call(thisObj, element, key, a)) {
+                res.push(element);
             }
-        }
+        });
         return res;
     };
     /**
      * @description : Executes a provided function once per array element.
      * @param       : {function} callback , Function to execute for each element.
      * @param       : {object  } thisObj  , Object to use as this when executing callback.
-     * @syntax      : array.forEach(callback[, thisObj])
+     * @syntax      : array.forEach(callback[, thisObj]) || array.each(callback[, thisObj])
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach
      */
-    BR.array.prototype.forEach = BR.array.prototype.forEach || function(callback, thisObj) {
-        var i,
-            len = this.length >>> 0;
-        for (i = 0; i < len; i ++) {
-            if (this.hasOwnProperty(i)) {
-                callback.call(thisObj, this[i], i, this);
-            }
-        }
-    };
-    // alias
-    BR.array.prototype.each = BR.array.prototype.each || BR.array.prototype.forEach;
+    // see brick.object.js: object.forEach || object.each
     /**
      * @description : Creates a new array with the results of calling a provided function on every element in this array.
      * @param       : {function} callback , Function that produces an element of the new Array from an element of the current one.
@@ -125,15 +114,12 @@
      * @syntax      : array.map(callback[, thisObj])
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map
      */
-    BR.array.prototype.map = BR.array.prototype.map || function(callback, thisObj) {
-        var i, kValue, mappedValue,
-            res = [],
-            len = this.length >>> 0;
-        for (i = 0; i < len; i ++) {
-            if (this.hasOwnProperty(i)) {
-                res.push(callback.call(thisObj, this[i], i, this));
-            }
-        }
+    p.map = p.map || function(callback, thisObj) {
+        var a = this,
+            res = [];
+        a.each(function (element, key) {
+            res.push(callback.call(thisObj, element, key, a));
+        });
         return res;
     };
     /**
@@ -144,11 +130,11 @@
      * @syntax      : array.some(callback[, thisObj])
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/some
      */
-    BR.array.prototype.some = BR.array.prototype.some || function (callback, thisObj) {
+    p.some = p.some || function (callback, thisObj) {
         var i,
-            len = this.length >>> 0;
-        for (i = 0; i < len; i ++) {
-            if (this.hasOwnProperty(i) && callback.call(thisObj, this[i], i, this)) {
+            a = this;
+        for (i = 0; i < a.length; i ++) {
+            if (a.has(i) && callback.call(thisObj, a[i], i, a)) {
                 return true;
             }
         }
@@ -168,20 +154,20 @@
      * @syntax          : array.reduce(callback[, thisObj])
      * @refference      : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Reduce
      */
-    BR.array.prototype.reduce = BR.array.prototype.reduce || function (callback, thisObj) {
+    p.reduce = p.reduce || function (callback, thisObj) {
         var i, value,
-            len = this.length >>> 0,
+            a = this,
             isValueSet = false;
-        if (thisObj !== null) {
+        if (BR.isDef(thisObj)) {
             value = thisObj;
             isValueSet = true;
         }
-        for (i = 0; i < len; i ++) {
-            if (this.hasOwnProperty(i)) {
+        for (i = 0; i < a.length; i ++) {
+            if (a.has(i)) {
                 if (isValueSet) {
-                    value = callback(value, this[i], i, this);
+                    value = callback(value, a[i], i, a);
                 } else {
-                    value = this[i];
+                    value = a[i];
                     isValueSet = true;
                 }
             }
@@ -199,20 +185,20 @@
      * @syntax      : array.reduceRight(callback[, thisObj])
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/ReduceRight
      */
-    BR.array.prototype.reduceRight = BR.array.prototype.reduceRight || function (callback, thisObj) {
+    p.reduceRight = p.reduceRight || function (callback, thisObj) {
         var i, value,
-            len = this.length >>> 0,
+            a = this,
             isValueSet = false;
-        if (thisObj !== null) {
+        if (BR.isDef(thisObj)) {
             value = thisObj;
             isValueSet = true;
         }
-        for (i = len - 1; i > -1; i --) {
-            if (!this.hasOwnProperty(i)) {
+        for (i = a.length - 1; i >= 0; i --) {
+            if (a.has(i)) {
                 if (isValueSet) {
-                    value = callback(value, this[i], i, this);
+                    value = callback(value, a[i], i, a);
                 } else {
-                    value = this[i];
+                    value = a[i];
                     isValueSet = true;
                 }
             }
@@ -223,7 +209,7 @@
         return value;
     };
 
-    // extend of Brick
+    // extend of BR.ick
     /**
      * @description : binarySearch.
      * @param       : {object  } element     , element to be searched.
@@ -231,19 +217,20 @@
      * @return      : {number  } result index.
      * @syntax      : array.binarySearch(element, compareFunc)
      */
-    BR.array.prototype.binarySearch = BR.array.prototype.binarySearch || function (element, compareFunc) {
+    p.binarySearch = p.binarySearch || function (element, compareFunc) {
         var start = 0,
-            end = this.length,
-            current = Math.floor(this.length/2);
+            a = this,
+            end = a.length,
+            current = Math.floor(end/2);
         while (end !== current) {
-            if (compareFunc(element, this[current]) > 0) {
+            if (compareFunc(element, a[current]) > 0) {
                 start = current + 1;
             } else {
                 end = current;
             }
             current = Math.floor((start + end) / 2);
         }
-        current = (current === 0 && compareFunc(element, this[current]) !== 0) ? -1 : current;
+        current = (current === 0 && compareFunc(element, a[current]) !== 0) ? -1 : current;
         return current;
     };
     /**
@@ -251,15 +238,18 @@
      * @param       : {number} fromIndex , index to remove from.
      * @param       : {number} toIndex   , index to remove to.
      * @syntax      : array.remove([fromIndex[, toIndex]])
-     * @refference  : Array Remove - By John Resig (MIT Licensed)
+     * @refference  : Array Remove - B. John Resig (MIT Licensed)
      */
-    BR.array.prototype.remove = BR.array.prototype.remove || function (fromIndex, toIndex) {
-        if (BR.isUndefined(fromIndex)) {
-            return this;
+    p.remove = p.remove || function (fromIndex, toIndex) {
+        var rest,
+            a = this,
+            len = a.length;
+        if (!BR.isDef(fromIndex)) {
+            return a;
         }
-        var rest = this.slice((toIndex || fromIndex) + 1 || this.length);
-        this.length = fromIndex < 0 ? this.length + fromIndex : fromIndex;
-        this.push.apply(this, rest);
+        rest = a.slice((toIndex || fromIndex) + 1 || len);
+        a.length = fromIndex < 0 ? len + fromIndex : fromIndex;
+        a.push.apply(a, rest);
     };
     /**
      * @description : replace.
@@ -267,40 +257,30 @@
      * @param       : {object} withElement , element to replace with.
      * @syntax      : array.replace(element, withElement)
      */
-    BR.array.prototype.replace = BR.array.prototype.replace || function (element, withElement) {
+    p.replace = p.replace || function (element, withElement) {
         var i,
-            len = this.length >>> 0;
-        for (i = 0; i < len; i ++) {
-            if (this[i] === element) {
-                this[i] = withElement;
+            a = this;
+        a.each(function (elem, i) {
+            if (elem === element) {
+                a[i] = withElement;
             }
-        }
+        });
     };
 
-    /**
-     * @description : test if array has an element.
-     * @param       : {object } element, element to be tested.
-     * @return      : {boolean} if array has the element.
-     * @syntax      : array.hasElement(element)
-     */
-    BR.array.prototype.hasElement = BR.array.prototype.hasElement || function (element) {
-        return (this.indexOf(element) > -1);
-    };
     /**
      * @description : intersection set of two arrays (this ∩ that)
      * @param       : {array} that, the array to get intersection set with.
      * @return      : {array} result array.
      * @syntax      : array.intersection(that)
      */
-    BR.array.prototype.intersection = BR.array.prototype.intersection || function (that) {
-        var i,
-            len = this.length >>> 0,
+    p.intersection = p.intersection || function (that) {
+        var a = this,
             resultArr = [];
-        for (i = 0; i < len; i ++) {
-            if (that.hasElement(this[i]) && !resultArr.hasElement(this[i])) {
-                resultArr.push(this[i]);
+        a.each(function (element) {
+            if (that.hasVal(element) && !resultArr.hasVal(element)) {
+                resultArr.push(element);
             }
-        }
+        });
         return resultArr;
     };
     /**
@@ -309,15 +289,14 @@
      * @return      : {array} result array.
      * @syntax      : array.complement(that)
      */
-    BR.array.prototype.complement = BR.array.prototype.complement || function (that) {
-        var i,
-            len = this.length >>> 0,
+    p.complement = p.complement || function (that) {
+        var a = this,
             resultArr = [];
-        for (i = 0; i < len; i ++) {
-            if (!that.hasElement(this[i]) && !resultArr.hasElement(this[i])) {
-                resultArr.push(this[i]);
+        a.each(function (element) {
+            if (!that.hasVal(element) && !resultArr.hasVal(element)) {
+                resultArr.push(element);
             }
-        }
+        });
         return resultArr;
     };
     /**
@@ -326,7 +305,7 @@
      * @return      : {array} result array.
      * @syntax      : array.intersection(that)
      */
-    BR.array.prototype.union = BR.array.prototype.union || function (that) {
+    p.union = p.union || function (that) {
         return this.concat(that).uniq();
     };
     /**
@@ -334,15 +313,14 @@
      * @return      : {array} result sub array.
      * @syntax      : array.uniq()
      */
-    BR.array.prototype.uniq = BR.array.prototype.uniq || function () {
-        var i = 0,
-            len = this.length >>> 0,
+    p.uniq = p.uniq || function () {
+        var a = this,
             resultArr = [];
-        for (i = 0; i < len; i ++) {
-            if (!resultArr.hasElement(this[i])) {
-                resultArr.push(this[i]);
+        a.each(function (element) {
+            if (!resultArr.hasVal(element)) {
+                resultArr.push(element);
             }
-        }
+        });
         return resultArr;
     };
 }(BR));

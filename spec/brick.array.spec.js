@@ -118,9 +118,9 @@ describe('brick.array.js', function () {
         arrA.replace(3, 0);
         expect(arrA).toEqual([1, 2, 8, 8, 4, 4, 4, 5]);
     });
-    it('array.hasElement', function () {
-        expect(arrA.hasElement(1)).toBe(true);
-        expect(arrA.hasElement(0)).toBe(false);
+    it('array.hasVal', function () {
+        expect(arrA.hasVal(1)).toBe(true);
+        expect(arrA.hasVal(0)).toBe(false);
     });
     it('array.intersection', function () {
         expect(arrA.intersection(arrB)).toEqual([]);

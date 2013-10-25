@@ -6,14 +6,14 @@
 'use strict';
 
 (function (BR) {
-    BR.origin = BR.origin || {};
+    var o = BR.ori = BR.origin = BR.origin || {};
 
     /*
      * @param  : {array  } callbackList, list of callback functions.
      * @return : {unknown} value the callback functions try to return.
-     * @syntax : BR.origin.tryOneOf(callbackList)
+     * @syntax : BR.origin.tryEach(callbackList) || BR.ori.tryEach(callbackList)
      */
-    BR.origin.tryOneOf = BR.origin.tryOneOf || function (callbackList) {
+    o.tryAny = o.tryAny || function (callbackList) {
         var i, callback, returnValue;
 
         for (i = 0; i < callbackList.length; i ++) {
@@ -21,8 +21,7 @@
             try {
                 returnValue = callback();
                 break;
-            } catch (e) {
-            }
+            } catch (e) {}
         }
         return returnValue;
     };

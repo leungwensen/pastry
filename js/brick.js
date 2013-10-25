@@ -7,10 +7,11 @@
 
 var BRICK, BR;
 BRICK = BR = {};
+
 (function () {
     // getting the environment
     /*
-     * @syntax : BR.GROUND
+     * @syntax : BR.ROOT
      */
-    BR.GROUND = BR.GROUND || this;
+    BR.ROOT = BR.ROOT || this;
 }());

@@ -1,21 +1,21 @@
 /**
  * @description : extend for Number
  * @filename    : brick.number.js
- * @requires    : [brick.js]
+ * @requires    : [brick.js, brick.object.js]
  */
 'use strict';
 
-(function (BR) {
-    BR.number = BR.number || Number;
+(function () {
+    var p = Number.prototype;
 
     /**
      * @description : return stringified number according to given pattern.
      * @param       : {object} option, defines pattern for stringify.
      * @example     : {"comma": "1|0", "decimal": ">=0", "integer" : ">=0", "zero": "1|0"}
      * @return      : {string} result string.
-     * @syntax      : number.toFormatString([option])
+     * @syntax      : number.stringf([option])
      */
-    BR.number.prototype.toFormatString = BR.number.prototype.toFormatString || function (option) {
+    p.stringf = p.stringf || function (option) {
         var i, len, placeHolder,
             str = this.toString(),
             strArr = str.split('.');
@@ -25,8 +25,8 @@
             'integer' : 5,
             'zero'    : 0
         };
-        placeHolder = (option.hasOwnProperty('zero') && option.zero > 0) ? '0' : ' ';
-        if (option.hasOwnProperty('decimal') && option.decimal > 0) {
+        placeHolder = (option.has('zero') && option.zero > 0) ? '0' : ' ';
+        if (option.has('decimal') && option.decimal > 0) {
             strArr[1] = strArr[1] || '';
             strArr[1] = strArr[1].slice(0, option.decimal);
             len = option.decimal - strArr[1].length;
@@ -34,13 +34,13 @@
                 strArr[1] += '0';
             }
         }
-        if (option.hasOwnProperty('integer') && option.integer > 0) {
+        if (option.has('integer') && option.integer > 0) {
             len = option.integer - strArr[0].length;
             for (i = 0; i < len; i ++) {
                 strArr[0] = placeHolder + strArr[0];
             }
         }
-        if (option.hasOwnProperty('comma') && option.comma !== 0) {
+        if (option.has('comma') && option.comma !== 0) {
             strArr[0] = strArr[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
         }
         if (strArr[1] !== '') {
@@ -48,4 +48,4 @@
         }
         return strArr[0];
     };
-}(BR));
+}());

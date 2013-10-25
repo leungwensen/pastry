@@ -1,7 +1,7 @@
 /**
  * @description : validator
  * @filename    : brick.validator.js
- * @requires    : [brick.js]
+ * @requires    : [brick.js, brick.alias.js]
  */
 'use strict';
 
@@ -14,53 +14,46 @@
      */
 
     /**
-     * @syntax : BR.isDefined(value)
+     * @syntax : BR.isDef(value)
      */
-    BR.isDefined = BR.isDefined || function (value) {
+    BR.isDef = BR.isDef || function (value) {
         return (typeof value !== 'undefined');
     };
-    /**
-     * @syntax : BR.isUndefined(value)
-     */
-    BR.isUndefined = BR.isUndefined || function (value) {
-        return (typeof value === 'undefined');
-    };
 
-    /**
-     * @syntax : BR.isFunction(value)
+     /**
+     * @syntax : BR.isFunc(value)
      */
-    BR.isFunction = BR.isFunction || function (value) {
+    BR.isFunc = BR.isFunc || function (value) {
         return (typeof value === 'function');
     };
 
     /**
-     * @syntax : BR.isFunction(value)
+     * @syntax : BR.isNum(value)
      */
-    BR.isNumber = BR.isNumber || function (value) {
+    BR.isNum = BR.isNum || function (value) {
         return (typeof value === 'number');
     };
 
     /**
-     * @syntax : BR.isObject(value)
+     * @syntax : BR.isObj(value)
      */
-    BR.isObject = BR.isObject || function (value) {
+    BR.isObj = BR.isObj || function (value) {
         return (typeof value === 'object');
     };
 
     /**
-     * @syntax : BR.isString(value)
+     * @syntax : BR.isStr(value)
      */
-    BR.isString = BR.isString || function (value) {
+    BR.isStr = BR.isStr || function (value) {
         return (typeof value === 'string');
     };
 
     // extend of Javascript 1.8.5
     /**
-     * @syntax     : BR.isArray(value)
+     * @syntax     : BR.isArr(value)
      * @refference : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray
      */
-    BR.isArray = BR.isArray || Array.isArray || function (value) {
+    BR.isArr = BR.isArr || Array.isArray || function (value) {
         return Object.prototype.toString.call(value) === "[object Array]";
     };
-
 }(BR));
