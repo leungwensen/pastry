@@ -1,11 +1,11 @@
 /**
  * @description : extend for Array
- * @filename    : brick.array.js
- * @requires    : [brick.js, brick.validator.js, brick.object.js]
+ * @filename    : pastry.array.js
+ * @requires    : [pastry.js, pastry.validator.js, pastry.object.js]
  */
 'use strict';
 
-(function (BR) {
+(function (PT) {
     var p = Array.prototype;
 
     // extend of Javascript 1.6
@@ -24,7 +24,7 @@
         if (len === 0) {
             return -1;
         }
-        if (!BR.isDef(fromIndex)) {
+        if (!PT.isDef(fromIndex)) {
             fromIndex = 0;
         }
         if (fromIndex >= len) {
@@ -52,7 +52,7 @@
         if (len === 0) {
             return -1;
         }
-        if (!BR.isDef(fromIndex)) {
+        if (!PT.isDef(fromIndex)) {
             fromIndex = len;
         }
         for (i = fromIndex >= 0 ? Math.min(fromIndex, len - 1) : len - Math.abs(fromIndex); i >= 0; i --) {
@@ -105,7 +105,7 @@
      * @syntax      : array.forEach(callback[, thisObj]) || array.each(callback[, thisObj])
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach
      */
-    // see brick.object.js: object.forEach || object.each
+    // see pastry.object.js: object.forEach || object.each
     /**
      * @description : Creates a new array with the results of calling a provided function on every element in this array.
      * @param       : {function} callback , Function that produces an element of the new Array from an element of the current one.
@@ -158,7 +158,7 @@
         var i, value,
             a = this,
             isValueSet = false;
-        if (BR.isDef(thisObj)) {
+        if (PT.isDef(thisObj)) {
             value = thisObj;
             isValueSet = true;
         }
@@ -189,7 +189,7 @@
         var i, value,
             a = this,
             isValueSet = false;
-        if (BR.isDef(thisObj)) {
+        if (PT.isDef(thisObj)) {
             value = thisObj;
             isValueSet = true;
         }
@@ -209,7 +209,7 @@
         return value;
     };
 
-    // extend of BR.ick
+    // extend of PT.ick
     /**
      * @description : binarySearch.
      * @param       : {object  } element     , element to be searched.
@@ -244,7 +244,7 @@
         var rest,
             a = this,
             len = a.length;
-        if (!BR.isDef(fromIndex)) {
+        if (!PT.isDef(fromIndex)) {
             return a;
         }
         rest = a.slice((toIndex || fromIndex) + 1 || len);
@@ -323,4 +323,4 @@
         });
         return resultArr;
     };
-}(BR));
+}(PT));

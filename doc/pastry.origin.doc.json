@@ -1,0 +1,16 @@
+[{
+    "description": "try to load original edition of global variables",
+    "filename": "pastry.origin.js",
+    "requires": ["pastry.js"]
+}, {
+    "param": [{
+        "type": "array",
+        "name": "callbackList",
+        "description": "list of callback functions."
+    }],
+    "return": {
+        "type": "unknown",
+        "description": "value the callback functions try to return."
+    },
+    "syntax": "PT.origin.tryEach(callbackList) || PT.ori.tryEach(callbackList)"
+}]

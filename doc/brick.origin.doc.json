@@ -1,1 +1,0 @@
-[{"description":"try to load original edition of global variables","filename":"brick.origin.js","requires":["brick.js"]},{"param":[{"type":"array","name":"callbackList","description":"list of callback functions."}],"return":{"type":"unknown","description":"value the callback functions try to return."},"syntax":"BR.origin.tryEach(callbackList) || BR.ori.tryEach(callbackList)"}]

@@ -11,7 +11,8 @@
     "eqnull"  : true,
     "node"    : true,
     "globals" : {
-        "BR"         : true,
+        "PT"         : true,
+        "PASTRY"     : true,
         "jasmine"    : true,
         "describe"   : true,
         "it"         : true,

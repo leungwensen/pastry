@@ -1,0 +1,33 @@
+[{
+    "description": "validator",
+    "filename": "pastry.validator.js",
+    "requires": ["pastry.js", "pastry.alias.js"]
+}, {
+    "description": "isXxx, check if is Xxx.",
+    "parameters": [{
+        "type": "unknown",
+        "name": "value",
+        "description": "value to be tested."
+    }],
+    "return": {
+        "type": "boolean",
+        "description": "if test succeeded."
+    },
+    "syntax": "PT.isXxx(value)"
+}, {
+    "syntax": "PT.isDef(value)"
+}, {
+    "syntax": "PT.isFunc(value)"
+}, {
+    "syntax": "PT.isNum(value)"
+}, {
+    "syntax": "PT.isObj(value)"
+}, {
+    "syntax": "PT.isStr(value)"
+}, "extend of Javascript 1.8.5", {
+    "syntax": "PT.isArr(value)",
+    "refference": {
+        "type": "link",
+        "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray"
+    }
+}]

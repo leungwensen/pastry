@@ -2,7 +2,7 @@
 
 var objA, objB;
 
-describe('brick.object.js', function () {
+describe('pastry.object.js', function () {
     beforeEach(function () {
         objA = {
             'hello': 'world'
@@ -23,7 +23,7 @@ describe('brick.object.js', function () {
     });
 });
 
-describe('brick.object.js', function () {
+describe('pastry.object.js', function () {
     it('object.keys', function () {
         expect(objA.keys()).toEqual(['hello']);
     });

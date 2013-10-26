@@ -1,59 +1,59 @@
 /**
  * @description : validator
- * @filename    : brick.validator.js
- * @requires    : [brick.js, brick.alias.js]
+ * @filename    : pastry.validator.js
+ * @requires    : [pastry.js, pastry.alias.js]
  */
 'use strict';
 
-(function (BR) {
+(function (PT) {
     /**
      * @description : isXxx, check if is Xxx.
      * @parameters  : {unknown} value, value to be tested.
      * @return      : {boolean} if test succeeded.
-     * @syntax      : BR.isXxx(value)
+     * @syntax      : PT.isXxx(value)
      */
 
     /**
-     * @syntax : BR.isDef(value)
+     * @syntax : PT.isDef(value)
      */
-    BR.isDef = BR.isDef || function (value) {
+    PT.isDef = PT.isDef || function (value) {
         return (typeof value !== 'undefined');
     };
 
      /**
-     * @syntax : BR.isFunc(value)
+     * @syntax : PT.isFunc(value)
      */
-    BR.isFunc = BR.isFunc || function (value) {
+    PT.isFunc = PT.isFunc || function (value) {
         return (typeof value === 'function');
     };
 
     /**
-     * @syntax : BR.isNum(value)
+     * @syntax : PT.isNum(value)
      */
-    BR.isNum = BR.isNum || function (value) {
+    PT.isNum = PT.isNum || function (value) {
         return (typeof value === 'number');
     };
 
     /**
-     * @syntax : BR.isObj(value)
+     * @syntax : PT.isObj(value)
      */
-    BR.isObj = BR.isObj || function (value) {
+    PT.isObj = PT.isObj || function (value) {
         return (typeof value === 'object');
     };
 
     /**
-     * @syntax : BR.isStr(value)
+     * @syntax : PT.isStr(value)
      */
-    BR.isStr = BR.isStr || function (value) {
+    PT.isStr = PT.isStr || function (value) {
         return (typeof value === 'string');
     };
 
     // extend of Javascript 1.8.5
     /**
-     * @syntax     : BR.isArr(value)
+     * @syntax     : PT.isArr(value)
      * @refference : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray
      */
-    BR.isArr = BR.isArr || Array.isArray || function (value) {
+    PT.isArr = PT.isArr || Array.isArray || function (value) {
         return Object.prototype.toString.call(value) === "[object Array]";
     };
-}(BR));
+}(PT));

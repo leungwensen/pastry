@@ -11,7 +11,7 @@
     "eqnull"  : true,
     "node"    : true,
     "globals" : {
-        "BR"    : true,
-        "BRICK" : true
+        "PT"     : true,
+        "PASTRY" : true
     }
 }

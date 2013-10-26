@@ -3,10 +3,10 @@ pygments:         true
 permalink:        pretty
 destination:      ./_site
 port:             9001
-baseurl:          /brick
-name:             brick
+baseurl:          /pastry
+name:             pastry
 description:      a simple, easy to be customized html5 UI tookit.
-url:              http://leungwensen.github.io/brick/
+url:              http://leungwensen.github.io/pastry/
 copyright:        |
   MIT LICENSE<br>
   Copyright (C) 2013 leungwensen<br>

@@ -64,7 +64,7 @@ module.exports = function(grunt) {
         jasmine: {
             src : 'dist/js/*.js',
             options : {
-                specs  : 'spec/brick.*.spec.js',
+                specs  : 'spec/<%= pkg.title || pkg.name %>.*.spec.js',
                 vendor : 'dist/js/*.js'
             }
         },

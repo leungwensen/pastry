@@ -1,29 +1,30 @@
 {
-    "name"        : "brick",
-    "title"       : "brick",
+    "name"        : "pastry",
+    "title"       : "pastry",
     "version"     : "0.0.0",
     "description" : "a simple, easy to be customized html5 UI tookit.",
-    "homepage"    : "https://github.com/leungwensen/brick",
-    "keywords"    : ["brick", "html5", "UI", "tookit"],
+    "homepage"    : "https://github.com/leungwensen/pastry",
+    "keywords"    : ["pastry", "html5", "UI", "tookit"],
 
     "author"     : {
-        "name" : "BR builders",
-        "url"  : "https://github.com/leungwensen/brick/graphs/contributors"
+        "name" : "cookers",
+        "url"  : "https://github.com/leungwensen/pastry/graphs/contributors"
     },
     "repository" : {
         "type" : "git",
-        "url"  : "git://github.com/leungwensen/brick.git"
+        "url"  : "git://github.com/leungwensen/pastry.git"
     },
-    "bugs"       : "https://github.com/leungwensen/brick/issues",
+    "bugs"       : "https://github.com/leungwensen/pastry/issues",
     "licenses"   : [{
         "type" : "MIT",
-        "url"  : "https://github.com/leungwensen/brick/blob/master/LICENSE.md"
+        "url"  : "https://github.com/leungwensen/pastry/blob/master/LICENSE.md"
     }],
 
     "dependencies"    : { },
     "devDependencies" : {
         "browserstack-runner"   : "~0.0.12",
         "commander"             : "~2.0.0",
+        "js-beautify"           : "~1.4.1",
         "grunt"                 : "~0.4.1",
         "grunt-contrib-clean"   : "~0.5.0",
         "grunt-contrib-connect" : "~0.4.1",
@@ -40,16 +41,16 @@
     },
 
     "jsFiles" : [
-        "js/brick.js",
-        "js/brick.origin.js",
-        "js/brick.validator.js",
-        "js/brick.object.js",
-        "js/brick.array.js",
-        "js/brick.bool.js",
-        "js/brick.number.js",
-        "js/brick.date.js",
-        "js/brick.string.js",
-        "js/brick.json.js"
+        "js/pastry.js",
+        "js/pastry.origin.js",
+        "js/pastry.validator.js",
+        "js/pastry.object.js",
+        "js/pastry.array.js",
+        "js/pastry.bool.js",
+        "js/pastry.number.js",
+        "js/pastry.date.js",
+        "js/pastry.string.js",
+        "js/pastry.json.js"
     ],
 
     "scripts" : {

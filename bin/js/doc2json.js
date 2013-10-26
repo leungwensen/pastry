@@ -7,6 +7,7 @@ String.prototype.trim = String.prototype.trim || function () {
 };
 
 var genJSON = require('commander'),
+    beautify = require('js-beautify').js_beautify,
     fs = require('fs'),
     list = function (val) {      // for commander, get an array of strings
         return val.split(' ');
@@ -74,34 +75,34 @@ var genJSON = require('commander'),
         /*
          * @description: every line of comment like this one would be parsed as an object and added into the result list
          */
-        switch (key) {
-            case 'param':
-                ret[key] = ret[key] || [];
-                ret[key].push(embellishParam(value));
-                break;
-            case 'return':
-                ret[key] = embellishReturn(value);
-                break;
-            case 'requires':
-                if (!ret.hasOwnProperty(key)) {
-                    ret[key] = [];
-                }
-                ret[key] = ret[key].concat(str2arr(value));
-                break;
-            default:
-                if (ret.hasOwnProperty(key)) {
-                    var oldValue = ret[key],
-                        newValue = embellishValue(value);
-                    if (typeof oldValue === 'array' && typeof newValue !== 'array') {
-                        ret[key].push(newValue);
-                    } else {
-                        ret[key] = [];
-                        ret[key].push(oldValue, newValue);
-                    }
+        switch (true) {
+        case /^param/.test(key):
+            ret[key] = ret[key] || [];
+            ret[key].push(embellishParam(value));
+            break;
+        case /^return/.test(key):
+            ret[key] = embellishReturn(value);
+            break;
+        case /^require/.test(key):
+            if (!ret.hasOwnProperty(key)) {
+                ret[key] = [];
+            }
+            ret[key] = ret[key].concat(str2arr(value));
+            break;
+        default:
+            if (ret.hasOwnProperty(key)) {
+                var oldValue = ret[key],
+                    newValue = embellishValue(value);
+                if (typeof oldValue === 'array' && typeof newValue !== 'array') {
+                    ret[key].push(newValue);
                 } else {
-                    ret[key] = embellishValue(value);
+                    ret[key] = [];
+                    ret[key].push(oldValue, newValue);
                 }
-                break;
+            } else {
+                ret[key] = embellishValue(value);
+            }
+            break;
         }
     },
     doc2JSON = function (doc) {
@@ -153,7 +154,9 @@ var genJSON = require('commander'),
             for (i = 0; i < len; i ++) {
                 targetContent.push(doc2JSON(docs[i]));
             }
-            fs.writeFile(targetFilename, JSON.stringify(targetContent), function (err) {
+            fs.writeFile(targetFilename, beautify(JSON.stringify(targetContent), {
+                        indent_size: 4
+                    }), function (err) {
                 if (err) {
                     console.log('writting into ' + targetFilename + " failed:\n" + err);
                 }

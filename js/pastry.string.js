@@ -1,6 +1,6 @@
 /**
  * @description : extend for String
- * @filename    : brick.string.js
+ * @filename    : pastry.string.js
  * @requires    : []
  */
 'use strict';

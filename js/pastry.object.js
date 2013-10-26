@@ -1,11 +1,11 @@
 /**
  * @description : extend for Object
- * @filename    : brick.object.js
- * @requires    : [brick.js]
+ * @filename    : pastry.object.js
+ * @requires    : [pastry.js]
  */
 'use strict';
 
-(function (BR) {
+(function (PT) {
     var o = Object, p = o.prototype;
 
     // Javascript 1.5
@@ -40,7 +40,7 @@
     o.keys = o.keys || function (obj) {
         var key,
             result = [];
-        if (BR.isFunc(obj)) {
+        if (PT.isFunc(obj)) {
             obj.each(function (value, key) {
                 if (key !== 'prototype') {
                     result.push(key);
@@ -89,4 +89,4 @@
     p.hasVal = p.hasValue = p.hasValue || function (value) {
         return (this.values().indexOf(value) > -1);
     };
-}(BR));
+}(PT));

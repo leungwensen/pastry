@@ -2,7 +2,7 @@
 
 var dateA;
 
-describe('brick.date.js', function () {
+describe('pastry.date.js', function () {
     beforeEach(function () {
         dateA = new Date(1995,11,17,3,24,0);
     });

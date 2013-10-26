@@ -1,7 +1,7 @@
 /**
  * @description : extend for Number
- * @filename    : brick.number.js
- * @requires    : [brick.js, brick.object.js]
+ * @filename    : pastry.number.js
+ * @requires    : [pastry.object.js]
  */
 'use strict';
 

@@ -2,7 +2,7 @@
 
 var numA;
 
-describe('brick.number.js', function () {
+describe('pastry.number.js', function () {
     beforeEach(function () {
         numA = 123456.0789;
     });

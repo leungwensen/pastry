@@ -1,17 +1,17 @@
 /**
  * @description : try to load original edition of global variables
- * @filename    : brick.origin.js
- * @requires    : [brick.js]
+ * @filename    : pastry.origin.js
+ * @requires    : [pastry.js]
  */
 'use strict';
 
-(function (BR) {
-    var o = BR.ori = BR.origin = BR.origin || {};
+(function (PT) {
+    var o = PT.ori = PT.origin = PT.origin || {};
 
     /*
      * @param  : {array  } callbackList, list of callback functions.
      * @return : {unknown} value the callback functions try to return.
-     * @syntax : BR.origin.tryEach(callbackList) || BR.ori.tryEach(callbackList)
+     * @syntax : PT.origin.tryEach(callbackList) || PT.ori.tryEach(callbackList)
      */
     o.tryAny = o.tryAny || function (callbackList) {
         var i, callback, returnValue;
@@ -25,4 +25,4 @@
         }
         return returnValue;
     };
-}(BR));
+}(PT));

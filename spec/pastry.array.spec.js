@@ -2,7 +2,7 @@
 
 var arrA, arrB, arrC;
 
-describe('brick.array.js', function () {
+describe('pastry.array.js', function () {
     beforeEach(function () {
         arrA = [1, 2, 3, 3, 4, 4, 4, 5];
         arrB = [];
@@ -67,7 +67,7 @@ describe('brick.array.js', function () {
     });
 });
 
-describe('brick.array.js', function () {
+describe('pastry.array.js', function () {
     beforeEach(function () {
         arrA = [1, 2, 3, 3, 4, 4, 4, 5];
         arrB = [[1, 2], [3, 4], [5, 6]];
@@ -91,7 +91,7 @@ describe('brick.array.js', function () {
     });
 });
 
-describe('brick.array.js', function () {
+describe('pastry.array.js', function () {
     beforeEach(function () {
         arrA = [1, 2, 3, 3, 4, 4, 4, 5];
         arrB = [6, 7, 8, 9, 0];
