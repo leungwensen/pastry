@@ -1,18 +1,19 @@
-# brick
+# pastry
 
-[![Build Status](https://travis-ci.org/leungwensen/brick.png)](https://travis-ci.org/leungwensen/brick)
+[![Build Status](https://travis-ci.org/leungwensen/pastry.png)](https://travis-ci.org/leungwensen/pastry)
 
 
 ## description
 
-brick is a simple, easy to be customized html5 UI tookit.
+taste it for your html5 development. you can take one piece or any.
 
+## cookers
 
-## contributors
+[contributors](https://github.com/leungwensen/pastry/graphs/contributors)
 
-[contributors](https://github.com/leungwensen/brick/graphs/contributors)
+## want show your way of cooking?
 
 
 ## LICENSE
 
-[MIT LICENSE](https://github.com/leungwensen/brick/blob/master/LICENSE.md)
+[MIT LICENSE](https://github.com/leungwensen/pastry/blob/master/LICENSE.md)
