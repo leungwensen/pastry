@@ -8,9 +8,9 @@
         "name": "callbackList",
         "description": "list of callback functions."
     }],
-    "return": {
+    "return": [{
         "type": "unknown",
         "description": "value the callback functions try to return."
-    },
+    }],
     "syntax": "PT.origin.tryEach(callbackList) || PT.ori.tryEach(callbackList)"
 }]

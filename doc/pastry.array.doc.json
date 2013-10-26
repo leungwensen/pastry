@@ -1,7 +1,7 @@
 [{
     "description": "extend for Array",
     "filename": "pastry.array.js",
-    "requires": ["pastry.js", "pastry.validator.js", "pastry.object.js"]
+    "requires": ["pastry.js", "pastry.object.js"]
 }, "extend of Javascript 1.6", {
     "description": "Returns the first index at which a given element can be found in the array, or -1 if it is not present.",
     "param": [{
@@ -13,10 +13,10 @@
         "name": "fromIndex",
         "description": "The index to start the search at. Default: 0 (Entire array is searched)."
     }],
-    "return": {
+    "return": [{
         "type": "number",
         "description": "index of element."
-    },
+    }],
     "syntax": "array.indexOf(searchElement[, fromIndex])",
     "refference": {
         "type": "link",
@@ -33,10 +33,10 @@
         "name": "fromIndex",
         "description": "The index at which to start searching backwards. Defaults to the array's length."
     }],
-    "return": {
+    "return": [{
         "type": "number",
         "description": "index of element."
-    },
+    }],
     "syntax": "array.lastIndexOf(searchElement[, fromIndex])",
     "refference": {
         "type": "link",
@@ -53,10 +53,10 @@
         "name": "thisObj",
         "description": "Object to use as this when executing callback."
     }],
-    "return": {
+    "return": [{
         "type": "boolean",
         "description": "if test succeeded or not."
-    },
+    }],
     "syntax": "array.every(callback[, thisObj])",
     "refference": {
         "type": "link",
@@ -73,10 +73,10 @@
         "name": "thisObj",
         "description": "Object to use as this when executing callback."
     }],
-    "return": {
+    "return": [{
         "type": "array",
         "description": "result array."
-    },
+    }],
     "syntax": "array.filter(callback[, thisObj])",
     "refference": {
         "type": "link",
@@ -109,10 +109,10 @@
         "name": "thisObj",
         "description": "Object to use as this when executing callback."
     }],
-    "return": {
+    "return": [{
         "type": "array",
         "description": "result array."
-    },
+    }],
     "syntax": "array.map(callback[, thisObj])",
     "refference": {
         "type": "link",
@@ -129,10 +129,10 @@
         "name": "thisObj",
         "description": "Object to use as this when executing callback."
     }],
-    "return": {
+    "return": [{
         "type": "boolean",
         "description": "if test succeeded or not."
-    },
+    }],
     "syntax": "array.some(callback[, thisObj])",
     "refference": {
         "type": "link",
@@ -166,10 +166,10 @@
         "name": "array",
         "description": "The array reduce was called upon."
     }],
-    "return": {
+    "return": [{
         "type": "object",
         "description": "result value."
-    },
+    }],
     "syntax": "array.reduce(callback[, thisObj])",
     "refference": {
         "type": "link",
@@ -186,16 +186,16 @@
         "name": "thisObj",
         "description": "Object to use as the first argument to the first call of the callback."
     }],
-    "return": {
+    "return": [{
         "type": "object",
         "description": "result value."
-    },
+    }],
     "syntax": "array.reduceRight(callback[, thisObj])",
     "refference": {
         "type": "link",
         "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/ReduceRight"
     }
-}, "extend of PT.ick", {
+}, "extend of pastry", {
     "description": "binarySearch.",
     "param": [{
         "type": "object",
@@ -206,10 +206,10 @@
         "name": "compareFunc",
         "description": "compare function executed when searching."
     }],
-    "return": {
+    "return": [{
         "type": "number",
         "description": "result index."
-    },
+    }],
     "syntax": "array.binarySearch(element, compareFunc)"
 }, {
     "description": "Remove elements according to the given fromIndex and toIndex, and return the rest array.",
@@ -243,10 +243,10 @@
         "name": "that",
         "description": "the array to get intersection set with."
     }],
-    "return": {
+    "return": [{
         "type": "array",
         "description": "result array."
-    },
+    }],
     "syntax": "array.intersection(that)"
 }, {
     "description": "complement set of two arrays (this - that)",
@@ -255,10 +255,10 @@
         "name": "that",
         "description": "the array to get complement set with."
     }],
-    "return": {
+    "return": [{
         "type": "array",
         "description": "result array."
-    },
+    }],
     "syntax": "array.complement(that)"
 }, {
     "description": "union set of two arrays (this U that)",
@@ -267,16 +267,16 @@
         "name": "that",
         "description": "the array to get union set with."
     }],
-    "return": {
+    "return": [{
         "type": "array",
         "description": "result array."
-    },
+    }],
     "syntax": "array.intersection(that)"
 }, {
     "description": "uniq sub array of an array.",
-    "return": {
+    "return": [{
         "type": "array",
         "description": "result sub array."
-    },
+    }],
     "syntax": "array.uniq()"
 }]

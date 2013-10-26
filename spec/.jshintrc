@@ -13,6 +13,7 @@
     "globals" : {
         "PT"         : true,
         "PASTRY"     : true,
+        "exports"    : true,
         "jasmine"    : true,
         "describe"   : true,
         "it"         : true,

@@ -9,10 +9,10 @@
         "name": "pattern",
         "description": "defines pattern for stringify."
     }],
-    "return": {
+    "return": [{
         "type": "string",
         "description": "result string."
-    },
+    }],
     "syntax": "date.stringf([pattern])",
     "example": ["'{YYYY}-{MM}-{DD} {hh}:{mm}:{ss}' => '2013-10-03 00:57::13'", "'{YY}-{M}-{D} {h}:{m}:{s}' => '13-10-3 0:57::13'"]
 }]

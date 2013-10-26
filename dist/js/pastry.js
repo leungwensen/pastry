@@ -1,4 +1,4 @@
-/* pastry v0.0.0
+/* pastry v0.0.1
 *  https://github.com/leungwensen/pastry
 *  Copyright (c) 2013 cookers;  Licensed MIT */
 
@@ -8,22 +8,98 @@ var PASTRY, PT;
 PASTRY = PT = {};
 
 (function () {
-    // getting the environment
-    /*
-     * @syntax : PT.OVEN
-     */
-    PT.OVEN = PT.OVEN || this;
-}());
+    var P = PT;
 
-(function (PT) {
-    var o = PT.ori = PT.origin = PT.origin || {};
+    // alias. oh yeah, this is UNREADABLE !!
+    // just for saving bits.
+    /*
+     * @description : alias of Array
+     */
+    P.A  = Array;
+    P.AP = P.A.prototype;
+    /*
+     * @description : alias of Boolean
+     */
+    P.B  = Boolean;
+    P.BP = P.B.prototype;
+    /*
+     * @description : alias of Date
+     */
+    P.D  = Date;
+    P.DP = P.D.prototype;
+    /*
+     * @description : alias of Function
+     */
+    P.F  = Function;
+    P.FP = P.F.prototype;
+    /*
+     * @description : alias of Function
+     */
+    P.N  = Number;
+    P.NP = P.N.prototype;
+    /*
+     * @description : alias of Object
+     */
+    P.O  = Object;
+    P.OP = P.O.prototype;
+    /*
+     * @description : alias of String
+     */
+    P.S  = String;
+    P.SP = P.S.prototype;
+
+    /**
+     * @description : isXxx, check if is Xxx.
+     * @parameters  : {unknown} value, value to be tested.
+     * @return      : {boolean} if test succeeded.
+     * @syntax      : PT.isXxx(value)
+     */
+    /**
+     * @syntax : PT.isDef(value)
+     */
+    P.isDef = function (value) {
+        return (typeof value !== 'undefined');
+    };
+     /**
+     * @syntax : PT.isFunc(value)
+     */
+    P.isFunc = function (value) {
+        return (typeof value === 'function');
+    };
+    /**
+     * @syntax : PT.isNum(value)
+     */
+    P.isNum = function (value) {
+        return (typeof value === 'number');
+    };
+    /**
+     * @syntax : PT.isObj(value)
+     */
+    P.isObj = function (value) {
+        return (typeof value === 'object');
+    };
+    /**
+     * @syntax : PT.isStr(value)
+     */
+    P.isStr = function (value) {
+        return (typeof value === 'string');
+    };
+    // extend of Javascript 1.8.5
+    /**
+     * @syntax     : PT.isArr(value)
+     * @refference : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray
+     */
+    P.isArr = P.A.isArray || function (value) {
+        return P.OP.toString.call(value) === "[object Array]";
+    };
 
     /*
-     * @param  : {array  } callbackList, list of callback functions.
-     * @return : {unknown} value the callback functions try to return.
-     * @syntax : PT.origin.tryEach(callbackList) || PT.ori.tryEach(callbackList)
+     * @description : try to load original edition of global variables
+     * @param       : {array  } callbackList, list of callback functions.
+     * @return      : {unknown} value the callback functions try to return.
+     * @syntax      : PT.tryEach(callbackList) || PT.tryEach(callbackList)
      */
-    o.tryAny = o.tryAny || function (callbackList) {
+    P.tryAny = function (callbackList) {
         var i, callback, returnValue;
 
         for (i = 0; i < callbackList.length; i ++) {
@@ -35,63 +111,29 @@ PASTRY = PT = {};
         }
         return returnValue;
     };
-}(PT));
+
+    // export PT
+    /*
+     * @description : the environment global variable.
+     * @syntax      : PT.OVEN
+     * @return      : {browser} window.
+     * @return      : {nodejs } exports.
+     */
+    P.OVEN = P.ON = this || {}; // jasmine...
+    if (P.isDef(exports)) {
+        if (P.isDef(module) && module.exports) {
+            exports = module.exports = P;
+        }
+        exports.PASTRY = exports.PT = P;
+    } else {
+        P.ON.PASTRY = P.ON.PT = P;
+    }
+
+    // ready for cooking!
+}());
 
 (function (PT) {
-    /**
-     * @description : isXxx, check if is Xxx.
-     * @parameters  : {unknown} value, value to be tested.
-     * @return      : {boolean} if test succeeded.
-     * @syntax      : PT.isXxx(value)
-     */
-
-    /**
-     * @syntax : PT.isDef(value)
-     */
-    PT.isDef = PT.isDef || function (value) {
-        return (typeof value !== 'undefined');
-    };
-
-     /**
-     * @syntax : PT.isFunc(value)
-     */
-    PT.isFunc = PT.isFunc || function (value) {
-        return (typeof value === 'function');
-    };
-
-    /**
-     * @syntax : PT.isNum(value)
-     */
-    PT.isNum = PT.isNum || function (value) {
-        return (typeof value === 'number');
-    };
-
-    /**
-     * @syntax : PT.isObj(value)
-     */
-    PT.isObj = PT.isObj || function (value) {
-        return (typeof value === 'object');
-    };
-
-    /**
-     * @syntax : PT.isStr(value)
-     */
-    PT.isStr = PT.isStr || function (value) {
-        return (typeof value === 'string');
-    };
-
-    // extend of Javascript 1.8.5
-    /**
-     * @syntax     : PT.isArr(value)
-     * @refference : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray
-     */
-    PT.isArr = PT.isArr || Array.isArray || function (value) {
-        return Object.prototype.toString.call(value) === "[object Array]";
-    };
-}(PT));
-
-(function (PT) {
-    var o = Object, p = o.prototype;
+    var o = PT.O, op = PT.OP;
 
     // Javascript 1.5
     /**
@@ -99,7 +141,7 @@ PASTRY = PT = {};
      * @param       : {string} key, key to check
      * @syntax      : object.hasKey(key) || object.has(key)
      */
-    p.has = p.hasKey = p.hasKey || p.hasOwnProperty;
+    op.has = op.hasKey = op.hasOwnProperty;
 
     // extend of Javascript 1.8.x
     /**
@@ -108,7 +150,7 @@ PASTRY = PT = {};
      * @param       : {object  } thisObj  , Object to use as this when executing callback.
      * @syntax      : object.forEach(callback[, thisObj]) || object.each(callback[, thisObj])
      */
-    p.each = p.forEach = p.forEach || function (callback, thisObj) {
+    op.each = op.forEach = op.forEach || function (callback, thisObj) {
         var key,
             obj = this;
         for (key in obj){
@@ -139,12 +181,12 @@ PASTRY = PT = {};
         return result;
     };
 
-    // extend of Brick
+    // extend of pastry
     /**
      * @description : returns keys of an object
      * @syntax      : object.keys()
      */
-    p.keys = p.keys || function () {
+    op.keys = function () {
         return o.keys(this);
     };
     /**
@@ -152,7 +194,7 @@ PASTRY = PT = {};
      * @param       : {object} obj, Object to get values from.
      * @syntax      : o.values(obj)
      */
-    o.values = o.values || function (obj) {
+    o.values = function (obj) {
         var values = [];
         obj.each(function (value) {
             values.push(value);
@@ -163,7 +205,7 @@ PASTRY = PT = {};
      * @description : returns values of an object
      * @syntax      : object.values()
      */
-    p.values = p.values || function () {
+    op.values = function () {
         return o.values(this);
     };
     /**
@@ -171,13 +213,13 @@ PASTRY = PT = {};
      * @param       : {unknown} value, value to check.
      * @syntax      : object.hasValue(value) || object.hasVal(value)
      */
-    p.hasVal = p.hasValue = p.hasValue || function (value) {
+    op.hasVal = op.hasValue = function (value) {
         return (this.values().indexOf(value) > -1);
     };
 }(PT));
 
 (function (PT) {
-    var p = Array.prototype;
+    var ap = PT.AP;
 
     // extend of Javascript 1.6
     /**
@@ -188,7 +230,7 @@ PASTRY = PT = {};
      * @syntax      : array.indexOf(searchElement[, fromIndex])
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf
      */
-    p.indexOf = p.indexOf || function (searchElement, fromIndex) {
+    ap.indexOf = ap.indexOf || function (searchElement, fromIndex) {
         var i,
             a = this,
             len = a.length >>> 0;
@@ -216,7 +258,7 @@ PASTRY = PT = {};
      * @syntax      : array.lastIndexOf(searchElement[, fromIndex])
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/lastIndexOf
      */
-    p.lastIndexOf = p.lastIndexOf || function (searchElement, fromIndex) {
+    ap.lastIndexOf = ap.lastIndexOf || function (searchElement, fromIndex) {
         var i,
             a = this,
             len = a.length >>> 0;
@@ -241,7 +283,7 @@ PASTRY = PT = {};
      * @syntax      : array.every(callback[, thisObj])
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/every
      */
-    p.every = p.every || function (callback, thisObj) {
+    ap.every = ap.every || function (callback, thisObj) {
         var i,
             a = this;
         for (i = 0; i < a.length; i ++) {
@@ -259,7 +301,7 @@ PASTRY = PT = {};
      * @syntax      : array.filter(callback[, thisObj])
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter
      */
-    p.filter = p.filter || function (callback, thisObj) {
+    ap.filter = ap.filter || function (callback, thisObj) {
         var a = this,
             res = [];
         a.each(function (element, key) {
@@ -285,7 +327,7 @@ PASTRY = PT = {};
      * @syntax      : array.map(callback[, thisObj])
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map
      */
-    p.map = p.map || function(callback, thisObj) {
+    ap.map = ap.map || function(callback, thisObj) {
         var a = this,
             res = [];
         a.each(function (element, key) {
@@ -301,7 +343,7 @@ PASTRY = PT = {};
      * @syntax      : array.some(callback[, thisObj])
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/some
      */
-    p.some = p.some || function (callback, thisObj) {
+    ap.some = ap.some || function (callback, thisObj) {
         var i,
             a = this;
         for (i = 0; i < a.length; i ++) {
@@ -325,7 +367,7 @@ PASTRY = PT = {};
      * @syntax          : array.reduce(callback[, thisObj])
      * @refference      : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Reduce
      */
-    p.reduce = p.reduce || function (callback, thisObj) {
+    ap.reduce = ap.reduce || function (callback, thisObj) {
         var i, value,
             a = this,
             isValueSet = false;
@@ -356,7 +398,7 @@ PASTRY = PT = {};
      * @syntax      : array.reduceRight(callback[, thisObj])
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/ReduceRight
      */
-    p.reduceRight = p.reduceRight || function (callback, thisObj) {
+    ap.reduceRight = ap.reduceRight || function (callback, thisObj) {
         var i, value,
             a = this,
             isValueSet = false;
@@ -380,7 +422,7 @@ PASTRY = PT = {};
         return value;
     };
 
-    // extend of PT.ick
+    // extend of pastry
     /**
      * @description : binarySearch.
      * @param       : {object  } element     , element to be searched.
@@ -388,7 +430,7 @@ PASTRY = PT = {};
      * @return      : {number  } result index.
      * @syntax      : array.binarySearch(element, compareFunc)
      */
-    p.binarySearch = p.binarySearch || function (element, compareFunc) {
+    ap.binarySearch = function (element, compareFunc) {
         var start = 0,
             a = this,
             end = a.length,
@@ -411,7 +453,7 @@ PASTRY = PT = {};
      * @syntax      : array.remove([fromIndex[, toIndex]])
      * @refference  : Array Remove - B. John Resig (MIT Licensed)
      */
-    p.remove = p.remove || function (fromIndex, toIndex) {
+    ap.remove = function (fromIndex, toIndex) {
         var rest,
             a = this,
             len = a.length;
@@ -428,7 +470,7 @@ PASTRY = PT = {};
      * @param       : {object} withElement , element to replace with.
      * @syntax      : array.replace(element, withElement)
      */
-    p.replace = p.replace || function (element, withElement) {
+    ap.replace = function (element, withElement) {
         var i,
             a = this;
         a.each(function (elem, i) {
@@ -444,7 +486,7 @@ PASTRY = PT = {};
      * @return      : {array} result array.
      * @syntax      : array.intersection(that)
      */
-    p.intersection = p.intersection || function (that) {
+    ap.intersection = function (that) {
         var a = this,
             resultArr = [];
         a.each(function (element) {
@@ -460,7 +502,7 @@ PASTRY = PT = {};
      * @return      : {array} result array.
      * @syntax      : array.complement(that)
      */
-    p.complement = p.complement || function (that) {
+    ap.complement = function (that) {
         var a = this,
             resultArr = [];
         a.each(function (element) {
@@ -476,7 +518,7 @@ PASTRY = PT = {};
      * @return      : {array} result array.
      * @syntax      : array.intersection(that)
      */
-    p.union = p.union || function (that) {
+    ap.union = function (that) {
         return this.concat(that).uniq();
     };
     /**
@@ -484,7 +526,7 @@ PASTRY = PT = {};
      * @return      : {array} result sub array.
      * @syntax      : array.uniq()
      */
-    p.uniq = p.uniq || function () {
+    ap.uniq = function () {
         var a = this,
             resultArr = [];
         a.each(function (element) {
@@ -497,8 +539,8 @@ PASTRY = PT = {};
 }(PT));
 
 
-(function () {
-    var p = Number.prototype;
+(function (PT) {
+    var np = PT.NP;
 
     /**
      * @description : return stringified number according to given pattern.
@@ -507,7 +549,7 @@ PASTRY = PT = {};
      * @return      : {string} result string.
      * @syntax      : number.stringf([option])
      */
-    p.stringf = p.stringf || function (option) {
+    np.stringf = function (option) {
         var i, len, placeHolder,
             str = this.toString(),
             strArr = str.split('.');
@@ -540,10 +582,10 @@ PASTRY = PT = {};
         }
         return strArr[0];
     };
-}());
+}(PT));
 
-(function () {
-    var p = Date.prototype,
+(function (PT) {
+    var dp = PT.DP,
         f = function (n) {
             return n < 10 ? '0' + n : n;
         };
@@ -555,10 +597,10 @@ PASTRY = PT = {};
      * @example     : '{YYYY}-{MM}-{DD} {hh}:{mm}:{ss}' => '2013-10-03 00:57::13'
      * @example     : '{YY}-{M}-{D} {h}:{m}:{s}'        => '13-10-3 0:57::13'
      */
-    p.stringf = p.stringf || function (pattern) {
+    dp.stringf = function (pattern) {
         var y, mo, d, h, mi, s;
         pattern = pattern || '{YYYY}-{MM}-{DD} {hh}:{mm}:{ss}';
-        return pattern.replace( '{YYYY}', y = String(this.getFullYear()) )
+        return pattern.replace( '{YYYY}', y = PT.S(this.getFullYear()) )
                       .replace( '{MM}'  , f(mo = this.getMonth()  ) )
                       .replace( '{DD}'  , f(d  = this.getDate()   ) )
                       .replace( '{hh}'  , f(h  = this.getHours()  ) )
@@ -571,10 +613,10 @@ PASTRY = PT = {};
                       .replace( '{m}'   , mi )
                       .replace( '{s}'   , s  );
     };
-}());
+}(PT));
 
-(function () {
-    var s = String, p = s.prototype;
+(function (PT) {
+    var sp = PT.SP;
     // extend of Javascript 1.8.1
     /**
      * @description : Removes whitespace from both ends of the string.
@@ -582,23 +624,24 @@ PASTRY = PT = {};
      * @syntax      : string.trim()
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/Trim
      */
-    p.trim = p.trim || function () {
+    sp.trim = sp.trim || function () {
         return this.replace(/^\s+|\s+$/g, '');
     };
-}());
+}(PT));
 
 (function (PT) {
-    PT.JSON = PT.JSON || PT.origin.tryAny([
+    PT.JSON = PT.tryAny([
             function () { return JSON; },
-            function () { return PT.GROUND.JSON; }
+            function () { return PT.OVEN.JSON; }
         ]);
     if (PT.isDef(PT.JSON)) {
         return;
     }
 
-    var D2JSON = Date.prototype.toJSON;
+    var D2JSON = PT.DP.toJSON,
+        S = PT.S;
     if (!PT.isFunc(D2JSON)) {
-        [String.prototype, Number.prototype, Boolean.prototype].each(function (p) {
+        [PT.SP, PT.NP, PT.BP].each(function (p) {
             p.toJSON = function () {
                 return this.valueOf();
             };
@@ -641,17 +684,17 @@ PASTRY = PT = {};
             case 'string':
                 return quote(value);
             case 'number':
-                return isFinite(value) ? String(value) : 'null';
+                return isFinite(value) ? S(value) : 'null';
             case 'boolean':
             case 'null':
-                return String(value);
+                return S(value);
             case 'object':
                 if (!value) {
                     return 'null';
                 }
                 gap += indent;
                 partial = [];
-                if (Object.prototype.toString.apply(value) === '[object Array]') {
+                if (PT.OP.toString.apply(value) === '[object Array]') {
                     for (i = 0; i < value.length; i += 1) {
                         partial[i] = str(i, value) || 'null';
                     }
@@ -689,7 +732,7 @@ PASTRY = PT = {};
      * @return      : {string } result string.
      * @syntax      : PT.JSON.stringify(value).
      */
-    J.stringify = J.stringify || function (value, replacer, space) {
+    J.stringify = function (value, replacer, space) {
         var i;
         gap = '';
         indent = '';
@@ -715,7 +758,7 @@ PASTRY = PT = {};
      * @return      : {unknown} result object.
      * @syntax      : PT.JSON.parse(string).
      */
-    J.parse = J.parse || function (text, reviver) {
+    J.parse = function (text, reviver) {
         var j;
         function walk(holder, key) {
             var k, v,
@@ -732,7 +775,7 @@ PASTRY = PT = {};
             }
             return reviver.call(holder, key, value);
         }
-        text = String(text);
+        text = S(text);
         cx.lastIndex = 0;
         if (cx.test(text)) {
             text = text.replace(cx, function (a) {

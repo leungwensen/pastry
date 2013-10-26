@@ -1,12 +1,12 @@
 /**
  * @description : extend for Array
  * @filename    : pastry.array.js
- * @requires    : [pastry.js, pastry.validator.js, pastry.object.js]
+ * @requires    : [pastry.js, pastry.object.js]
  */
 'use strict';
 
 (function (PT) {
-    var p = Array.prototype;
+    var ap = PT.AP;
 
     // extend of Javascript 1.6
     /**
@@ -17,7 +17,7 @@
      * @syntax      : array.indexOf(searchElement[, fromIndex])
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf
      */
-    p.indexOf = p.indexOf || function (searchElement, fromIndex) {
+    ap.indexOf = ap.indexOf || function (searchElement, fromIndex) {
         var i,
             a = this,
             len = a.length >>> 0;
@@ -45,7 +45,7 @@
      * @syntax      : array.lastIndexOf(searchElement[, fromIndex])
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/lastIndexOf
      */
-    p.lastIndexOf = p.lastIndexOf || function (searchElement, fromIndex) {
+    ap.lastIndexOf = ap.lastIndexOf || function (searchElement, fromIndex) {
         var i,
             a = this,
             len = a.length >>> 0;
@@ -70,7 +70,7 @@
      * @syntax      : array.every(callback[, thisObj])
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/every
      */
-    p.every = p.every || function (callback, thisObj) {
+    ap.every = ap.every || function (callback, thisObj) {
         var i,
             a = this;
         for (i = 0; i < a.length; i ++) {
@@ -88,7 +88,7 @@
      * @syntax      : array.filter(callback[, thisObj])
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter
      */
-    p.filter = p.filter || function (callback, thisObj) {
+    ap.filter = ap.filter || function (callback, thisObj) {
         var a = this,
             res = [];
         a.each(function (element, key) {
@@ -114,7 +114,7 @@
      * @syntax      : array.map(callback[, thisObj])
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map
      */
-    p.map = p.map || function(callback, thisObj) {
+    ap.map = ap.map || function(callback, thisObj) {
         var a = this,
             res = [];
         a.each(function (element, key) {
@@ -130,7 +130,7 @@
      * @syntax      : array.some(callback[, thisObj])
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/some
      */
-    p.some = p.some || function (callback, thisObj) {
+    ap.some = ap.some || function (callback, thisObj) {
         var i,
             a = this;
         for (i = 0; i < a.length; i ++) {
@@ -154,7 +154,7 @@
      * @syntax          : array.reduce(callback[, thisObj])
      * @refference      : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Reduce
      */
-    p.reduce = p.reduce || function (callback, thisObj) {
+    ap.reduce = ap.reduce || function (callback, thisObj) {
         var i, value,
             a = this,
             isValueSet = false;
@@ -185,7 +185,7 @@
      * @syntax      : array.reduceRight(callback[, thisObj])
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/ReduceRight
      */
-    p.reduceRight = p.reduceRight || function (callback, thisObj) {
+    ap.reduceRight = ap.reduceRight || function (callback, thisObj) {
         var i, value,
             a = this,
             isValueSet = false;
@@ -209,7 +209,7 @@
         return value;
     };
 
-    // extend of PT.ick
+    // extend of pastry
     /**
      * @description : binarySearch.
      * @param       : {object  } element     , element to be searched.
@@ -217,7 +217,7 @@
      * @return      : {number  } result index.
      * @syntax      : array.binarySearch(element, compareFunc)
      */
-    p.binarySearch = p.binarySearch || function (element, compareFunc) {
+    ap.binarySearch = function (element, compareFunc) {
         var start = 0,
             a = this,
             end = a.length,
@@ -240,7 +240,7 @@
      * @syntax      : array.remove([fromIndex[, toIndex]])
      * @refference  : Array Remove - B. John Resig (MIT Licensed)
      */
-    p.remove = p.remove || function (fromIndex, toIndex) {
+    ap.remove = function (fromIndex, toIndex) {
         var rest,
             a = this,
             len = a.length;
@@ -257,7 +257,7 @@
      * @param       : {object} withElement , element to replace with.
      * @syntax      : array.replace(element, withElement)
      */
-    p.replace = p.replace || function (element, withElement) {
+    ap.replace = function (element, withElement) {
         var i,
             a = this;
         a.each(function (elem, i) {
@@ -273,7 +273,7 @@
      * @return      : {array} result array.
      * @syntax      : array.intersection(that)
      */
-    p.intersection = p.intersection || function (that) {
+    ap.intersection = function (that) {
         var a = this,
             resultArr = [];
         a.each(function (element) {
@@ -289,7 +289,7 @@
      * @return      : {array} result array.
      * @syntax      : array.complement(that)
      */
-    p.complement = p.complement || function (that) {
+    ap.complement = function (that) {
         var a = this,
             resultArr = [];
         a.each(function (element) {
@@ -305,7 +305,7 @@
      * @return      : {array} result array.
      * @syntax      : array.intersection(that)
      */
-    p.union = p.union || function (that) {
+    ap.union = function (that) {
         return this.concat(that).uniq();
     };
     /**
@@ -313,7 +313,7 @@
      * @return      : {array} result sub array.
      * @syntax      : array.uniq()
      */
-    p.uniq = p.uniq || function () {
+    ap.uniq = function () {
         var a = this,
             resultArr = [];
         a.each(function (element) {

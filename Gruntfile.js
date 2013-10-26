@@ -27,7 +27,7 @@ module.exports = function(grunt) {
                     },
                 },
                 files: {
-                    'dist/js/<%= pkg.name %>-<%= pkg.version %>.js': pkg.jsFiles,
+                    'dist/js/<%= pkg.name %>.js': pkg.jsFiles,
                 }
 
             }
@@ -65,13 +65,13 @@ module.exports = function(grunt) {
             src : 'dist/js/*.js',
             options : {
                 specs  : 'spec/<%= pkg.title || pkg.name %>.*.spec.js',
-                vendor : 'dist/js/*.js'
+                vendor : 'vendor/*.js'
             }
         },
         sass: {
             dist: {
                 files: {
-                    'dist/css/<%= pkg.name %>-<%= pkg.version %>.css': 'scss/<%= pkg.name %>.scss'
+                    'dist/css/<%= pkg.name %>.css': 'scss/<%= pkg.name %>.scss'
                 }
             }
         },
@@ -96,8 +96,8 @@ module.exports = function(grunt) {
                     banner: '<%= banner %>'
                 },
                 files: {
-                    'release/css/<%= pkg.name %>-<%= pkg.version %>.min.css': [
-                        'dist/css/<%= pkg.name %>-<%= pkg.version %>.css'
+                    'release/css/<%= pkg.name %>.min.css': [
+                        'dist/css/<%= pkg.name %>.css'
                     ]
                 }
             },
@@ -114,8 +114,8 @@ module.exports = function(grunt) {
                 banner: '<%= banner %>'
             },
             dist: {
-                src: 'dist/js/<%= pkg.name %>-<%= pkg.version %>.js',
-                dest: 'release/js/<%= pkg.name %>-<%= pkg.version %>.min.js'
+                src: 'dist/js/<%= pkg.name %>.js',
+                dest: 'release/js/<%= pkg.name %>.min.js'
             }
         },
 

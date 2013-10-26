@@ -1,24 +1,41 @@
 {
     "name"        : "pastry",
     "title"       : "pastry",
-    "version"     : "0.0.0",
+    "version"     : "0.0.1",
     "description" : "a simple, easy to be customized html5 UI tookit.",
     "homepage"    : "https://github.com/leungwensen/pastry",
-    "keywords"    : ["pastry", "html5", "UI", "tookit"],
+    "main"        : "release/js/pastry.min.js",
 
-    "author"     : {
+    "keywords" : [
+        "pastry",
+        "html5",
+        "UI",
+        "javascript language extend",
+        "tookit"
+    ],
+
+    "author" : {
         "name" : "cookers",
         "url"  : "https://github.com/leungwensen/pastry/graphs/contributors"
     },
+
     "repository" : {
         "type" : "git",
         "url"  : "git://github.com/leungwensen/pastry.git"
     },
-    "bugs"       : "https://github.com/leungwensen/pastry/issues",
+
+    "bugs" : {
+        "url" : "https://github.com/leungwensen/pastry/issues"
+    },
+
     "licenses"   : [{
         "type" : "MIT",
         "url"  : "https://github.com/leungwensen/pastry/blob/master/LICENSE.md"
     }],
+
+    "engines": {
+        "node": ">=0.8.0"
+    },
 
     "dependencies"    : { },
     "devDependencies" : {
@@ -42,8 +59,6 @@
 
     "jsFiles" : [
         "js/pastry.js",
-        "js/pastry.origin.js",
-        "js/pastry.validator.js",
         "js/pastry.object.js",
         "js/pastry.array.js",
         "js/pastry.bool.js",

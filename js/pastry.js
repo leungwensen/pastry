@@ -9,9 +9,126 @@ var PASTRY, PT;
 PASTRY = PT = {};
 
 (function () {
-    // getting the environment
+    var P = PT;
+
+    // alias. oh yeah, this is UNREADABLE !!
+    // just for saving bits.
     /*
-     * @syntax : PT.OVEN
+     * @description : alias of Array
      */
-    PT.OVEN = PT.OVEN || this;
+    P.A  = Array;
+    P.AP = P.A.prototype;
+    /*
+     * @description : alias of Boolean
+     */
+    P.B  = Boolean;
+    P.BP = P.B.prototype;
+    /*
+     * @description : alias of Date
+     */
+    P.D  = Date;
+    P.DP = P.D.prototype;
+    /*
+     * @description : alias of Function
+     */
+    P.F  = Function;
+    P.FP = P.F.prototype;
+    /*
+     * @description : alias of Function
+     */
+    P.N  = Number;
+    P.NP = P.N.prototype;
+    /*
+     * @description : alias of Object
+     */
+    P.O  = Object;
+    P.OP = P.O.prototype;
+    /*
+     * @description : alias of String
+     */
+    P.S  = String;
+    P.SP = P.S.prototype;
+
+    /**
+     * @description : isXxx, check if is Xxx.
+     * @parameters  : {unknown} value, value to be tested.
+     * @return      : {boolean} if test succeeded.
+     * @syntax      : PT.isXxx(value)
+     */
+    /**
+     * @syntax : PT.isDef(value)
+     */
+    P.isDef = function (value) {
+        return (typeof value !== 'undefined');
+    };
+     /**
+     * @syntax : PT.isFunc(value)
+     */
+    P.isFunc = function (value) {
+        return (typeof value === 'function');
+    };
+    /**
+     * @syntax : PT.isNum(value)
+     */
+    P.isNum = function (value) {
+        return (typeof value === 'number');
+    };
+    /**
+     * @syntax : PT.isObj(value)
+     */
+    P.isObj = function (value) {
+        return (typeof value === 'object');
+    };
+    /**
+     * @syntax : PT.isStr(value)
+     */
+    P.isStr = function (value) {
+        return (typeof value === 'string');
+    };
+    // extend of Javascript 1.8.5
+    /**
+     * @syntax     : PT.isArr(value)
+     * @refference : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray
+     */
+    P.isArr = P.A.isArray || function (value) {
+        return P.OP.toString.call(value) === "[object Array]";
+    };
+
+    /*
+     * @description : try to load original edition of global variables
+     * @param       : {array  } callbackList, list of callback functions.
+     * @return      : {unknown} value the callback functions try to return.
+     * @syntax      : PT.tryEach(callbackList) || PT.tryEach(callbackList)
+     */
+    P.tryAny = function (callbackList) {
+        var i, callback, returnValue;
+
+        for (i = 0; i < callbackList.length; i ++) {
+            callback = callbackList[i];
+            try {
+                returnValue = callback();
+                break;
+            } catch (e) {}
+        }
+        return returnValue;
+    };
+
+    // export PT
+    /*
+     * @description : the environment global variable.
+     * @syntax      : PT.OVEN
+     * @return      : {browser} window.
+     * @return      : {nodejs } exports.
+     */
+    P.OVEN = P.ON = this || {}; // jasmine...
+    if (P.isDef(exports)) {
+        if (P.isDef(module) && module.exports) {
+            exports = module.exports = P;
+        }
+        exports.PASTRY = exports.PT = P;
+    } else {
+        P.ON.PASTRY = P.ON.PT = P;
+    }
+
+    // ready for cooking!
 }());

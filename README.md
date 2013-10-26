@@ -7,13 +7,19 @@
 
 taste it for your html5 development. you can take one piece or any.
 
+
+## way to taste it
+
+
 ## cookers
 
 [contributors](https://github.com/leungwensen/pastry/graphs/contributors)
 
-## want show your way of cooking?
+
+## want to help cooking?
 
 
 ## LICENSE
 
 [MIT LICENSE](https://github.com/leungwensen/pastry/blob/master/LICENSE.md)
+

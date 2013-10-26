@@ -5,8 +5,8 @@
  */
 'use strict';
 
-(function () {
-    var p = Number.prototype;
+(function (PT) {
+    var np = PT.NP;
 
     /**
      * @description : return stringified number according to given pattern.
@@ -15,7 +15,7 @@
      * @return      : {string} result string.
      * @syntax      : number.stringf([option])
      */
-    p.stringf = p.stringf || function (option) {
+    np.stringf = function (option) {
         var i, len, placeHolder,
             str = this.toString(),
             strArr = str.split('.');
@@ -48,4 +48,4 @@
         }
         return strArr[0];
     };
-}());
+}(PT));

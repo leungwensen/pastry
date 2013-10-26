@@ -15,9 +15,9 @@
         "integer": ">=0",
         "zero": "1|0"
     },
-    "return": {
+    "return": [{
         "type": "string",
         "description": "result string."
-    },
+    }],
     "syntax": "number.stringf([option])"
 }]

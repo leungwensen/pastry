@@ -11,8 +11,6 @@
     "eqnull"  : true,
     "node"    : true,
     "globals" : {
-        "PT"      : true,
-        "PASTRY"  : true,
         "exports" : true
     }
 }

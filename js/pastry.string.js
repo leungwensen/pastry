@@ -1,12 +1,12 @@
 /**
  * @description : extend for String
  * @filename    : pastry.string.js
- * @requires    : []
+ * @requires    : [pastry.js]
  */
 'use strict';
 
-(function () {
-    var s = String, p = s.prototype;
+(function (PT) {
+    var sp = PT.SP;
     // extend of Javascript 1.8.1
     /**
      * @description : Removes whitespace from both ends of the string.
@@ -14,7 +14,7 @@
      * @syntax      : string.trim()
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/Trim
      */
-    p.trim = p.trim || function () {
+    sp.trim = sp.trim || function () {
         return this.replace(/^\s+|\s+$/g, '');
     };
-}());
+}(PT));

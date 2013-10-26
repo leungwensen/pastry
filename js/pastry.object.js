@@ -6,7 +6,7 @@
 'use strict';
 
 (function (PT) {
-    var o = Object, p = o.prototype;
+    var o = PT.O, op = PT.OP;
 
     // Javascript 1.5
     /**
@@ -14,7 +14,7 @@
      * @param       : {string} key, key to check
      * @syntax      : object.hasKey(key) || object.has(key)
      */
-    p.has = p.hasKey = p.hasKey || p.hasOwnProperty;
+    op.has = op.hasKey = op.hasOwnProperty;
 
     // extend of Javascript 1.8.x
     /**
@@ -23,7 +23,7 @@
      * @param       : {object  } thisObj  , Object to use as this when executing callback.
      * @syntax      : object.forEach(callback[, thisObj]) || object.each(callback[, thisObj])
      */
-    p.each = p.forEach = p.forEach || function (callback, thisObj) {
+    op.each = op.forEach = op.forEach || function (callback, thisObj) {
         var key,
             obj = this;
         for (key in obj){
@@ -54,12 +54,12 @@
         return result;
     };
 
-    // extend of Brick
+    // extend of pastry
     /**
      * @description : returns keys of an object
      * @syntax      : object.keys()
      */
-    p.keys = p.keys || function () {
+    op.keys = function () {
         return o.keys(this);
     };
     /**
@@ -67,7 +67,7 @@
      * @param       : {object} obj, Object to get values from.
      * @syntax      : o.values(obj)
      */
-    o.values = o.values || function (obj) {
+    o.values = function (obj) {
         var values = [];
         obj.each(function (value) {
             values.push(value);
@@ -78,7 +78,7 @@
      * @description : returns values of an object
      * @syntax      : object.values()
      */
-    p.values = p.values || function () {
+    op.values = function () {
         return o.values(this);
     };
     /**
@@ -86,7 +86,7 @@
      * @param       : {unknown} value, value to check.
      * @syntax      : object.hasValue(value) || object.hasVal(value)
      */
-    p.hasVal = p.hasValue = p.hasValue || function (value) {
+    op.hasVal = op.hasValue = function (value) {
         return (this.values().indexOf(value) > -1);
     };
 }(PT));

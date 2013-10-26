@@ -9,10 +9,10 @@
         "name": "value",
         "description": "value to be tested."
     }],
-    "return": {
+    "return": [{
         "type": "boolean",
         "description": "if test succeeded."
-    },
+    }],
     "syntax": "PT.isXxx(value)"
 }, {
     "syntax": "PT.isDef(value)"

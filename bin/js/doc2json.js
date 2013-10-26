@@ -2,13 +2,10 @@
 
 'use strict';
 
-String.prototype.trim = String.prototype.trim || function () {
-    return this.replace(/^\s+|\s+$/g, '');
-};
-
-var genJSON = require('commander'),
+var genJSON  = require('commander'),
+    PT       = require('pastry'),
     beautify = require('js-beautify').js_beautify,
-    fs = require('fs'),
+    fs       = require('fs'),
     list = function (val) {      // for commander, get an array of strings
         return val.split(' ');
     },
@@ -16,18 +13,14 @@ var genJSON = require('commander'),
         return val;
     },
     str2arr = function (str) {   // '[xxx, xxx]' => ['xxx', 'xxx']
-        var i,
-            arr = str.replace(/\[|\]/gm, '').split(','),
-            len = arr.length;
-        for (i = 0; i < len; i ++) {
-            arr[i] = arr[i].trim();
-        }
-        return arr;
+        return str.replace(/\[|\]/gm, '').split(',').map(function (val) {
+            return val.trim();
+        });
     },
+    /*
+     * @param : {type} name , description
+     */
     embellishParam = function (val) {
-        /*
-         * @param : {type} name , description
-         */
         var parts,
             type = val.match(/\{\w+\s*\}/)[0];
         val = val.replace(type, '');
@@ -38,10 +31,10 @@ var genJSON = require('commander'),
             'description' : parts.slice(1).join('').trim()
         };
     },
+    /*
+     * @return : {type} description
+     */
     embellishReturn = function (val) {
-        /*
-         * @return : {type} description
-         */
         var type = val.match(/\{\w+\s*\}/)[0],
             description = val.replace(type, '');
         return {
@@ -49,15 +42,14 @@ var genJSON = require('commander'),
             'description' : description.trim()
         };
     },
+    /*
+     * @any : {this is what will be dealed with}
+     */
     embellishValue = function (val) {
-        /*
-         * @any : {this is what will be dealed with}
-         */
-        val = String(val);
+        val = PT.S(val);
         try {
-            var jsonObj = JSON.parse(val);
-            var type = typeof jsonObj;
-            if (type === 'object' || type === 'array' || type === 'function') {
+            var jsonObj = PT.JSON.parse(val);
+            if (PT.isObj(jsonObj) || PT.isArr(jsonObj) || PT.isFunc(jsonObj)) {
                 return jsonObj;
             }
         } catch (e) {
@@ -71,29 +63,30 @@ var genJSON = require('commander'),
         }
         return val;
     },
+    /*
+     * @description: every line of comment like this one would be parsed as an object and added into the result list
+     */
     addComment = function (ret, key, value) {
-        /*
-         * @description: every line of comment like this one would be parsed as an object and added into the result list
-         */
         switch (true) {
         case /^param/.test(key):
             ret[key] = ret[key] || [];
             ret[key].push(embellishParam(value));
             break;
         case /^return/.test(key):
-            ret[key] = embellishReturn(value);
+            ret[key] = ret[key] || [];
+            ret[key].push(embellishReturn(value));
             break;
         case /^require/.test(key):
-            if (!ret.hasOwnProperty(key)) {
+            if (!ret.has(key)) {
                 ret[key] = [];
             }
             ret[key] = ret[key].concat(str2arr(value));
             break;
         default:
-            if (ret.hasOwnProperty(key)) {
+            if (ret.has(key)) {
                 var oldValue = ret[key],
                     newValue = embellishValue(value);
-                if (typeof oldValue === 'array' && typeof newValue !== 'array') {
+                if (PT.isArr(oldValue) && !PT.isArr(newValue)) {
                     ret[key].push(newValue);
                 } else {
                     ret[key] = [];
@@ -105,11 +98,11 @@ var genJSON = require('commander'),
             break;
         }
     },
+    /*
+     * @name        : doc2JSON
+     * @description : turn comments like this into a JSON-string
+     */
     doc2JSON = function (doc) {
-        /*
-         * @name        : doc2JSON
-         * @description : turn comments like this into a JSON-string
-         */
         if (doc.match(/\/\/(.*)$/)) {
             return doc.replace(/\/\/\s+/, '');
         }
@@ -119,7 +112,7 @@ var genJSON = require('commander'),
                  .replace(/(\r\n|\n|\r)/gm   , '' )  // reomve '\r\n'
                  .replace(/\*\s+/gm          , '' )  // remove '*'
                  .replace(/\s+/gm            , ' '); // '\s+' => '\s'
-        stringList = doc.split('@');                 // params[i]: xxxx : xxxx xxx, xxx.
+        stringList = doc.split('@'); // params[i]: xxxx : xxxx xxx, xxx.
         stringList.forEach(function (str) {
             str = str.trim();
             if (str === '' || str === null) {
@@ -136,25 +129,24 @@ var genJSON = require('commander'),
             }
         });
         return ret;
-    }, genJSONFromFile = function (filename) {
-        /*
-         * @description : generate JSON-format string from a single file
-         */
+    },
+    /*
+     * @description : generate JSON-format string from a single file
+     */
+    genJSONFromFile = function (filename) {
         fs.readFile(filename, function (err, data) {
             if (err) {
                 console.log('reading from ' + filename + " failed:\n" + err );
                 return;
             }
-            var i,
-                targetFilename = genJSON.directory + filename.replace(/^.*[\\\/]|\.js$/gm, '') + '.doc.json',
-                fileContent = String(data),
+            var targetFilename = genJSON.directory + filename.replace(/^.*[\\\/]|\.js$/gm, '') + '.doc.json',
+                fileContent = PT.S(data),
                 docs = fileContent.match(/(\/\*([\s\S]*?)\*\/)|(\/\/(.*)$)/gm),
-                len = docs.length,
                 targetContent = [];
-            for (i = 0; i < len; i ++) {
-                targetContent.push(doc2JSON(docs[i]));
-            }
-            fs.writeFile(targetFilename, beautify(JSON.stringify(targetContent), {
+            docs.each(function (doc) {
+                targetContent.push(doc2JSON(doc));
+            });
+            fs.writeFile(targetFilename, beautify(PT.JSON.stringify(targetContent), {
                         indent_size: 4
                     }), function (err) {
                 if (err) {

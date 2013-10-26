@@ -30,7 +30,7 @@
         "description": "Object to get keys from."
     }],
     "syntax": "o.keys(obj)"
-}, "extend of Brick", {
+}, "extend of pastry", {
     "description": "returns keys of an object",
     "syntax": "object.keys()"
 }, {

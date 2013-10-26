@@ -1,13 +1,13 @@
 [{
     "description": "extend for String",
     "filename": "pastry.string.js",
-    "requires": [""]
+    "requires": ["pastry.js"]
 }, "extend of Javascript 1.8.1", {
     "description": "Removes whitespace from both ends of the string.",
-    "return": {
+    "return": [{
         "type": "string",
         "description": "result string."
-    },
+    }],
     "syntax": "string.trim()",
     "refference": {
         "type": "link",

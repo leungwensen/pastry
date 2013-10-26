@@ -1,23 +1,24 @@
 /**
  * @description : extend for JSON
  * @filename    : pastry.json.js
- * @requires    : [pastry.js, pastry.validator.js, pastry.origin.js, pastry.array.js, pastry.date.js]
+ * @requires    : [pastry.js, pastry.array.js, pastry.date.js]
  * @refference  : https://github.com/douglascrockford/JSON-js/blob/master/json2.js
  */
 'use strict';
 
 (function (PT) {
-    PT.JSON = PT.JSON || PT.origin.tryAny([
+    PT.JSON = PT.tryAny([
             function () { return JSON; },
-            function () { return PT.GROUND.JSON; }
+            function () { return PT.OVEN.JSON; }
         ]);
     if (PT.isDef(PT.JSON)) {
         return;
     }
 
-    var D2JSON = Date.prototype.toJSON;
+    var D2JSON = PT.DP.toJSON,
+        S = PT.S;
     if (!PT.isFunc(D2JSON)) {
-        [String.prototype, Number.prototype, Boolean.prototype].each(function (p) {
+        [PT.SP, PT.NP, PT.BP].each(function (p) {
             p.toJSON = function () {
                 return this.valueOf();
             };
@@ -60,17 +61,17 @@
             case 'string':
                 return quote(value);
             case 'number':
-                return isFinite(value) ? String(value) : 'null';
+                return isFinite(value) ? S(value) : 'null';
             case 'boolean':
             case 'null':
-                return String(value);
+                return S(value);
             case 'object':
                 if (!value) {
                     return 'null';
                 }
                 gap += indent;
                 partial = [];
-                if (Object.prototype.toString.apply(value) === '[object Array]') {
+                if (PT.OP.toString.apply(value) === '[object Array]') {
                     for (i = 0; i < value.length; i += 1) {
                         partial[i] = str(i, value) || 'null';
                     }
@@ -108,7 +109,7 @@
      * @return      : {string } result string.
      * @syntax      : PT.JSON.stringify(value).
      */
-    J.stringify = J.stringify || function (value, replacer, space) {
+    J.stringify = function (value, replacer, space) {
         var i;
         gap = '';
         indent = '';
@@ -134,7 +135,7 @@
      * @return      : {unknown} result object.
      * @syntax      : PT.JSON.parse(string).
      */
-    J.parse = J.parse || function (text, reviver) {
+    J.parse = function (text, reviver) {
         var j;
         function walk(holder, key) {
             var k, v,
@@ -151,7 +152,7 @@
             }
             return reviver.call(holder, key, value);
         }
-        text = String(text);
+        text = S(text);
         cx.lastIndex = 0;
         if (cx.test(text)) {
             text = text.replace(cx, function (a) {
