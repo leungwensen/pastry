@@ -1,2 +1,7 @@
-var exports = {},
-    module  = {};
+
+var exports       = {},
+    process       = {},
+    module        = {},
+    ActiveXObject = function () {},
+    navigator     = {};
+

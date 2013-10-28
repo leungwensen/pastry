@@ -5,12 +5,11 @@
  */
 'use strict';
 
-var PASTRY, PT;
-PASTRY = PT = {};
+var PASTRY, PT, P;
+PASTRY  = PT = P = {};
+/* jshint -W040 */ P.OVEN  = P.ON = this;
 
 (function () {
-    var P = PT;
-
     // alias. oh yeah, this is UNREADABLE !!
     // just for saving bits.
     /*
@@ -48,6 +47,10 @@ PASTRY = PT = {};
      */
     P.S  = String;
     P.SP = P.S.prototype;
+    /*
+     * @description : alias of Object.prototype.toString
+     */
+    P.toStr = P.OP.toString;
 
     /**
      * @description : isXxx, check if is Xxx.
@@ -55,6 +58,12 @@ PASTRY = PT = {};
      * @return      : {boolean} if test succeeded.
      * @syntax      : PT.isXxx(value)
      */
+    /**
+     * @syntax : PT.isBool(value)
+     */
+    P.isBool = function (value) {
+        return (typeof value === 'boolean');
+    };
     /**
      * @syntax : PT.isDef(value)
      */
@@ -74,16 +83,16 @@ PASTRY = PT = {};
         return (typeof value === 'number');
     };
     /**
-     * @syntax : PT.isObj(value)
-     */
-    P.isObj = function (value) {
-        return (typeof value === 'object');
-    };
-    /**
      * @syntax : PT.isStr(value)
      */
     P.isStr = function (value) {
         return (typeof value === 'string');
+    };
+    /**
+     * @syntax : PT.isObj(value)
+     */
+    P.isObj = function (value) {
+        return (value !== null && typeof value === 'object');
     };
     // extend of Javascript 1.8.5
     /**
@@ -91,7 +100,26 @@ PASTRY = PT = {};
      * @refference : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray
      */
     P.isArr = P.A.isArray || function (value) {
-        return P.OP.toString.call(value) === "[object Array]";
+        return P.toStr.call(value) === "[object Array]";
+    };
+    /**
+     * @syntax : PT.isDate(value)
+     */
+    P.isDate = function (value) {
+        return P.toStr.call(value) === '[object Date]';
+    };
+    /**
+     * @syntax : PT.isRegExp(value)
+     */
+    P.isRegExp = function (value) {
+        return P.toStr.call(value) === '[object RegExp]';
+    };
+
+    /**
+     * @syntax : PT.toInt(value[, base])
+     */
+    P.toInt = function (value, base) {
+        return parseInt(value, base || 10);
     };
 
     /*
@@ -120,15 +148,18 @@ PASTRY = PT = {};
      * @return      : {browser} window.
      * @return      : {nodejs } exports.
      */
-    P.OVEN = P.ON = this || {}; // jasmine...
     if (P.isDef(exports)) {
         if (P.isDef(module) && module.exports) {
             exports = module.exports = P;
         }
         exports.PASTRY = exports.PT = P;
+        P.NODEJS     = 1;
+        P.ON.process = process;
     } else {
         P.ON.PASTRY = P.ON.PT = P;
+        P.BROWSER = 1;
     }
 
     // ready for cooking!
 }());
+

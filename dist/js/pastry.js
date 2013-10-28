@@ -4,12 +4,11 @@
 
 "use strict";
 
-var PASTRY, PT;
-PASTRY = PT = {};
+var PASTRY, PT, P;
+PASTRY  = PT = P = {};
+/* jshint -W040 */ P.OVEN  = P.ON = this;
 
 (function () {
-    var P = PT;
-
     // alias. oh yeah, this is UNREADABLE !!
     // just for saving bits.
     /*
@@ -47,6 +46,10 @@ PASTRY = PT = {};
      */
     P.S  = String;
     P.SP = P.S.prototype;
+    /*
+     * @description : alias of Object.prototype.toString
+     */
+    P.toStr = P.OP.toString;
 
     /**
      * @description : isXxx, check if is Xxx.
@@ -54,6 +57,12 @@ PASTRY = PT = {};
      * @return      : {boolean} if test succeeded.
      * @syntax      : PT.isXxx(value)
      */
+    /**
+     * @syntax : PT.isBool(value)
+     */
+    P.isBool = function (value) {
+        return (typeof value === 'boolean');
+    };
     /**
      * @syntax : PT.isDef(value)
      */
@@ -73,16 +82,16 @@ PASTRY = PT = {};
         return (typeof value === 'number');
     };
     /**
-     * @syntax : PT.isObj(value)
-     */
-    P.isObj = function (value) {
-        return (typeof value === 'object');
-    };
-    /**
      * @syntax : PT.isStr(value)
      */
     P.isStr = function (value) {
         return (typeof value === 'string');
+    };
+    /**
+     * @syntax : PT.isObj(value)
+     */
+    P.isObj = function (value) {
+        return (value !== null && typeof value === 'object');
     };
     // extend of Javascript 1.8.5
     /**
@@ -90,7 +99,26 @@ PASTRY = PT = {};
      * @refference : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray
      */
     P.isArr = P.A.isArray || function (value) {
-        return P.OP.toString.call(value) === "[object Array]";
+        return P.toStr.call(value) === "[object Array]";
+    };
+    /**
+     * @syntax : PT.isDate(value)
+     */
+    P.isDate = function (value) {
+        return P.toStr.call(value) === '[object Date]';
+    };
+    /**
+     * @syntax : PT.isRegExp(value)
+     */
+    P.isRegExp = function (value) {
+        return P.toStr.call(value) === '[object RegExp]';
+    };
+
+    /**
+     * @syntax : PT.toInt(value[, base])
+     */
+    P.toInt = function (value, base) {
+        return parseInt(value, base || 10);
     };
 
     /*
@@ -119,18 +147,84 @@ PASTRY = PT = {};
      * @return      : {browser} window.
      * @return      : {nodejs } exports.
      */
-    P.OVEN = P.ON = this || {}; // jasmine...
     if (P.isDef(exports)) {
         if (P.isDef(module) && module.exports) {
             exports = module.exports = P;
         }
         exports.PASTRY = exports.PT = P;
+        P.NODEJS     = 1;
+        P.ON.process = process;
     } else {
         P.ON.PASTRY = P.ON.PT = P;
+        P.BROWSER = 1;
     }
 
     // ready for cooking!
 }());
+
+
+
+(function (PT) {
+    var sp = PT.SP;
+    // extend of Javascript 1.8.1
+    /**
+     * @description : Removes whitespace from both ends of the string.
+     * @return      : {string} result string.
+     * @syntax      : string.trim()
+     * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/Trim
+     */
+    sp.trim = sp.trim || function () {
+        return this.replace(/^\s+|\s+$/g, '');
+    };
+
+    // alias. black pastries again
+    /*
+     * @syntax : string.uc()
+     */
+    sp.uc = sp.toUpperCase;
+    /*
+     * @syntax : string.lc()
+     */
+    sp.lc = sp.toLowerCase;
+
+    /*
+     * @syntax : string.toInt()
+     */
+    sp.toInt = function(base){
+        return parseInt(this, base || 10);
+    };
+}(PT));
+
+(function (PT) {
+    var dp = PT.DP,
+        f = function (n) {
+            return n < 10 ? '0' + n : n;
+        };
+    /**
+     * @description : return stringified date according to given pattern.
+     * @param       : {string} pattern, defines pattern for stringify.
+     * @return      : {string} result string.
+     * @syntax      : date.stringf([pattern])
+     * @example     : '{YYYY}-{MM}-{DD} {hh}:{mm}:{ss}' => '2013-10-03 00:57::13'
+     * @example     : '{YY}-{M}-{D} {h}:{m}:{s}'        => '13-10-3 0:57::13'
+     */
+    dp.stringf = function (pattern) {
+        var y, mo, d, h, mi, s;
+        pattern = pattern || '{YYYY}-{MM}-{DD} {hh}:{mm}:{ss}';
+        return pattern.replace( '{YYYY}', y = PT.S(this.getFullYear()) )
+                      .replace( '{MM}'  , f(mo = this.getMonth()  ) )
+                      .replace( '{DD}'  , f(d  = this.getDate()   ) )
+                      .replace( '{hh}'  , f(h  = this.getHours()  ) )
+                      .replace( '{mm}'  , f(mi = this.getMinutes()) )
+                      .replace( '{ss}'  , f(s  = this.getSeconds()) )
+                      .replace( '{YY}'  , y.substring(2) )
+                      .replace( '{M}'   , mo )
+                      .replace( '{D}'   , d  )
+                      .replace( '{h}'   , h  )
+                      .replace( '{m}'   , mi )
+                      .replace( '{s}'   , s  );
+    };
+}(PT));
 
 (function (PT) {
     var o = PT.O, op = PT.OP;
@@ -215,6 +309,51 @@ PASTRY = PT = {};
      */
     op.hasVal = op.hasValue = function (value) {
         return (this.values().indexOf(value) > -1);
+    };
+}(PT));
+
+(function (PT) {
+    var np = PT.NP;
+
+    /**
+     * @description : return stringified number according to given pattern.
+     * @param       : {object} option, defines pattern for stringify.
+     * @example     : {"comma": "1|0", "decimal": ">=0", "integer" : ">=0", "zero": "1|0"}
+     * @return      : {string} result string.
+     * @syntax      : number.stringf([option])
+     */
+    np.stringf = function (option) {
+        var i, len, placeHolder,
+            str = this.toString(),
+            strArr = str.split('.');
+        option = option || {
+            'comma'   : 1,
+            'decimal' : 2,
+            'integer' : 5,
+            'zero'    : 0
+        };
+        placeHolder = (option.has('zero') && option.zero > 0) ? '0' : ' ';
+        if (option.has('decimal') && option.decimal > 0) {
+            strArr[1] = strArr[1] || '';
+            strArr[1] = strArr[1].slice(0, option.decimal);
+            len = option.decimal - strArr[1].length;
+            for (i = 0; i < len; i ++) {
+                strArr[1] += '0';
+            }
+        }
+        if (option.has('integer') && option.integer > 0) {
+            len = option.integer - strArr[0].length;
+            for (i = 0; i < len; i ++) {
+                strArr[0] = placeHolder + strArr[0];
+            }
+        }
+        if (option.has('comma') && option.comma !== 0) {
+            strArr[0] = strArr[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        }
+        if (strArr[1] !== '') {
+            return strArr.join('.');
+        }
+        return strArr[0];
     };
 }(PT));
 
@@ -538,97 +677,6 @@ PASTRY = PT = {};
     };
 }(PT));
 
-
-(function (PT) {
-    var np = PT.NP;
-
-    /**
-     * @description : return stringified number according to given pattern.
-     * @param       : {object} option, defines pattern for stringify.
-     * @example     : {"comma": "1|0", "decimal": ">=0", "integer" : ">=0", "zero": "1|0"}
-     * @return      : {string} result string.
-     * @syntax      : number.stringf([option])
-     */
-    np.stringf = function (option) {
-        var i, len, placeHolder,
-            str = this.toString(),
-            strArr = str.split('.');
-        option = option || {
-            'comma'   : 1,
-            'decimal' : 2,
-            'integer' : 5,
-            'zero'    : 0
-        };
-        placeHolder = (option.has('zero') && option.zero > 0) ? '0' : ' ';
-        if (option.has('decimal') && option.decimal > 0) {
-            strArr[1] = strArr[1] || '';
-            strArr[1] = strArr[1].slice(0, option.decimal);
-            len = option.decimal - strArr[1].length;
-            for (i = 0; i < len; i ++) {
-                strArr[1] += '0';
-            }
-        }
-        if (option.has('integer') && option.integer > 0) {
-            len = option.integer - strArr[0].length;
-            for (i = 0; i < len; i ++) {
-                strArr[0] = placeHolder + strArr[0];
-            }
-        }
-        if (option.has('comma') && option.comma !== 0) {
-            strArr[0] = strArr[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-        }
-        if (strArr[1] !== '') {
-            return strArr.join('.');
-        }
-        return strArr[0];
-    };
-}(PT));
-
-(function (PT) {
-    var dp = PT.DP,
-        f = function (n) {
-            return n < 10 ? '0' + n : n;
-        };
-    /**
-     * @description : return stringified date according to given pattern.
-     * @param       : {string} pattern, defines pattern for stringify.
-     * @return      : {string} result string.
-     * @syntax      : date.stringf([pattern])
-     * @example     : '{YYYY}-{MM}-{DD} {hh}:{mm}:{ss}' => '2013-10-03 00:57::13'
-     * @example     : '{YY}-{M}-{D} {h}:{m}:{s}'        => '13-10-3 0:57::13'
-     */
-    dp.stringf = function (pattern) {
-        var y, mo, d, h, mi, s;
-        pattern = pattern || '{YYYY}-{MM}-{DD} {hh}:{mm}:{ss}';
-        return pattern.replace( '{YYYY}', y = PT.S(this.getFullYear()) )
-                      .replace( '{MM}'  , f(mo = this.getMonth()  ) )
-                      .replace( '{DD}'  , f(d  = this.getDate()   ) )
-                      .replace( '{hh}'  , f(h  = this.getHours()  ) )
-                      .replace( '{mm}'  , f(mi = this.getMinutes()) )
-                      .replace( '{ss}'  , f(s  = this.getSeconds()) )
-                      .replace( '{YY}'  , y.substring(2) )
-                      .replace( '{M}'   , mo )
-                      .replace( '{D}'   , d  )
-                      .replace( '{h}'   , h  )
-                      .replace( '{m}'   , mi )
-                      .replace( '{s}'   , s  );
-    };
-}(PT));
-
-(function (PT) {
-    var sp = PT.SP;
-    // extend of Javascript 1.8.1
-    /**
-     * @description : Removes whitespace from both ends of the string.
-     * @return      : {string} result string.
-     * @syntax      : string.trim()
-     * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/Trim
-     */
-    sp.trim = sp.trim || function () {
-        return this.replace(/^\s+|\s+$/g, '');
-    };
-}(PT));
-
 (function (PT) {
     PT.JSON = PT.tryAny([
             function () { return JSON; },
@@ -790,4 +838,167 @@ PASTRY = PT = {};
         }
         throw new SyntaxError('JSON.parse');
     };
+}(PT));
+
+(function (PT) {
+    var matched,
+        isNode  = PT.NODEJS,
+        win     = PT.ON,
+        process = win.process   || {},
+        nav     = win.navigator || {},
+        plStr   = nav.platform,
+        plugs   = nav.plugins,
+        uaStr   = PT.UA = nav.userAgent;
+
+    /*
+     * @description : host of the window
+     * @syntax      : PT.HOST
+     */
+    if (!isNode) {
+        PT.HOST = win.location.host;
+        PT.DOC  = win.document;
+    }
+    /*
+     * @description : platform
+     * @syntax      : PT.PL | PT.platform
+     */
+    /*
+     * @description : plugins
+     * @syntax      : PT.PLUG | PT.plugins
+     */
+    /*
+     * @description : versions
+     * @syntax      : PT.VER | PT.versions
+     */
+
+    function setVerInt(versions, key, strVal) {
+        versions[key] = PT.toInt(strVal);
+    }
+    function setVer(versions, str, reg) {
+        matched = str.match(reg);
+        if (matched) {
+            setVerInt(versions, matched[0].match(/\w*/)[0], matched[1] || 0);
+        }
+    }
+
+    /*
+     * @description : detect platform
+     * @param       : {string} platform defined string.
+     * @syntax      : PT.detectPL(platformStr)
+     * @return      : {string} platform. (mac|windows|linux...)
+     */
+    PT.detectPL = function (str) {
+        if (!PT.isDef(str)) {
+            return;
+        }
+        return str.lc().match(/mac|windows|linux|ipad|ipod|iphone|android/)[0] || 'unknown';
+    };
+
+    /*
+     * @description : detect plugins (now flash only)
+     * @param       : {array } plugin list
+     * @syntax      : PT.detectPLUG(platformStr)
+     * @return      : {object} { 'flash' : 0|xx }
+     */
+    PT.detectPLUG = function (arr) {
+        return {
+            flash: (function () {
+                var flash,
+                    v      = 0,
+                    startV = 13;
+                if (arr && arr.length) {
+                    flash = arr['Shockwave Flash'];
+                    if (flash && flash.description) {
+                        v = flash.description.match(/\b(\d+)\.\d+\b/)[1] || v;
+                    }
+                } else {
+                    while (startV --) {
+                        try {
+                            new ActiveXObject('ShockwaveFlash.ShockwaveFlash.' + startV);
+                            v = startV;
+                            break;
+                        } catch(e) {}
+                    }
+                }
+                return PT.toInt(v);
+            }())
+        };
+    };
+
+    /*
+     * @description : detect versions (nodejs: v8 version, node version ,.. ; browsers: browser version, platform version, ...)
+     * @param       : {string} userAgent, window.navigator.userAgent
+     * @syntax      : PT.detectVer(userAgent)
+     * @return      : {object} { 'flash' : 0|xx }
+     */
+    PT.detectVER = function (str) {
+        if (!PT.isDef(str)) {
+            return;
+        }
+        str = str.lc();
+
+        var ieVer,
+            versions = {};
+
+        // browser versions
+        [
+            /msie ([\d.]+)/     ,
+            /firefox\/([\d.]+)/ ,
+            /chrome\/([\d.]+)/  ,
+            /crios\/([\d.]+)/   ,
+            /opera.([\d.]+)/    ,
+            /adobeair\/([\d.]+)/
+        ].each(function (reg) {
+            setVer(versions, str, reg);
+        });
+        // chrome
+        if (versions.crios) {
+            versions.chrome = versions.crios;
+        }
+        // detect safari version
+        matched = str.match(/version\/([\d.]+).*safari/);
+        if (matched) {
+            setVerInt(versions, 'safari', matched[1] || 0);
+        }
+        // detect mobile safari version
+        matched = str.match(/version\/([\d.]+).*mobile.*safari/);
+        if (matched) {
+            setVerInt(versions, 'mobilesafari', matched[1] || 0);
+        }
+
+        // engine versions
+        [
+            /trident\/([\d.]+)/     ,
+            /gecko\/([\d.]+)/       ,
+            /applewebkit\/([\d.]+)/ ,
+            /presto\/([\d.]+)/
+        ].each(function (reg) {
+            setVer(versions, str, reg);
+        });
+        ieVer = versions.msie;
+        if (ieVer) {
+            switch (true) {
+                case (ieVer === 6):
+                    versions.trident = 4;
+                    break;
+                case (ieVer === 7 || ieVer === 8):
+                    versions.trident = 5;
+                    break;
+            }
+        }
+
+        return versions;
+    };
+
+    /*
+     * @description : init PT.PL | PT.PLUG | PT.VER for current enviroment
+     * @syntax      : PT.initUA()
+     */
+    PT.initUA = function () {
+        PT.PL   = PT.platform = isNode ? {}               : PT.detectPL(plStr);
+        PT.PLUG = PT.plugins  = isNode ? process.plugins  : PT.detectPLUG(plugs);
+        PT.VER  = PT.versions = isNode ? process.versions : PT.detectVER(uaStr);
+    };
+
+    PT.initUA();
 }(PT));

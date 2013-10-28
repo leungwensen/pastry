@@ -11,8 +11,9 @@
     "eqnull"  : true,
     "node"    : true,
     "globals" : {
-        "PT"      : true,
-        "PASTRY"  : true,
-        "exports" : true
+        "PT"            : true,
+        "PASTRY"        : true,
+        "exports"       : true,
+        "ActiveXObject" : true
     }
 }

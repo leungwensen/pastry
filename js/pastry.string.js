@@ -17,4 +17,21 @@
     sp.trim = sp.trim || function () {
         return this.replace(/^\s+|\s+$/g, '');
     };
+
+    // alias. black pastries again
+    /*
+     * @syntax : string.uc()
+     */
+    sp.uc = sp.toUpperCase;
+    /*
+     * @syntax : string.lc()
+     */
+    sp.lc = sp.toLowerCase;
+
+    /*
+     * @syntax : string.toInt()
+     */
+    sp.toInt = function(base){
+        return parseInt(this, base || 10);
+    };
 }(PT));

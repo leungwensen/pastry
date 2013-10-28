@@ -1,0 +1,56 @@
+[{
+    "description": "about browser",
+    "filename": "pastry.browser.js",
+    "requires": ["pastry.js", "pastry.array.js", "pastry.string.js"]
+}, {
+    "description": "host of the window",
+    "syntax": "PT.HOST"
+}, {
+    "description": "platform",
+    "syntax": "PT.PL | PT.platform"
+}, {
+    "description": "plugins",
+    "syntax": "PT.PLUG | PT.plugins"
+}, {
+    "description": "versions",
+    "syntax": "PT.VER | PT.versions"
+}, {
+    "description": "detect platform",
+    "param": [{
+        "type": "string",
+        "name": "platformStr",
+        "description": "platform defined string."
+    }],
+    "syntax": "PT.detectPL(platformStr)",
+    "return": [{
+        "type": "string",
+        "description": "platform. (mac|windows|linux...)"
+    }]
+}, {
+    "description": "detect plugins (now flash only)",
+    "param": [{
+        "type": "array",
+        "name": "plugins",
+        "description": "plugin list"
+    }],
+    "syntax": "PT.detectPLUG(plugins)",
+    "return": [{
+        "type": "object",
+        "description": "{ 'flash' : 0|xx }"
+    }]
+}, {
+    "description": "detect versions (nodejs: v8 version, node version ,.. ; browsers: browser version, platform version, ...)",
+    "param": [{
+        "type": "string",
+        "name": "userAgent",
+        "description": "window.navigator.userAgent"
+    }],
+    "syntax": "PT.detectVer(userAgent)",
+    "return": [{
+        "type": "object",
+        "description": "{ 'flash' : 0|xx }"
+    }]
+}, "browser versions", "chrome", "detect safari version", "detect mobile safari version", "engine versions", {
+    "description": "init PT.PL | PT.PLUG | PT.VER for current enviroment",
+    "syntax": "PT.initUA()"
+}]

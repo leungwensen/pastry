@@ -13,4 +13,10 @@
         "type": "link",
         "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/Trim"
     }
+}, "alias. black pastries again", {
+    "syntax": "string.uc()"
+}, {
+    "syntax": "string.lc()"
+}, {
+    "syntax": "string.toInt()"
 }]

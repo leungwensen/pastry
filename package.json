@@ -59,13 +59,14 @@
 
     "jsFiles" : [
         "js/pastry.js",
-        "js/pastry.object.js",
-        "js/pastry.array.js",
         "js/pastry.bool.js",
-        "js/pastry.number.js",
-        "js/pastry.date.js",
         "js/pastry.string.js",
-        "js/pastry.json.js"
+        "js/pastry.date.js",
+        "js/pastry.object.js",
+        "js/pastry.number.js",
+        "js/pastry.array.js",
+        "js/pastry.json.js",
+        "js/pastry.ua.js"
     ],
 
     "scripts" : {
