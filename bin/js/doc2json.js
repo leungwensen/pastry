@@ -7,10 +7,14 @@ var genJSON  = require('commander'),
     beautify = require('js-beautify').js_beautify,
     fs       = require('fs'),
     list = function (val) {      // for commander, get an array of strings
-        return val.split(' ');
+        var list = val.split(',');
+        list.each(function (val, i) {
+            list[i] = val.trim();
+        });
+        return list;
     },
     stringify = function (val) { // for commander, get a string
-        return val;
+        return val.trim();
     },
     str2arr = function (str) {   // '[xxx, xxx]' => ['xxx', 'xxx']
         return str.replace(/\[|\]/gm, '').split(',').map(function (val) {
@@ -113,7 +117,7 @@ var genJSON  = require('commander'),
                  .replace(/\*\s+/gm          , '' )  // remove '*'
                  .replace(/\s+/gm            , ' '); // '\s+' => '\s'
         stringList = doc.split('@'); // params[i]: xxxx : xxxx xxx, xxx.
-        stringList.forEach(function (str) {
+        stringList.each(function (str) {
             str = str.trim();
             if (str === '' || str === null) {
                 return;
@@ -168,7 +172,7 @@ genJSON.directory  = genJSON.directory || 'doc';
 genJSON.directory += /\/$/.test(genJSON.directory) ? '' : '/';
 
 // deal with each source file
-genJSON.files.forEach(function (path) {
+genJSON.files.each(function (path) {
     if (/\.js$/.test(path)) {
         // when path is a .js source file already
         genJSONFromFile(path);
@@ -178,7 +182,7 @@ genJSON.files.forEach(function (path) {
             if (err) {
                 console.log('reading directory ' + path + " failed:\n" + err);
             }
-            files.forEach(function (file) {
+            files.each(function (file) {
                 if (/\.js$/.test(file)) {
                     genJSONFromFile(path + file);
                 }

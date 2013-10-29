@@ -1,4 +1,4 @@
-/* pastry v0.0.1
+/* pastry v0.0.2
 *  https://github.com/leungwensen/pastry
 *  Copyright (c) 2013 cookers;  Licensed MIT */
 
@@ -147,6 +147,7 @@ PASTRY  = PT = P = {};
      * @return      : {browser} window.
      * @return      : {nodejs } exports.
      */
+    var exports = exports || undefined;
     if (P.isDef(exports)) {
         if (P.isDef(module) && module.exports) {
             exports = module.exports = P;
@@ -356,6 +357,7 @@ PASTRY  = PT = P = {};
         return strArr[0];
     };
 }(PT));
+
 
 (function (PT) {
     var ap = PT.AP;
@@ -729,48 +731,48 @@ PASTRY  = PT = P = {};
                 value = rep.call(holder, key, value);
             }
             switch (typeof value) {
-            case 'string':
-                return quote(value);
-            case 'number':
-                return isFinite(value) ? S(value) : 'null';
-            case 'boolean':
-            case 'null':
-                return S(value);
-            case 'object':
-                if (!value) {
-                    return 'null';
-                }
-                gap += indent;
-                partial = [];
-                if (PT.OP.toString.apply(value) === '[object Array]') {
-                    for (i = 0; i < value.length; i += 1) {
-                        partial[i] = str(i, value) || 'null';
+                case 'string':
+                    return quote(value);
+                case 'number':
+                    return isFinite(value) ? S(value) : 'null';
+                case 'boolean':
+                case 'null':
+                    return S(value);
+                case 'object':
+                    if (!value) {
+                        return 'null';
                     }
-                    v = (partial.length === 0) ? '[]' : gap ? '[\n' + gap + partial.join(',\n' + gap) + '\n' + mind + ']' : '[' + partial.join(',') + ']';
-                    gap = mind;
-                    return v;
-                }
-                if (rep && PT.isObj(rep)) {
-                    rep.each(function (element) {
-                        if (PT.isStr(element)) {
-                            k = element;
+                    gap += indent;
+                    partial = [];
+                    if (PT.OP.toString.apply(value) === '[object Array]') {
+                        for (i = 0; i < value.length; i += 1) {
+                            partial[i] = str(i, value) || 'null';
+                        }
+                        v = (partial.length === 0) ? '[]' : gap ? '[\n' + gap + partial.join(',\n' + gap) + '\n' + mind + ']' : '[' + partial.join(',') + ']';
+                        gap = mind;
+                        return v;
+                    }
+                    if (rep && PT.isObj(rep)) {
+                        rep.each(function (element) {
+                            if (PT.isStr(element)) {
+                                k = element;
+                                v = str(k, value);
+                                if (v) {
+                                    partial.push(quote(k) + (gap ? ': ' : ':') + v);
+                                }
+                            }
+                        });
+                    } else {
+                        value.each(function (element, k) {
                             v = str(k, value);
                             if (v) {
                                 partial.push(quote(k) + (gap ? ': ' : ':') + v);
                             }
-                        }
-                    });
-                } else {
-                    value.each(function (element, k) {
-                        v = str(k, value);
-                        if (v) {
-                            partial.push(quote(k) + (gap ? ': ' : ':') + v);
-                        }
-                    });
-                }
-                v = (partial.length === 0) ? '{}' : gap ? '{\n' + gap + partial.join(',\n' + gap) + '\n' + mind + '}' : '{' + partial.join(',') + '}';
-                gap = mind;
-                return v;
+                        });
+                    }
+                    v = (partial.length === 0) ? '{}' : gap ? '{\n' + gap + partial.join(',\n' + gap) + '\n' + mind + '}' : '{' + partial.join(',') + '}';
+                    gap = mind;
+                    return v;
             }
         };
 
@@ -842,34 +844,58 @@ PASTRY  = PT = P = {};
 
 (function (PT) {
     var matched,
-        isNode  = PT.NODEJS,
         win     = PT.ON,
         process = win.process   || {},
         nav     = win.navigator || {},
         plStr   = nav.platform,
         plugs   = nav.plugins,
-        uaStr   = PT.UA = nav.userAgent;
+        uaStr   = nav.userAgent;
 
     /*
-     * @description : host of the window
-     * @syntax      : PT.HOST
+     * @description : init PT.PL | PT.PLUG | PT.VER for current enviroment
+     * @syntax      : PT.initUA()
      */
-    if (!isNode) {
-        PT.HOST = win.location.host;
-        PT.DOC  = win.document;
-    }
-    /*
-     * @description : platform
-     * @syntax      : PT.PL | PT.platform
-     */
-    /*
-     * @description : plugins
-     * @syntax      : PT.PLUG | PT.plugins
-     */
-    /*
-     * @description : versions
-     * @syntax      : PT.VER | PT.versions
-     */
+    PT.initUA = function () {
+        /*
+         * @description : platform
+         * @alias       : PT.platform
+         * @syntax      : PT.PL
+         */
+        /*
+         * @description : plugins
+         * @alias       : PT.plugins
+         * @syntax      : PT.PLUG
+         */
+        /*
+         * @description : versions of browser or nodejs
+         * @alias       : PT.versions
+         * @syntax      : PT.VER
+         */
+        /*
+         * @description : host of the window
+         * @syntax      : PT.HOST
+         */
+        /*
+         * @description : document of the window
+         * @syntax      : PT.DOC
+         */
+        /*
+         * @description : userAgent of the browser
+         * @alias       : PT.userAgent
+         * @syntax      : PT.UA
+         */
+
+        if (PT.NODEJS) {
+            PT.VER  = PT.versions = process.versions;
+        } else {
+            PT.HOST = win.location.host;
+            PT.DOC  = win.document;
+            PT.UA   = PT.userAgent = uaStr;
+            PT.PL   = PT.platform  = PT.detectPL(plStr);
+            PT.PLUG = PT.plugins   = PT.detectPLUG(plugs);
+            PT.VER  = PT.versions  = PT.detectVER(uaStr);
+        }
+    };
 
     function setVerInt(versions, key, strVal) {
         versions[key] = PT.toInt(strVal);
@@ -883,7 +909,7 @@ PASTRY  = PT = P = {};
 
     /*
      * @description : detect platform
-     * @param       : {string} platform defined string.
+     * @param       : {string} platformStr, platform defined string.
      * @syntax      : PT.detectPL(platformStr)
      * @return      : {string} platform. (mac|windows|linux...)
      */
@@ -896,8 +922,8 @@ PASTRY  = PT = P = {};
 
     /*
      * @description : detect plugins (now flash only)
-     * @param       : {array } plugin list
-     * @syntax      : PT.detectPLUG(platformStr)
+     * @param       : {array } plugins, plugin list
+     * @syntax      : PT.detectPLUG(plugins)
      * @return      : {object} { 'flash' : 0|xx }
      */
     PT.detectPLUG = function (arr) {
@@ -936,7 +962,6 @@ PASTRY  = PT = P = {};
             return;
         }
         str = str.lc();
-
         var ieVer,
             versions = {};
 
@@ -955,12 +980,12 @@ PASTRY  = PT = P = {};
         if (versions.crios) {
             versions.chrome = versions.crios;
         }
-        // detect safari version
+        // safari version
         matched = str.match(/version\/([\d.]+).*safari/);
         if (matched) {
             setVerInt(versions, 'safari', matched[1] || 0);
         }
-        // detect mobile safari version
+        // mobile safari version
         matched = str.match(/version\/([\d.]+).*mobile.*safari/);
         if (matched) {
             setVerInt(versions, 'mobilesafari', matched[1] || 0);
@@ -988,16 +1013,6 @@ PASTRY  = PT = P = {};
         }
 
         return versions;
-    };
-
-    /*
-     * @description : init PT.PL | PT.PLUG | PT.VER for current enviroment
-     * @syntax      : PT.initUA()
-     */
-    PT.initUA = function () {
-        PT.PL   = PT.platform = isNode ? {}               : PT.detectPL(plStr);
-        PT.PLUG = PT.plugins  = isNode ? process.plugins  : PT.detectPLUG(plugs);
-        PT.VER  = PT.versions = isNode ? process.versions : PT.detectVER(uaStr);
     };
 
     PT.initUA();

@@ -1,40 +1,64 @@
 /**
- * @description : about browser
- * @filename    : pastry.browser.js
+ * @description : about running enviroment
+ * @filename    : pastry.enviroment.js
  * @requires    : [pastry.js, pastry.array.js, pastry.string.js]
  */
 'use strict';
 
 (function (PT) {
     var matched,
-        isNode  = PT.NODEJS,
         win     = PT.ON,
         process = win.process   || {},
         nav     = win.navigator || {},
         plStr   = nav.platform,
         plugs   = nav.plugins,
-        uaStr   = PT.UA = nav.userAgent;
+        uaStr   = nav.userAgent;
 
     /*
-     * @description : host of the window
-     * @syntax      : PT.HOST
+     * @description : init PT.PL | PT.PLUG | PT.VER for current enviroment
+     * @syntax      : PT.initUA()
      */
-    if (!isNode) {
-        PT.HOST = win.location.host;
-        PT.DOC  = win.document;
-    }
-    /*
-     * @description : platform
-     * @syntax      : PT.PL | PT.platform
-     */
-    /*
-     * @description : plugins
-     * @syntax      : PT.PLUG | PT.plugins
-     */
-    /*
-     * @description : versions
-     * @syntax      : PT.VER | PT.versions
-     */
+    PT.initUA = function () {
+        /*
+         * @description : platform
+         * @alias       : PT.platform
+         * @syntax      : PT.PL
+         */
+        /*
+         * @description : plugins
+         * @alias       : PT.plugins
+         * @syntax      : PT.PLUG
+         */
+        /*
+         * @description : versions of browser or nodejs
+         * @alias       : PT.versions
+         * @syntax      : PT.VER
+         */
+        /*
+         * @description : host of the window
+         * @syntax      : PT.HOST
+         */
+        /*
+         * @description : document of the window
+         * @syntax      : PT.DOC
+         */
+        /*
+         * @description : userAgent of the browser
+         * @alias       : PT.userAgent
+         * @syntax      : PT.UA
+         */
+
+        if (PT.NODEJS) {
+            PT.VER  = PT.versions = process.versions;
+        } else {
+            PT.HOST = win.location.host;
+            PT.DOC  = win.document;
+            PT.UA   = PT.userAgent = uaStr;
+            PT.PL   = PT.platform  = PT.detectPL(plStr);
+            PT.PLUG = PT.plugins   = PT.detectPLUG(plugs);
+            PT.VER  = PT.versions  = PT.detectVER(uaStr);
+        }
+    };
 
     function setVerInt(versions, key, strVal) {
         versions[key] = PT.toInt(strVal);
@@ -101,7 +125,6 @@
             return;
         }
         str = str.lc();
-
         var ieVer,
             versions = {};
 
@@ -120,12 +143,12 @@
         if (versions.crios) {
             versions.chrome = versions.crios;
         }
-        // detect safari version
+        // safari version
         matched = str.match(/version\/([\d.]+).*safari/);
         if (matched) {
             setVerInt(versions, 'safari', matched[1] || 0);
         }
-        // detect mobile safari version
+        // mobile safari version
         matched = str.match(/version\/([\d.]+).*mobile.*safari/);
         if (matched) {
             setVerInt(versions, 'mobilesafari', matched[1] || 0);
@@ -153,16 +176,6 @@
         }
 
         return versions;
-    };
-
-    /*
-     * @description : init PT.PL | PT.PLUG | PT.VER for current enviroment
-     * @syntax      : PT.initUA()
-     */
-    PT.initUA = function () {
-        PT.PL   = PT.platform = isNode ? {}               : PT.detectPL(plStr);
-        PT.PLUG = PT.plugins  = isNode ? process.plugins  : PT.detectPLUG(plugs);
-        PT.VER  = PT.versions = isNode ? process.versions : PT.detectVER(uaStr);
     };
 
     PT.initUA();

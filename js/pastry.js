@@ -148,6 +148,7 @@ PASTRY  = PT = P = {};
      * @return      : {browser} window.
      * @return      : {nodejs } exports.
      */
+    var exports = exports || undefined;
     if (P.isDef(exports)) {
         if (P.isDef(module) && module.exports) {
             exports = module.exports = P;

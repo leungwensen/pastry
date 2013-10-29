@@ -1,19 +1,32 @@
 [{
-    "description": "about browser",
-    "filename": "pastry.browser.js",
+    "description": "about running enviroment",
+    "filename": "pastry.enviroment.js",
     "requires": ["pastry.js", "pastry.array.js", "pastry.string.js"]
+}, {
+    "description": "init PT.PL | PT.PLUG | PT.VER for current enviroment",
+    "syntax": "PT.initUA()"
+}, {
+    "description": "platform",
+    "alias": "PT.platform",
+    "syntax": "PT.PL"
+}, {
+    "description": "plugins",
+    "alias": "PT.plugins",
+    "syntax": "PT.PLUG"
+}, {
+    "description": "versions of browser or nodejs",
+    "alias": "PT.versions",
+    "syntax": "PT.VER"
 }, {
     "description": "host of the window",
     "syntax": "PT.HOST"
 }, {
-    "description": "platform",
-    "syntax": "PT.PL | PT.platform"
+    "description": "document of the window",
+    "syntax": "PT.DOC"
 }, {
-    "description": "plugins",
-    "syntax": "PT.PLUG | PT.plugins"
-}, {
-    "description": "versions",
-    "syntax": "PT.VER | PT.versions"
+    "description": "userAgent of the browser",
+    "alias": "PT.userAgent",
+    "syntax": "PT.UA"
 }, {
     "description": "detect platform",
     "param": [{
@@ -50,7 +63,4 @@
         "type": "object",
         "description": "{ 'flash' : 0|xx }"
     }]
-}, "browser versions", "chrome", "detect safari version", "detect mobile safari version", "engine versions", {
-    "description": "init PT.PL | PT.PLUG | PT.VER for current enviroment",
-    "syntax": "PT.initUA()"
-}]
+}, "browser versions", "chrome", "safari version", "mobile safari version", "engine versions"]

@@ -58,48 +58,48 @@
                 value = rep.call(holder, key, value);
             }
             switch (typeof value) {
-            case 'string':
-                return quote(value);
-            case 'number':
-                return isFinite(value) ? S(value) : 'null';
-            case 'boolean':
-            case 'null':
-                return S(value);
-            case 'object':
-                if (!value) {
-                    return 'null';
-                }
-                gap += indent;
-                partial = [];
-                if (PT.OP.toString.apply(value) === '[object Array]') {
-                    for (i = 0; i < value.length; i += 1) {
-                        partial[i] = str(i, value) || 'null';
+                case 'string':
+                    return quote(value);
+                case 'number':
+                    return isFinite(value) ? S(value) : 'null';
+                case 'boolean':
+                case 'null':
+                    return S(value);
+                case 'object':
+                    if (!value) {
+                        return 'null';
                     }
-                    v = (partial.length === 0) ? '[]' : gap ? '[\n' + gap + partial.join(',\n' + gap) + '\n' + mind + ']' : '[' + partial.join(',') + ']';
-                    gap = mind;
-                    return v;
-                }
-                if (rep && PT.isObj(rep)) {
-                    rep.each(function (element) {
-                        if (PT.isStr(element)) {
-                            k = element;
+                    gap += indent;
+                    partial = [];
+                    if (PT.OP.toString.apply(value) === '[object Array]') {
+                        for (i = 0; i < value.length; i += 1) {
+                            partial[i] = str(i, value) || 'null';
+                        }
+                        v = (partial.length === 0) ? '[]' : gap ? '[\n' + gap + partial.join(',\n' + gap) + '\n' + mind + ']' : '[' + partial.join(',') + ']';
+                        gap = mind;
+                        return v;
+                    }
+                    if (rep && PT.isObj(rep)) {
+                        rep.each(function (element) {
+                            if (PT.isStr(element)) {
+                                k = element;
+                                v = str(k, value);
+                                if (v) {
+                                    partial.push(quote(k) + (gap ? ': ' : ':') + v);
+                                }
+                            }
+                        });
+                    } else {
+                        value.each(function (element, k) {
                             v = str(k, value);
                             if (v) {
                                 partial.push(quote(k) + (gap ? ': ' : ':') + v);
                             }
-                        }
-                    });
-                } else {
-                    value.each(function (element, k) {
-                        v = str(k, value);
-                        if (v) {
-                            partial.push(quote(k) + (gap ? ': ' : ':') + v);
-                        }
-                    });
-                }
-                v = (partial.length === 0) ? '{}' : gap ? '{\n' + gap + partial.join(',\n' + gap) + '\n' + mind + '}' : '{' + partial.join(',') + '}';
-                gap = mind;
-                return v;
+                        });
+                    }
+                    v = (partial.length === 0) ? '{}' : gap ? '{\n' + gap + partial.join(',\n' + gap) + '\n' + mind + '}' : '{' + partial.join(',') + '}';
+                    gap = mind;
+                    return v;
             }
         };
 
