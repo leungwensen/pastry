@@ -5,10 +5,10 @@
 
 ## description
 
-taste it for your html5 development. you can take one piece or any. and you can taste in in nodejs's house, too.
+taste it for your html5 development. you can take one piece or any. and you can taste in nodejs's house, too.
 
 
-## [way to taste pastry](https://github.com/leungwensen/pastry/wiki/way-to-taste-pastry)
+## [the way to taste pastry](https://github.com/leungwensen/pastry/wiki/the-way-to-taste-pastry)
 
 ### download
 
@@ -22,7 +22,7 @@ add this to your html file before your own codes:
 
     <script type="text/javascript" src="path/to/pastry.[min.]js"></script>
 
-then you can use the extended prototype functions or access variables of functions defined in the global variable `PT` or `PASTRY`
+then you can use the extended prototype functions or access variables or functions defined in the global variable `PT` or `PASTRY`
 
 #### css
 
@@ -40,14 +40,14 @@ then use pastry like this:
 
     var PT = require('pastry');
 
-### do not want the whole all pieces of pastry
+### if you don't want to eat the whole pastry
 
-you can get some pieces of it like this:
+you can get pieces of it like this:
 
     $ cd /path/to/pastry
     $ ./bin/js/concat.js -f array,json -t /path/to/target-file.js -m
 
-and then you have a piece of pastry with array and json functions only! good for health, doesn't it?
+and then you will have a piece of pastry with array and json functions only! good for health, isn't it?
 
 to know a little bit more about the DIY thing, just:
 
@@ -57,10 +57,10 @@ to know a little bit more about the DIY thing, just:
 enjoy it!
 
 
-## [cookers](https://github.com/leungwensen/pastry/graphs/contributors)
+## [cooks](https://github.com/leungwensen/pastry/graphs/contributors)
 
 
-## [way to help cooking](https://github.com/leungwensen/pastry/wiki/way-to-help-cooking)
+## [the way to help cooking](https://github.com/leungwensen/pastry/wiki/the-way-to-help-cooking)
 
 
 ## [MIT LICENSE](https://github.com/leungwensen/pastry/blob/master/LICENSE.md)
