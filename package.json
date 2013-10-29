@@ -1,7 +1,7 @@
 {
     "name"        : "pastry",
     "title"       : "pastry",
-    "version"     : "0.0.2",
+    "version"     : "0.0.3",
     "description" : "a simple, easy to be customized html5 UI tookit.",
     "homepage"    : "https://github.com/leungwensen/pastry",
     "main"        : "release/js/pastry.min.js",
