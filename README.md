@@ -5,7 +5,7 @@
 
 ## description
 
-taste it for your html5 development. you can take one piece or any.
+taste it for your html5 development. you can take one piece or any. and you can taste in in nodejs's house, too.
 
 
 ## [way to taste pastry](https://github.com/leungwensen/pastry/wiki/way-to-taste-pastry)
@@ -57,15 +57,11 @@ to know a little bit more about the DIY thing, just:
 enjoy it!
 
 
-## cookers
-
-[contributors](https://github.com/leungwensen/pastry/graphs/contributors)
+## [cookers](https://github.com/leungwensen/pastry/graphs/contributors)
 
 
 ## [way to help cooking](https://github.com/leungwensen/pastry/wiki/way-to-help-cooking)
 
 
-## LICENSE
-
-[MIT LICENSE](https://github.com/leungwensen/pastry/blob/master/LICENSE.md)
+## [MIT LICENSE](https://github.com/leungwensen/pastry/blob/master/LICENSE.md)
 
