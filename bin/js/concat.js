@@ -5,7 +5,7 @@
 var resultStr,
     concat  = require('commander'),
     PT      = require('pastry'),
-    uglify = require('uglify-js'),
+    uglify  = require('uglify-js'),
     fs      = require('fs'),
     list = function (val) {      // for commander, get an array of strings
         return val.split(',');
@@ -13,17 +13,17 @@ var resultStr,
     stringify = function (val) { // for commander, get a string
         return val.trim();
     },
-    names = [
-        'bool'       ,
-        'string'     ,
-        'date'       ,
-        'object'     ,
-        'number'     ,
-        'function'   ,
-        'array'      ,
-        'json'       ,
-        'enviroment' ,
-    ],
+    packageInfo = (function () {
+        var data,
+            packageFile = 'package.json';
+        try {
+            data = fs.readFileSync(packageFile);
+        } catch (err) {
+            console.log('cannot load ' + packageFile + err);
+            process.exit(1);
+        }
+        return PT.JSON.parse(data);
+    }()),
     isRoot = function (filename) {
         return (/^[js\/p|p]astry\.js$/).test(filename);
     },
@@ -54,9 +54,9 @@ var resultStr,
             if (isRoot(file)) {
                 return;
             }
-            if (!names.some(function (name) {
-                    reg = new RegExp(name);
-                    return reg.test(file);
+            reg = new RegExp(file);
+            if (!packageInfo.jsFiles.some(function (name) {
+                    return reg.test(name);
                 })){
                 console.error('concat failed: cannot validate this file: ' + file);
                 process.exit(1);
@@ -68,9 +68,9 @@ var resultStr,
             });
             tempfiles.push(file);
         });
-        for (i = 0; i < names.length; i ++) {
-            requireFile = getFullPath(names[i]);
-            if (tempfiles.hasVal(requireFile)) {
+        for (i = 0; i < packageInfo.jsFiles.length; i ++) {
+            requireFile = getFullPath(packageInfo.jsFiles[i]);
+            if (tempfiles.hasVal(requireFile) && !requireFiles.hasVal(requireFile)) {
                 requireFiles.push(requireFile);
             }
         }

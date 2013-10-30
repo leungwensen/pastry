@@ -1,0 +1,57 @@
+- author: 
+    type: link
+    url: "https://github.com/leungwensen/pastry/graphs/contributors"
+  description: first pastry of the building
+  filename: pastry.js
+- {}
+- "alias. oh yeah, this is UNREADABLE !!"
+- just for saving bits.
+- description: alias of Array
+- description: alias of Boolean
+- description: alias of Date
+- description: alias of Function
+- description: alias of Function
+- description: alias of Object
+- description: alias of String
+- description: alias of Object.prototype.toString
+- description: "isXxx, check if is Xxx."
+  parameters: 
+    - type: unknown
+      name: value
+      description: value to be tested.
+  return: 
+    - type: boolean
+      description: if test succeeded.
+  syntax: PT.isXxx(value)
+- syntax: PT.isBool(value)
+- syntax: PT.isDef(value)
+- syntax: PT.isFunc(value)
+- syntax: PT.isNum(value)
+- syntax: PT.isStr(value)
+- syntax: PT.isObj(value)
+- extend of Javascript 1.8.5
+- syntax: PT.isArr(value)
+  refference: 
+    type: link
+    url: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray"
+- syntax: PT.isDate(value)
+- syntax: PT.isRegExp(value)
+- syntax: "PT.toInt(value[, base])"
+- description: try to load original edition of global variables
+  param: 
+    - type: array
+      name: callbackList
+      description: list of callback functions.
+  return: 
+    - type: unknown
+      description: value the callback functions try to return.
+  syntax: "PT.tryEach(callbackList) || PT.tryEach(callbackList)"
+- export PT
+- description: the environment global variable.
+  syntax: PT.OVEN
+  return: 
+    - type: browser
+      description: window.
+    - type: nodejs
+      description: exports.
+- "ready for cooking!"

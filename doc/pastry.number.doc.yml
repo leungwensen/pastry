@@ -1,0 +1,18 @@
+- description: extend for Number
+  filename: pastry.number.js
+  requires: 
+    - pastry.object.js
+- description: return stringified number according to given pattern.
+  param: 
+    - type: object
+      name: option
+      description: defines pattern for stringify.
+  example: 
+    comma: "1|0"
+    decimal: ">=0"
+    integer: ">=0"
+    zero: "1|0"
+  return: 
+    - type: string
+      description: result string.
+  syntax: "number.stringf([option])"
