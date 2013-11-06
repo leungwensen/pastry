@@ -41,5 +41,8 @@ describe('pastry.object.js', function () {
         expect(objA.hasValue('world')).toBe(true);
         expect(objA.hasValue('bar')).toBe(false);
     });
+    it('object.merge(that)', function () {
+        expect(objA.merge({ 'hello': 'merge' })).toEqual({ 'hello': 'merge' });
+    });
 });
 

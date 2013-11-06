@@ -89,4 +89,21 @@
     op.hasVal = op.hasValue = function (value) {
         return (this.values().indexOf(value) > -1);
     };
+
+    /**
+     * @description : merge another object
+     * @param       : {object} that, object to merge with.
+     * @syntax      : object.merge(that)
+     */
+    op.merge = function (that) {
+        var result = {};
+        this.each(function (value, key) {
+            result[key] = value;
+        });
+        that.each(function (value, key) {
+            result[key] = value;
+        });
+        return result;
+    };
+
 }(PT));
