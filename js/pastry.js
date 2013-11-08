@@ -109,6 +109,12 @@ PASTRY  = PT = P = {};
         return P.toStr.call(value) === '[object Date]';
     };
     /**
+     * @syntax : PT.isErr(value)
+     */
+    P.isErr = function (value) {
+        return P.toStr.call(value) === '[object Error]';
+    };
+    /**
      * @syntax : PT.isRegExp(value)
      */
     P.isRegExp = function (value) {

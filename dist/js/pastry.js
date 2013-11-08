@@ -1,4 +1,4 @@
-/* pastry v0.0.5
+/* pastry v0.0.52
 *  https://github.com/leungwensen/pastry
 *  Copyright (c) 2013 cookers;  Licensed MIT */
 
@@ -106,6 +106,12 @@ PASTRY  = PT = P = {};
      */
     P.isDate = function (value) {
         return P.toStr.call(value) === '[object Date]';
+    };
+    /**
+     * @syntax : PT.isErr(value)
+     */
+    P.isErr = function (value) {
+        return P.toStr.call(value) === '[object Error]';
     };
     /**
      * @syntax : PT.isRegExp(value)
