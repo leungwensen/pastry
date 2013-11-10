@@ -1,4 +1,4 @@
-/* pastry v0.0.53
+/* pastry v0.0.54
 *  https://github.com/leungwensen/pastry
 *  Copyright (c) 2013 cookers;  Licensed MIT */
 
@@ -67,7 +67,7 @@ PASTRY  = PT = P = {};
      * @syntax : PT.isDef(value)
      */
     P.isDef = function (value) {
-        return (typeof value !== 'undefined');
+        return (value !== null && value !== void 0);
     };
      /**
      * @syntax : PT.isFunc(value)

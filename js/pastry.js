@@ -68,7 +68,7 @@ PASTRY  = PT = P = {};
      * @syntax : PT.isDef(value)
      */
     P.isDef = function (value) {
-        return (typeof value !== 'undefined');
+        return (value !== null && value !== void 0);
     };
      /**
      * @syntax : PT.isFunc(value)
