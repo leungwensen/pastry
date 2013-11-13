@@ -52,4 +52,12 @@
         "description": "value to check."
     }],
     "syntax": "object.hasValue(value) || object.hasVal(value)"
+}, {
+    "description": "merge another object",
+    "param": [{
+        "type": "object",
+        "name": "that",
+        "description": "object to merge with."
+    }],
+    "syntax": "object.merge(that)"
 }]

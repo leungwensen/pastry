@@ -1,4 +1,4 @@
-/* pastry v0.0.54
+/* pastry v0.0.6
 *  https://github.com/leungwensen/pastry
 *  Copyright (c) 2013 cookers;  Licensed MIT */
 
@@ -134,12 +134,11 @@ PASTRY  = PT = P = {};
      * @syntax      : PT.tryEach(callbackList) || PT.tryEach(callbackList)
      */
     P.tryAny = function (callbackList) {
-        var i, callback, returnValue;
+        var i, returnValue;
 
         for (i = 0; i < callbackList.length; i ++) {
-            callback = callbackList[i];
             try {
-                returnValue = callback();
+                returnValue = callbackList[i]();
                 break;
             } catch (e) {}
         }
@@ -153,16 +152,19 @@ PASTRY  = PT = P = {};
      * @return      : {browser} window.
      * @return      : {nodejs } exports.
      */
-    if (P.isDef(exports)) {
-        if (P.isDef(module) && module.exports) {
-            exports = module.exports = P;
+    try {
+        if (P.isDef(exports)) {
+            if (P.isDef(module) && module.exports) {
+                exports = module.exports = P;
+            }
+            exports.PASTRY = exports.PT = P;
+            P.NODEJS     = 1;
+            P.ON.process = process;
+        } else {
+            P.ON.PASTRY = P.ON.PT = P;
+            P.BROWSER = 1;
         }
-        exports.PASTRY = exports.PT = P;
-        P.NODEJS     = 1;
-        P.ON.process = process;
-    } else {
-        P.ON.PASTRY = P.ON.PT = P;
-        P.BROWSER = 1;
+    } catch (e) {
     }
 
     // ready for cooking!
@@ -196,8 +198,18 @@ PASTRY  = PT = P = {};
     /*
      * @syntax : string.toInt()
      */
-    sp.toInt = function(base){
+    sp.toInt = function (base){
         return parseInt(this, base || 10);
+    };
+
+    /*
+     * @description : check if string has a given sub string.
+     * @syntax      : string.has(subStr)
+     * @param       : {String} subStr, given sub string.
+     * @return      : {Boolean} result.
+     */
+    sp.has = function (subStr) {
+        return (this.indexOf(subStr) > -1);
     };
 }(PT));
 
@@ -711,7 +723,7 @@ PASTRY  = PT = P = {};
 
 (function (PT) {
     PT.JSON = PT.tryAny([
-            function () { return JSON; },
+            function () { return JSON;         },
             function () { return PT.OVEN.JSON; }
         ]);
     if (PT.isDef(PT.JSON)) {
@@ -1046,4 +1058,212 @@ PASTRY  = PT = P = {};
     };
 
     PT.initUA();
+}(PT));
+
+(function (PT) {
+    if (PT.NODEJS) {
+        return;
+    }
+
+    var unescape = function (s) {
+            return decodeURIComponent(s.replace(/\+/g, ' '));
+        },
+        escape   = encodeURIComponent;
+
+    PT.QueryStr = {
+        /*
+         * @description : override default encoding method
+         * @syntax      : PT.QueryStr.escape(str)
+         * @param       : {String} str, unescaped string.
+         * @return      : {String} escaped string.
+         */
+        escape   : escape,
+
+        /*
+         * @description : override default decoding method
+         * @syntax      : PT.QueryStr.unescape(str)
+         * @param       : {String} str, escaped string.
+         * @return      : {String} unescaped string.
+         */
+        unescape : unescape,
+
+        /*
+         * @description : accept query strings and return native javascript objects.
+         * @syntax      : PT.QueryStr.parse(str)
+         * @param       : {String} str, query string to be parsed.
+         * @return      : {Object} parsed object.
+         */
+        parse : function (qs, sep, eq) {
+            sep = sep || "&";
+            eq  = eq  || "=";
+            var tuple,
+                obj = {},
+                pieces = qs.split(sep);
+
+            pieces.each(function (elem) {
+                tuple = elem.split(eq);
+                if (tuple.length > 0) {
+                    obj[unescape(tuple.shift())] = unescape(tuple.join(eq));
+                }
+            });
+            return obj;
+        },
+
+        /*
+         * @description : converts an arbitrary value to a query string representation.
+         * @syntax      : PT.QueryStr.stringify(obj)
+         * @param       : {object} obj, object to be stringified
+         * @return      : {String} query string.
+         */
+        stringify : function (obj, c) {
+            var qs = [],
+                s = c && c.arrayKey ? true : false;
+
+            obj.each(function (value, key) {
+                if (PT.isArr(value)) {
+                    value.each(function (elem) {
+                        qs.push(escape(s ? key + '[]' : key) + '=' + escape(elem));
+                    });
+                }
+                else {
+                    qs.push(escape(key) + '=' + escape(value));
+                }
+            });
+            return qs.join('&');
+        }
+    };
+}(PT));
+
+(function (PT) {
+    if (PT.NODEJS) {
+        return;
+    }
+
+    /*
+     * @description : XMLHttpRequest Object
+     * @syntax      : PT.getXHR()
+     */
+    PT.getXHR = function () {
+        return PT.tryAny([
+            function () { return new XMLHttpRequest();                   },
+            function () { return new ActiveXObject('MSXML2.XMLHTTP');    },
+            function () { return new ActiveXObject('Microsoft.XMLHTTP'); }
+        ]);
+    };
+
+    /*
+     * @description : ajax.
+     * @syntax      : PT.ajax(uri[, option])[.error(callback)][.success(callback)]..
+     * @param       : {String} uri, uri.
+     * @param       : {Object} option, option.
+     * @return      : {this  } return itself for chain operations.
+     */
+    PT.ajax = function (uri, option) {
+        option = option || {};
+        var xhr         = PT.getXHR(),
+            method      = option.method ? option.method.uc()                 : 'GET',
+            type        = option.type   ? option.type.lc()                   : 'xml',
+            data        = option.data   ? PT.QueryStr.stringify(option.data) : null,
+            contentType = option.contentType,
+            isAsync     = option.isAsync;
+
+        /*
+         * @description : event handlers.
+         * @syntax      : PT.ajax(uri[, option]).xxx(callback)..
+         * @param       : {Function} callback, callback function.
+         */
+        /*
+         * @syntax : PT.ajax(uri[, option]).abort(callback)..
+         */
+        /*
+         * @syntax : PT.ajax(uri[, option]).error(callback)..
+         */
+        /*
+         * @syntax : PT.ajax(uri[, option]).load(callback)..
+         */
+        /*
+         * @syntax : PT.ajax(uri[, option]).loadend(callback)..
+         */
+        /*
+         * @syntax : PT.ajax(uri[, option]).loadstart(callback)..
+         */
+        /*
+         * @syntax : PT.ajax(uri[, option]).progress(callback)..
+         */
+        /*
+         * @description : success event handler
+         * @syntax      : PT.ajax(uri[, option]).success(callback)..
+         */
+        /*
+         * @syntax : PT.ajax(uri[, option]).timeout(callback)..
+         */
+        [
+            'abort'     ,
+            'error'     ,
+            'load'      ,
+            'loadend'   ,
+            'loadstart' ,
+            'progress'  ,
+            'success'   ,
+            'timeout'
+        ].each(function (handler) {
+            if (option[handler]) {
+                xhr['on' + handler] = option[handler];
+            }
+        });
+
+        /*
+         * @description : is ajax request success
+         * @syntax      : $PT.ajax.isSuccess()
+         * @return      : {Boolean} is ajax request successfully porformed
+         */
+        xhr.isSuccess = function () {
+            return (xhr.status >= 200 && xhr.status < 300)                        ||
+                   (xhr.status === 304)                                           ||
+                   (!xhr.status && PT.ON.location.protocol === 'file:') ||
+                   (!xhr.status && PT.VER.safari);
+        };
+
+        xhr.onreadystatechange = function (){
+            if (xhr.readyState === 4) {
+                if (xhr.isSuccess() && option.success) {
+                    var response = xhr.responseText;
+                    xhr.onsuccess(type === 'json' ? PT.JSON.parse(response) : response);
+                } else if (option.error) {
+                    xhr.onerror(xhr.statusText);
+                }
+            }
+        };
+
+        // progress ajax
+        if (method === 'GET') {
+            if (data) {
+                uri += (uri.has('?') ? '&' : '?') + data;
+            }
+            xhr.open(method, uri, isAsync);
+            xhr.setRequestHeader(
+                    'Content-Type',
+                    contentType || 'text/plain;charset=UTF-8'
+                );
+        } else if (method === 'POST'){
+            xhr.open(method, uri, isAsync);
+            xhr.setRequestHeader(
+                    'Content-Type',
+                    contentType || 'application/x-www-form-urlencoded;charset=UTF-8'
+                );
+        } else {
+            xhr.open(method, uri, isAsync);
+        }
+        xhr.send(data);
+    };
+
+    [
+        'get' ,
+        'post'
+    ].each(function (method) {
+        PT[method] = function (uri, option) {
+            option.method = method;
+            PT.ajax(uri, option);
+        };
+    });
 }(PT));

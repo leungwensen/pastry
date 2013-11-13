@@ -35,6 +35,7 @@
     type: link
     url: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray"
 - syntax: PT.isDate(value)
+- syntax: PT.isErr(value)
 - syntax: PT.isRegExp(value)
 - syntax: "PT.toInt(value[, base])"
 - description: try to load original edition of global variables

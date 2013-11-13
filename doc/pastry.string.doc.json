@@ -19,4 +19,16 @@
     "syntax": "string.lc()"
 }, {
     "syntax": "string.toInt()"
+}, {
+    "description": "check if string has a given sub string.",
+    "syntax": "string.has(subStr)",
+    "param": [{
+        "type": "String",
+        "name": "subStr",
+        "description": "given sub string."
+    }],
+    "return": [{
+        "type": "Boolean",
+        "description": "result."
+    }]
 }]

@@ -54,6 +54,8 @@
 }, {
     "syntax": "PT.isDate(value)"
 }, {
+    "syntax": "PT.isErr(value)"
+}, {
     "syntax": "PT.isRegExp(value)"
 }, {
     "syntax": "PT.toInt(value[, base])"

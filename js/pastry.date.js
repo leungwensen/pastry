@@ -1,7 +1,7 @@
 /**
  * @description : extend for Date
  * @filename    : pastry.date.js
- * @requires    : []
+ * @requires    : [pastry.js]
  */
 'use strict';
 

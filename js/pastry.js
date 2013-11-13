@@ -135,12 +135,11 @@ PASTRY  = PT = P = {};
      * @syntax      : PT.tryEach(callbackList) || PT.tryEach(callbackList)
      */
     P.tryAny = function (callbackList) {
-        var i, callback, returnValue;
+        var i, returnValue;
 
         for (i = 0; i < callbackList.length; i ++) {
-            callback = callbackList[i];
             try {
-                returnValue = callback();
+                returnValue = callbackList[i]();
                 break;
             } catch (e) {}
         }
@@ -154,16 +153,19 @@ PASTRY  = PT = P = {};
      * @return      : {browser} window.
      * @return      : {nodejs } exports.
      */
-    if (P.isDef(exports)) {
-        if (P.isDef(module) && module.exports) {
-            exports = module.exports = P;
+    try {
+        if (P.isDef(exports)) {
+            if (P.isDef(module) && module.exports) {
+                exports = module.exports = P;
+            }
+            exports.PASTRY = exports.PT = P;
+            P.NODEJS     = 1;
+            P.ON.process = process;
+        } else {
+            P.ON.PASTRY = P.ON.PT = P;
+            P.BROWSER = 1;
         }
-        exports.PASTRY = exports.PT = P;
-        P.NODEJS     = 1;
-        P.ON.process = process;
-    } else {
-        P.ON.PASTRY = P.ON.PT = P;
-        P.BROWSER = 1;
+    } catch (e) {
     }
 
     // ready for cooking!

@@ -31,7 +31,17 @@
     /*
      * @syntax : string.toInt()
      */
-    sp.toInt = function(base){
+    sp.toInt = function (base){
         return parseInt(this, base || 10);
+    };
+
+    /*
+     * @description : check if string has a given sub string.
+     * @syntax      : string.has(subStr)
+     * @param       : {String} subStr, given sub string.
+     * @return      : {Boolean} result.
+     */
+    sp.has = function (subStr) {
+        return (this.indexOf(subStr) > -1);
     };
 }(PT));

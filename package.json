@@ -1,7 +1,7 @@
 {
     "name"        : "pastry",
     "title"       : "pastry",
-    "version"     : "0.0.54",
+    "version"     : "0.0.6",
     "description" : "a simple, easy to be customized html5 UI tookit.",
     "homepage"    : "https://github.com/leungwensen/pastry",
     "main"        : "release/js/pastry.min.js",
@@ -61,19 +61,21 @@
     },
 
     "jsFiles" : [
-        "js/pastry.js",
-        "js/pastry.bool.js",
-        "js/pastry.string.js",
-        "js/pastry.date.js",
-        "js/pastry.object.js",
-        "js/pastry.number.js",
-        "js/pastry.function.js",
-        "js/pastry.array.js",
-        "js/pastry.json.js",
-        "js/pastry.enviroment.js"
+        "js/pastry.js"             ,
+        "js/pastry.bool.js"        ,
+        "js/pastry.string.js"      ,
+        "js/pastry.date.js"        ,
+        "js/pastry.object.js"      ,
+        "js/pastry.number.js"      ,
+        "js/pastry.function.js"    ,
+        "js/pastry.array.js"       ,
+        "js/pastry.json.js"        ,
+        "js/pastry.enviroment.js"  ,
+        "js/pastry.querystring.js" ,
+        "js/pastry.io.js"
     ],
 
     "scripts" : {
-        "test"    : "grunt travis --verbose"
+        "test" : "grunt travis --verbose"
     }
 }
