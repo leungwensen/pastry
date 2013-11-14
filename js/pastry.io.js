@@ -89,17 +89,20 @@
          * @return      : {Boolean} is ajax request successfully porformed
          */
         xhr.isSuccess = function () {
-            return (xhr.status >= 200 && xhr.status < 300)                        ||
-                   (xhr.status === 304)                                           ||
+            return (xhr.status >= 200 && xhr.status < 300)              ||
+                   (xhr.status === 304)                                 ||
                    (!xhr.status && PT.ON.location.protocol === 'file:') ||
                    (!xhr.status && PT.VER.safari);
         };
 
-        xhr.onreadystatechange = function (){
+        xhr.onreadystatechange = function () {
             if (xhr.readyState === 4) {
                 if (xhr.isSuccess() && option.success) {
                     var response = xhr.responseText;
-                    xhr.onsuccess(type === 'json' ? PT.JSON.parse(response) : response);
+                    if (type === 'json') {
+                        response = PT.tryAny([function () { return PT.JSON.parse(response); }]) || response;
+                    }
+                    xhr.onsuccess(response);
                 } else if (option.error) {
                     xhr.onerror(xhr.statusText);
                 }

@@ -1,4 +1,4 @@
-/* pastry v0.0.6
+/* pastry v0.0.7
 *  https://github.com/leungwensen/pastry
 *  Copyright (c) 2013 cookers;  Licensed MIT */
 
@@ -152,24 +152,21 @@ PASTRY  = PT = P = {};
      * @return      : {browser} window.
      * @return      : {nodejs } exports.
      */
-    try {
-        if (P.isDef(exports)) {
-            if (P.isDef(module) && module.exports) {
-                exports = module.exports = P;
-            }
-            exports.PASTRY = exports.PT = P;
-            P.NODEJS     = 1;
-            P.ON.process = process;
-        } else {
-            P.ON.PASTRY = P.ON.PT = P;
-            P.BROWSER = 1;
+
+    if (typeof exports !== 'undefined') {
+        if (typeof module !== 'undefined' && module.exports) {
+            exports = module.exports = P;
         }
-    } catch (e) {
+        exports.PASTRY = exports.PT = P;
+        P.NODEJS     = 1;
+        P.ON.process = process;
+    } else {
+        P.ON.PASTRY = P.ON.PT = P;
+        P.BROWSER = 1;
     }
 
     // ready for cooking!
 }());
-
 
 
 (function (PT) {
@@ -1138,6 +1135,52 @@ PASTRY  = PT = P = {};
     if (PT.NODEJS) {
         return;
     }
+    var data = function (form) {
+            var resultObj         = {},
+                elementArray      = [],
+                rcheckableTypes   = /^(?:checkbox|radio)$/i,
+                rsubmitterTypes   = /^(?:submit|button|image|reset|file)$/i,
+                rsubmittableTypes = /^(?:input|select|textarea|keygen)/i;
+            form.elements.each(function (elem) {
+                elementArray.push(elem);
+            });
+
+            elementArray
+                .filter(function (elem) {
+                    return elem.name                                          &&
+                           !elem.disabled                                     &&
+                           rsubmittableTypes.test(elem.nodeName)              &&
+                           !rsubmitterTypes.test(elem.type)                   &&
+                           (!rcheckableTypes.test(elem.type) || elem.checked);
+                })
+                .map(function (elem) {
+                    var val = elem.value;
+                    if (PT.isDef(val)) {
+                        if (PT.isArr(val)) {
+                            val.map(function (element) {
+                                resultObj[element.name] = element.value;
+                            });
+                        } else {
+                            resultObj[elem.name] = elem.value;
+                        }
+                    }
+                });
+
+            return resultObj;
+        };
+
+    PT.Form = {
+        data      : data,
+        serialize : function (form) {
+            return PT.QueryStr.stringify(data(form));
+        }
+    };
+}(PT));
+
+(function (PT) {
+    if (PT.NODEJS) {
+        return;
+    }
 
     /*
      * @description : XMLHttpRequest Object
@@ -1218,17 +1261,20 @@ PASTRY  = PT = P = {};
          * @return      : {Boolean} is ajax request successfully porformed
          */
         xhr.isSuccess = function () {
-            return (xhr.status >= 200 && xhr.status < 300)                        ||
-                   (xhr.status === 304)                                           ||
+            return (xhr.status >= 200 && xhr.status < 300)              ||
+                   (xhr.status === 304)                                 ||
                    (!xhr.status && PT.ON.location.protocol === 'file:') ||
                    (!xhr.status && PT.VER.safari);
         };
 
-        xhr.onreadystatechange = function (){
+        xhr.onreadystatechange = function () {
             if (xhr.readyState === 4) {
                 if (xhr.isSuccess() && option.success) {
                     var response = xhr.responseText;
-                    xhr.onsuccess(type === 'json' ? PT.JSON.parse(response) : response);
+                    if (type === 'json') {
+                        response = PT.tryAny([function () { return PT.JSON.parse(response); }]) || response;
+                    }
+                    xhr.onsuccess(response);
                 } else if (option.error) {
                     xhr.onerror(xhr.statusText);
                 }

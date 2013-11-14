@@ -21,10 +21,10 @@
                 var $form = this;
 
                 PT.get($form.action, {
-                    success : function (text) {
+                    'success' : function (text) {
                         PT.DOC.getElementById('result').innerHTML = text;
                     },
-                    error   : function (err) {
+                    'error'   : function (err) {
                         alert(err);
                     }
                 });

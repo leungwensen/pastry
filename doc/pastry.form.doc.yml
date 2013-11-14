@@ -1,0 +1,22 @@
+- description: PT.Form
+  filename: pastry.form.js
+  requires: 
+    - pastry.js
+- description: return form data object.
+  syntax: PT.Form.data(form)
+  param: 
+    - type: HTMLFormElement
+      name: form
+      description: form to be get data from.
+  return: 
+    - type: Object
+      description: form data object.
+- description: return form data query string.
+  syntax: PT.Form.serialize(form)
+  param: 
+    - type: HTMLFormElement
+      name: form
+      description: form to be get data query string from.
+  return: 
+    - type: String
+      description: form data query string.

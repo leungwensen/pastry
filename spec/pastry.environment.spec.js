@@ -1,6 +1,6 @@
 'use strict';
 
-describe('pastry.ua.js', function () {
+describe('pastry.environment.js', function () {
     beforeEach(function () {
         // PT.initUA();
     });

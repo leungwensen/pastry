@@ -1,7 +1,7 @@
 {
     "name"        : "pastry",
     "title"       : "pastry",
-    "version"     : "0.0.6",
+    "version"     : "0.0.7",
     "description" : "a simple, easy to be customized html5 UI tookit.",
     "homepage"    : "https://github.com/leungwensen/pastry",
     "main"        : "release/js/pastry.min.js",
@@ -39,6 +39,7 @@
 
     "dependencies" : { },
     "devDependencies" : {
+        "assert"                : "*",
         "browserstack-runner"   : "*",
         "commander"             : "*",
         "js-beautify"           : "*",
@@ -57,6 +58,9 @@
         "grunt-contrib-watch"   : "*",
         "grunt-html-validation" : "*",
         "grunt-jekyll"          : "*",
+        "moment"                : "*",
+        "npm-download-counts"   : "*",
+        "npm-downloads"         : "*",
         "uglify-js"             : "*"
     },
 
@@ -70,8 +74,9 @@
         "js/pastry.function.js"    ,
         "js/pastry.array.js"       ,
         "js/pastry.json.js"        ,
-        "js/pastry.enviroment.js"  ,
+        "js/pastry.environment.js" ,
         "js/pastry.querystring.js" ,
+        "js/pastry.form.js"        ,
         "js/pastry.io.js"
     ],
 

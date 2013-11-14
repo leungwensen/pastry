@@ -97,6 +97,7 @@ if (!PT.isDef(concat.files) || !PT.isArr(concat.files)) {
 }
 
 concat.fromFiles = getFromFiles(concat.files);
+console.log(concat.fromFiles);
 resultStr = concatFileContents(concat.fromFiles);
 if (concat.minify) {
     resultStr = uglify.minify(resultStr, {fromString: true}).code;
@@ -109,6 +110,6 @@ if (concat.targetFile) {
         }
     });
 } else {
-    process.stdout.write(resultStr);
+    //process.stdout.write(resultStr);
 }
 

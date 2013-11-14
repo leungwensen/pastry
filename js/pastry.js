@@ -153,21 +153,18 @@ PASTRY  = PT = P = {};
      * @return      : {browser} window.
      * @return      : {nodejs } exports.
      */
-    try {
-        if (P.isDef(exports)) {
-            if (P.isDef(module) && module.exports) {
-                exports = module.exports = P;
-            }
-            exports.PASTRY = exports.PT = P;
-            P.NODEJS     = 1;
-            P.ON.process = process;
-        } else {
-            P.ON.PASTRY = P.ON.PT = P;
-            P.BROWSER = 1;
+
+    if (typeof exports !== 'undefined') {
+        if (typeof module !== 'undefined' && module.exports) {
+            exports = module.exports = P;
         }
-    } catch (e) {
+        exports.PASTRY = exports.PT = P;
+        P.NODEJS     = 1;
+        P.ON.process = process;
+    } else {
+        P.ON.PASTRY = P.ON.PT = P;
+        P.BROWSER = 1;
     }
 
     // ready for cooking!
 }());
-

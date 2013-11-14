@@ -40,10 +40,15 @@
     <script type="text/javascript">
         (function(PT){
             PT.ON.addEventListener('load', function(){
-                    ['platform', 'plugins', 'userAgent', 'versions'].each(function(item){
-                            PT.DOC.getElementById(item).innerHTML = PT.JSON.stringify(PT[item]);
-                        });
+                [
+                    'platform'  ,
+                    'plugins'   ,
+                    'userAgent' ,
+                    'versions'
+                ].each(function(item){
+                    PT.DOC.getElementById(item).innerHTML = PT.JSON.stringify(PT[item]);
                 });
+            });
         }(PT));
     </script>
 </body>
