@@ -1,56 +1,85 @@
-[{
+[
+  {
     "description": "PT.IO",
     "filename": "pastry.io.js",
-    "requires": ["pastry.js", "pastry.array.js", "pastry.environment.js", "pastry.string.js"]
-}, {
+    "requires": [
+      "pastry.js",
+      "pastry.array.js",
+      "pastry.environment.js",
+      "pastry.string.js"
+    ]
+  },
+  {
     "description": "XMLHttpRequest Object",
     "syntax": "PT.getXHR()"
-}, {
+  },
+  {
     "description": "ajax.",
     "syntax": "PT.ajax(uri[, option])[.error(callback)][.success(callback)]..",
-    "param": [{
+    "param": [
+      {
         "type": "String",
         "name": "uri",
         "description": "uri."
-    }, {
+      },
+      {
         "type": "Object",
         "name": "option",
         "description": "option."
-    }],
-    "return": [{
+      }
+    ],
+    "return": [
+      {
         "type": "this",
         "description": "return itself for chain operations."
-    }]
-}, {
+      }
+    ]
+  },
+  {
     "description": "event handlers.",
     "syntax": "PT.ajax(uri[, option]).xxx(callback)..",
-    "param": [{
+    "param": [
+      {
         "type": "Function",
         "name": "callback",
         "description": "callback function."
-    }]
-}, {
+      }
+    ]
+  },
+  {
     "syntax": "PT.ajax(uri[, option]).abort(callback).."
-}, {
+  },
+  {
     "syntax": "PT.ajax(uri[, option]).error(callback).."
-}, {
+  },
+  {
     "syntax": "PT.ajax(uri[, option]).load(callback).."
-}, {
+  },
+  {
     "syntax": "PT.ajax(uri[, option]).loadend(callback).."
-}, {
+  },
+  {
     "syntax": "PT.ajax(uri[, option]).loadstart(callback).."
-}, {
+  },
+  {
     "syntax": "PT.ajax(uri[, option]).progress(callback).."
-}, {
+  },
+  {
     "description": "success event handler",
     "syntax": "PT.ajax(uri[, option]).success(callback).."
-}, {
+  },
+  {
     "syntax": "PT.ajax(uri[, option]).timeout(callback).."
-}, {
+  },
+  {
     "description": "is ajax request success",
     "syntax": "$PT.ajax.isSuccess()",
-    "return": [{
+    "return": [
+      {
         "type": "Boolean",
         "description": "is ajax request successfully porformed"
-    }]
-}, "progress ajax"]
+      }
+    ]
+  },
+  "progress ajax"
+]

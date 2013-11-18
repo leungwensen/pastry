@@ -2,16 +2,22 @@
 
 'use strict';
 
-var assert = require('assert'),
-    moment = require('moment'),
-    pkg    = 'pastry',
-    start  = moment().subtract('months', 6).toDate(),
-    end    = new Date(),
-    downloadCounts = require('npm-download-counts');
+var PT       = require('pastry'),
+    assert   = require('assert'),
+    moment   = require('moment'),
+    pkg      = 'pastry',
+    start    = moment().subtract('months', 6).toDate(),
+    end      = new Date(),
+    counts   = require('npm-download-counts');
 
-downloadCounts(pkg, start, end, function (err, data) {
-        data.forEach(function (d, i) {
-            console.log('On %s, %s was downloaded ~%d times', d.day, pkg, d.count);
+counts(pkg, start, end, function (err, data) {
+        var result = {
+            'pkg'       : pkg,
+            'downloads' : []
+        };
+        data.each(function (d) {
+            result.downloads.push(d);
         });
-    }
-);
+        process.stdout.write(PT.JSON.stringify(result, undefined, 2));
+    });
+

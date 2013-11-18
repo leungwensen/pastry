@@ -1,53 +1,77 @@
-[{
+[
+  {
     "description": "PT.QueryStr",
     "filename": "pastry.querystring.js",
-    "requires": ["pastry.js"]
-}, {
+    "requires": [
+      "pastry.js"
+    ]
+  },
+  {
     "description": "override default encoding method",
     "syntax": "PT.QueryStr.escape(str)",
-    "param": [{
+    "param": [
+      {
         "type": "String",
         "name": "str",
         "description": "unescaped string."
-    }],
-    "return": [{
+      }
+    ],
+    "return": [
+      {
         "type": "String",
         "description": "escaped string."
-    }]
-}, {
+      }
+    ]
+  },
+  {
     "description": "override default decoding method",
     "syntax": "PT.QueryStr.unescape(str)",
-    "param": [{
+    "param": [
+      {
         "type": "String",
         "name": "str",
         "description": "escaped string."
-    }],
-    "return": [{
+      }
+    ],
+    "return": [
+      {
         "type": "String",
         "description": "unescaped string."
-    }]
-}, {
+      }
+    ]
+  },
+  {
     "description": "accept query strings and return native javascript objects.",
     "syntax": "PT.QueryStr.parse(str)",
-    "param": [{
+    "param": [
+      {
         "type": "String",
         "name": "str",
         "description": "query string to be parsed."
-    }],
-    "return": [{
+      }
+    ],
+    "return": [
+      {
         "type": "Object",
         "description": "parsed object."
-    }]
-}, {
+      }
+    ]
+  },
+  {
     "description": "converts an arbitrary value to a query string representation.",
     "syntax": "PT.QueryStr.stringify(obj)",
-    "param": [{
+    "param": [
+      {
         "type": "object",
         "name": "obj",
         "description": "object to be stringified"
-    }],
-    "return": [{
+      }
+    ],
+    "return": [
+      {
         "type": "String",
         "description": "query string."
-    }]
-}]
+      }
+    ]
+  }
+]

@@ -4,8 +4,8 @@
 
 var genJSON  = require('commander'),
     PT       = require('pastry'),
-    beautify = require('js-beautify').js_beautify,
     fs       = require('fs'),
+
     list = function (val) {      // for commander, get an array of strings
         var list = val.split(',');
         list.each(function (val, i) {
@@ -21,6 +21,7 @@ var genJSON  = require('commander'),
             return val.trim();
         });
     },
+
     /*
      * @param : {type} name , description
      */
@@ -150,9 +151,7 @@ var genJSON  = require('commander'),
             docs.each(function (doc) {
                 targetContent.push(doc2JSON(doc));
             });
-            fs.writeFile(targetFilename, beautify(PT.JSON.stringify(targetContent), {
-                        indent_size: 4
-                    }), function (err) {
+            fs.writeFile(targetFilename, PT.JSON.stringify(targetContent, undefined, 2), function (err) {
                 if (err) {
                     console.log('writting into ' + targetFilename + " failed:\n" + err);
                 }

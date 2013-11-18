@@ -110,6 +110,6 @@ if (concat.targetFile) {
         }
     });
 } else {
-    //process.stdout.write(resultStr);
+    process.stdout.write(resultStr);
 }
 

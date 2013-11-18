@@ -1,18 +1,31 @@
-[{
+[
+  {
     "description": "extend for Date",
     "filename": "pastry.date.js",
-    "requires": ["pastry.js"]
-}, {
+    "requires": [
+      "pastry.js"
+    ]
+  },
+  {
     "description": "return stringified date according to given pattern.",
-    "param": [{
+    "param": [
+      {
         "type": "string",
         "name": "pattern",
         "description": "defines pattern for stringify."
-    }],
-    "return": [{
+      }
+    ],
+    "return": [
+      {
         "type": "string",
         "description": "result string."
-    }],
+      }
+    ],
     "syntax": "date.stringf([pattern])",
-    "example": ["'{YYYY}-{MM}-{DD}T{hh}:{mm}:{ss}.{lms}Z' => '2013-10-03T00:57::13.180Z'", "'{YYYY}-{MM}-{DD} {hh}:{mm}:{ss}' => '2013-10-03 00:57::13'", "'{YY}-{M}-{D} {h}:{m}:{s}' => '13-10-3 0:57::13'"]
-}]
+    "example": [
+      "'{YYYY}-{MM}-{DD}T{hh}:{mm}:{ss}.{lms}Z' => '2013-10-03T00:57::13.180Z'",
+      "'{YYYY}-{MM}-{DD} {hh}:{mm}:{ss}' => '2013-10-03 00:57::13'",
+      "'{YY}-{M}-{D} {h}:{m}:{s}' => '13-10-3 0:57::13'"
+    ]
+  }
+]
