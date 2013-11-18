@@ -1,4 +1,4 @@
-/* pastry v0.0.7
+/* pastry v0.0.8
 *  https://github.com/leungwensen/pastry
 *  Copyright (c) 2013 cookers;  Licensed MIT */
 
@@ -1170,7 +1170,20 @@ PASTRY  = PT = P = {};
         };
 
     PT.Form = {
+        /*
+         * @description : return form data object.
+         * @syntax      : PT.Form.data(form)
+         * @param       : {HTMLFormElement} form, form to be get data from.
+         * @return      : {Object} form data object.
+         */
         data      : data,
+
+        /*
+         * @description : return form data query string.
+         * @syntax      : PT.Form.serialize(form)
+         * @param       : {HTMLFormElement} form, form to be get data query string from.
+         * @return      : {String} form data query string.
+         */
         serialize : function (form) {
             return PT.QueryStr.stringify(data(form));
         }
@@ -1313,3 +1326,68 @@ PASTRY  = PT = P = {};
         };
     });
 }(PT));
+
+(function (PT) {
+    if (PT.NODEJS) {
+        return;
+    }
+    PT.UI = {
+        addClass    : function ($node, style) {
+            var oldClass = $node.getAttribute('class').trim();
+            $node.setAttribute('class', oldClass + ' ' + style);
+        },
+        removeClass : function ($node, style) {
+            var oldClass = $node.getAttribute('class').trim();
+            $node.setAttribute('class', oldClass.replace(style, ''));
+        },
+        show : function ($node) {
+            $node.style.display = 'block';
+        },
+        hide : function ($node) {
+            $node.style.display = 'none';
+        }
+    };
+ }(PT));
+
+(function (PT) {
+    if (PT.NODEJS) {
+        return;
+    }
+    PT.UI.Tabs = function ($tabsMenu, option) {
+        option = option || {};
+        var currentTab   = 'data-currentTab',
+            contentIds   = 'data-contentIds',
+            activeClass  = option.activeClass || 'PT-activeTab',
+            showContents = function ($tab) {
+                $tab.getAttribute(contentIds).split(/\s/).each(function (id) {
+                    PT.UI.show(PT.DOC.getElementById(id));
+                });
+            },
+            hideContents = function ($tab) {
+                $tab.getAttribute(contentIds).split(/\s/).each(function (id) {
+                    PT.UI.hide(PT.DOC.getElementById(id));
+                });
+            };
+
+        $tabsMenu.children.each(function ($child) {
+            if (PT.isObj($child)) {
+                var currentTabId = $tabsMenu.getAttribute(currentTab);
+                if ($child.id === currentTabId) {
+                    PT.UI.addClass($child, activeClass);
+                    showContents($child);
+                } else {
+                    hideContents($child);
+                }
+                $child.addEventListener('click', function(){
+                    var $oldTab = PT.DOC.getElementById($tabsMenu.getAttribute(currentTab)),
+                        $newTab = this;
+                    PT.UI.removeClass($oldTab, activeClass);
+                    hideContents($oldTab);
+                    PT.UI.addClass($newTab, activeClass);
+                    showContents($newTab);
+                    $tabsMenu.setAttribute(currentTab, $newTab.id);
+                });
+            }
+        });
+    };
+ }(PT));

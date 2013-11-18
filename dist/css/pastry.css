@@ -294,3 +294,5 @@ table.tb-padding05 th, table.tb-padding05 td {
   .col {
     margin: 1% 0 1% 0%;
     width: 100%; } }
+.PT-activeTab {
+  font-weight: bold; }

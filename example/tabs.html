@@ -1,0 +1,37 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>pastry.ui.tabs.js example</title>
+    <link rel="stylesheet" href="../dist/css/pastry.css" />
+</head>
+<body>
+    <h1>example of tabs</h1>
+
+    <ul id="menu" class="grid" data-currentTab="tab1">
+        <li id="tab1" data-contentIds="content1" class="col span1-3">tab1</li>
+        <li id="tab2" data-contentIds="content2" class="col span1-3">tab2</li>
+        <li id="tab3" data-contentIds="content3" class="col span1-3">tab3</li>
+    </ul>
+
+    <div class="contents" id="content1">
+        <h1>content1</h1>
+    </div>
+    <div class="contents" id="content2">
+        <h1>content2</h1>
+    </div>
+    <div class="contents" id="content3">
+        <h1>content3</h1>
+    </div>
+
+    <script type="text/javascript" src="../dist/js/pastry.js"></script>
+    <!-- here goes your code -->
+    <script type="text/javascript">
+        (function(PT){
+            PT.ON.addEventListener('load', function(){
+                PT.UI.Tabs(PT.DOC.getElementById('menu'));
+            });
+        }(PT));
+    </script>
+</body>
+</html>
