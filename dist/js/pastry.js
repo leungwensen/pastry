@@ -1,4 +1,4 @@
-/* pastry v0.0.8
+/* pastry v0.0.9
 *  https://github.com/leungwensen/pastry
 *  Copyright (c) 2013 cookers;  Licensed MIT */
 
@@ -340,6 +340,9 @@ PASTRY  = PT = P = {};
      * @syntax      : object.merge(that)
      */
     op.merge = function (that) {
+        if (!that || !PT.isObj(that)) {
+            return this;
+        }
         var result = {};
         this.each(function (value, key) {
             result[key] = value;
@@ -397,6 +400,33 @@ PASTRY  = PT = P = {};
     };
 }(PT));
 
+(function (PT) {
+    var f = PT.F, fp = PT.FP;
+    // Javascript 1.8.5
+    /**
+     * @description : check if the object has the key
+     * @param       : {unkonwn} thisArg, The value to be passed as the this parameter to the target function when the bound function is called.
+     * @param       : {unkonwn} argx, Arguments to prepend to arguments provided to the bound function.
+     * @syntax      : fun.bind(thisArg[, arg1[, arg2[, ...]]])
+     * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind
+     */
+    fp.bind = fp.bind || function (oThis) {
+        if (PT.isFunc(oThis)) {
+            var aArgs = arguments.slice(1),
+                fToBind = this,
+                FNOP = function () {},
+                fBound = function () {
+                    return fToBind.apply(
+                            this instanceof FNOP && oThis ? this : oThis || PT.ON,
+                            aArgs.concat(arguments)
+                        );
+                };
+            FNOP.prototype   = this.prototype;
+            fBound.prototype = new FNOP();
+            return fBound;
+        }
+    };
+}(PT));
 
 (function (PT) {
     var ap = PT.AP;
@@ -1331,61 +1361,312 @@ PASTRY  = PT = P = {};
     if (PT.NODEJS) {
         return;
     }
-    PT.UI = {
-        addClass    : function ($node, style) {
-            var oldClass = $node.getAttribute('class').trim();
-            $node.setAttribute('class', oldClass + ' ' + style);
+
+    var DOC = PT.DOC ,
+        Obj = PT.O   ,
+        WIN = PT.ON  ,
+        elementStr = 'Element',
+        /**
+         * @description : check if Element has a property.
+         * @return      : {Boolean} if has or not.
+         * @syntax      : PT.DOM.hasElementProperty(name)
+         */
+        hasElementProperty = function (name) {
+            return (
+                    WIN.has(elementStr) && (
+                        DOC.createElement('_').has(name) &&
+                        DOC.createElementNS('http://www.w3.org/2000/svg', 'svg').has(name)
+                ));
         },
-        removeClass : function ($node, style) {
-            var oldClass = $node.getAttribute('class').trim();
-            $node.setAttribute('class', oldClass.replace(style, ''));
-        },
-        show : function ($node) {
-            $node.style.display = 'block';
-        },
-        hide : function ($node) {
-            $node.style.display = 'none';
-        }
+        /**
+         * @description : set a property of Element.
+         * @param       : {String  } name, property name.
+         * @param       : {Function} Getter, property getter method.
+         * @param       : {Function} Setter, property setter method.
+         * @param       : {Object  } option, defineProperty options.
+         * @syntax      : PT.DOM.setElementProperty(name, Getter[, Setter, option])
+         */
+        setElementProperty = function (name, Getter, Setter, option) {
+            var propDesc  = {},
+                elemProto = WIN[elementStr].prototype;
+            if (Obj.defineProperty) {
+                if (Getter) {
+                    propDesc.get = Getter;
+                }
+                if (Setter) {
+                    propDesc.set = Setter;
+                }
+                if (option) {
+                    propDesc = propDesc.merge(option);
+                }
+                Obj.defineProperty(elemProto, name, propDesc);
+            } else if (PT.OP.__defineGetter__) {
+                elemProto.__defineGetter__(name, Getter);
+                elemProto.__defineSetter__(name, Setter);
+            }
+        };
+
+    /**
+     * @description : DOM
+     * @syntax      : PT.DOM
+     */
+    PT.DOM = {
+        hasElementProperty : hasElementProperty,
+        setElementProperty : setElementProperty
     };
- }(PT));
+}(PT));
 
 (function (PT) {
     if (PT.NODEJS) {
         return;
     }
+
+    var classStr     = 'class',
+        classListStr = 'classList';
+
+    if (!PT.DOM.hasElementProperty(classListStr)) {
+        var validateClass = function (token) {
+                return (token === '' || /\s/.test(token)) ? false : true;
+            },
+            /**
+             * @description : classList shim.
+             * @return      : {Array} a list of classes of an element.
+             * @syntax      : Element.classList
+             * @refference  : https://github.com/eligrey/classList.js
+             */
+            ClassList = function (elem) {
+                var $self = this;
+                elem.getAttribute(classStr).trim().split(/\s+/).each(function (value) {
+                    $self.push(value);
+                });
+                $self._updateClassName = function () {
+                    elem.setAttribute(classStr, $self.toString());
+                };
+            },
+            classListGetter = function () {
+                return new ClassList(this);
+            };
+
+        ClassList.prototype = {
+            /**
+             * @description : check if an element has a class.
+             * @param       : {String } token, class name.
+             * @return      : {Boolean} if contans.
+             * @syntax      : Element.classList.contains(token)
+             */
+            contains : function (token) {
+                token = PT.S(token);
+                return validateClass(token) && this.has(token);
+            },
+            /**
+             * @description : get a class by index.
+             * @param       : {Number} index, index of class.
+             * @return      : {String} class name.
+             * @syntax      : Element.classList.item(index)
+             */
+            item : function (index) {
+                return this[index] || null;
+            },
+            /**
+             * @description : add classes to an element.
+             * @param       : {String} token, class name.
+             * @syntax      : Element.classList.add(token1[, token2, ...,])
+             */
+            add : function () {
+                var $self   = this,
+                    updated = false;
+                arguments.each(function (token) {
+                    token = PT.S(token);
+                    if (validateClass(token) && !$self.has(token)) {
+                        $self.push(token);
+                        updated = true;
+                    }
+                });
+                if (updated) {
+                    $self._updateClassName();
+                }
+            },
+            /**
+             * @description : remove classes from an element.
+             * @param       : {String} token, class name.
+             * @syntax      : Element.classList.remove(token1[, token2, ...,])
+             */
+            remove : function () {
+                var $self   = this,
+                    updated = false;
+                arguments.each(function (token) {
+                    token = PT.S(token);
+                    if (validateClass(token) && $self.has(token)) {
+                        $self.splice($self.indexOf(token), 1);
+                        updated = true;
+                    }
+                });
+                if (updated) {
+                    $self._updateClassName();
+                }
+            },
+            /**
+             * @description : if element has the given class then remove it, otherwise add it.
+             * @param       : {String } token, class name.
+             * @param       : {Boolean} forse, if forse toggle.
+             * @syntax      : Element.classList.toggle(token[, forse])
+             */
+            toggle : function (token, forse) {
+                token = PT.S(token);
+                if (!validateClass(token)) {
+                    return;
+                }
+                var $self  = this,
+                    method = $self.contains(token) ? forse !== true && 'remove' : forse !== false && 'add';
+                if (method) {
+                    $self[method](token);
+                }
+            },
+            /**
+             * @description : stringify the class list.
+             * @syntax      : Element.classList.toString()
+             */
+            toString : function () {
+                return this.join(' ');
+            }
+        };
+
+        PT.DOM.setElementProperty(classListStr, classListGetter);
+    }
+}(PT));
+
+(function (PT) {
+    if (PT.NODEJS) {
+        return;
+    }
+
+    var datasetStr = 'dataset';
+
+    if (!PT.DOM.hasElementProperty(datasetStr)) {
+        /**
+         * @description : dataset shim.
+         * @syntax      : Element.dataset
+         * @refference  : https://gist.github.com/brettz9/4093766
+         */
+        PT.DOM.setElementProperty(datasetStr, function () {
+            var attrVal, attrName, propName,
+                $this              = this,
+                HTML5_DOMStringMap = {},
+                attributes         = $this.attributes,
+                toUpperCase        = function (n0) {
+                    return n0.charAt(1).toUpperCase();
+                },
+                getter = function () {
+                    return this;
+                },
+                setter = function (attrName, value) {
+                    return value ? this.setAttribute(attrName, value) : this.removeAttribute(attrName);
+                };
+            attributes.each(function (attribute) {
+                if (attribute && attribute.name && (/^data-\w[\w\-]*$/).test(attribute.name)) {
+                    attrVal  = attribute.value;
+                    attrName = attribute.name;
+                    propName = attrName.substr(5).replace(/-./g, toUpperCase); // Change to CamelCase
+                    try {
+                        PT.O.defineProperty(HTML5_DOMStringMap, propName, {
+                            get : getter.bind(attrVal || '')  ,
+                            set : setter.bind($this, attrName)
+                        });
+                    }
+                    catch (e) { // if accessors are not working
+                        HTML5_DOMStringMap[propName] = attrVal;
+                    }
+                }
+            });
+            return HTML5_DOMStringMap;
+        });
+    }
+}(PT));
+
+(function (PT) {
+    if (PT.NODEJS) {
+        return;
+    }
+    var assets = {
+        /**
+         * @description : set a property of Element.
+         * @param       : {String  } name, property name.
+         * @param       : {Function} Getter, property getter method.
+         * @param       : {Function} Setter, property setter method.
+         * @param       : {Object  } option, defineProperty options.
+         * @syntax      : PT.DOM.setElementProperty(name, Getter[, Setter, option])
+         */
+        show : function () {
+            this.style.display = 'block';
+        },
+        hide : function () {
+            this.style.display = 'none';
+        },
+        toggle : function () {
+            var $self = this,
+                oldDisplay = $self.style.display;
+            $self.style.display = (oldDisplay === 'block') ? 'none' : 'block';
+        }
+    };
+
+    [
+        'show'   ,
+        'hide'   ,
+        'toggle'
+    ].each(function (prop) {
+        if (!PT.DOM.hasElementProperty(prop)) {
+            PT.DOM.setElementProperty(prop, function () {
+                return assets[prop];
+            });
+        }
+    });
+}(PT));
+
+(function (PT) {
+    if (PT.NODEJS) {
+        return;
+    }
+
+    /**
+     * @description : bind tabs behavior to an element with childs.
+     * @param       : {HTMLElement} $tabs, tabs menu.
+     * @param       : {Object     } option, options for binding tabs.
+     * @syntax      : PT.UI.Tabs($tabs[, option])
+     */
+    PT.UI = PT.UI || {};
     PT.UI.Tabs = function ($tabsMenu, option) {
         option = option || {};
-        var currentTab   = 'data-currentTab',
-            contentIds   = 'data-contentIds',
+        var currentTab   = 'current',
+            contentIds   = 'ids',
             activeClass  = option.activeClass || 'PT-activeTab',
             showContents = function ($tab) {
-                $tab.getAttribute(contentIds).split(/\s/).each(function (id) {
-                    PT.UI.show(PT.DOC.getElementById(id));
+                $tab.dataset[contentIds].split(/\s/).each(function (id) {
+                    PT.DOC.getElementById(id).show();
                 });
             },
             hideContents = function ($tab) {
-                $tab.getAttribute(contentIds).split(/\s/).each(function (id) {
-                    PT.UI.hide(PT.DOC.getElementById(id));
+                $tab.dataset[contentIds].split(/\s/).each(function (id) {
+                    PT.DOC.getElementById(id).hide();
                 });
             };
 
         $tabsMenu.children.each(function ($child) {
             if (PT.isObj($child)) {
-                var currentTabId = $tabsMenu.getAttribute(currentTab);
+                var currentTabId = $tabsMenu.dataset[currentTab];
                 if ($child.id === currentTabId) {
-                    PT.UI.addClass($child, activeClass);
+                    $child.classList.add(activeClass);
                     showContents($child);
                 } else {
                     hideContents($child);
                 }
                 $child.addEventListener('click', function(){
-                    var $oldTab = PT.DOC.getElementById($tabsMenu.getAttribute(currentTab)),
+                    var $oldTab = PT.DOC.getElementById($tabsMenu.dataset[currentTab]),
                         $newTab = this;
-                    PT.UI.removeClass($oldTab, activeClass);
+                    $oldTab.classList.toggle(activeClass);
+                    $newTab.classList.toggle(activeClass);
                     hideContents($oldTab);
-                    PT.UI.addClass($newTab, activeClass);
                     showContents($newTab);
-                    $tabsMenu.setAttribute(currentTab, $newTab.id);
+                    $tabsMenu.dataset[currentTab] = $newTab.id;
                 });
             }
         });

@@ -1,0 +1,51 @@
+[
+  {
+    "description": "PT.DOM",
+    "filename": "pastry.dom.js",
+    "requires": [
+      "pastry.js",
+      "pastry.object.js"
+    ]
+  },
+  {
+    "description": "check if Element has a property.",
+    "return": [
+      {
+        "type": "Boolean",
+        "description": "if has or not."
+      }
+    ],
+    "syntax": "PT.DOM.hasElementProperty(name)"
+  },
+  "//www.w3.org/2000/svg', 'svg').has(name)",
+  {
+    "description": "set a property of Element.",
+    "param": [
+      {
+        "type": "String",
+        "name": "name",
+        "description": "property name."
+      },
+      {
+        "type": "Function",
+        "name": "Getter",
+        "description": "property getter method."
+      },
+      {
+        "type": "Function",
+        "name": "Setter",
+        "description": "property setter method."
+      },
+      {
+        "type": "Object",
+        "name": "option",
+        "description": "defineProperty options."
+      }
+    ],
+    "syntax": "PT.DOM.setElementProperty(name, Getter[, Setter, option])"
+  },
+  {
+    "description": "DOM",
+    "syntax": "PT.DOM"
+  }
+]

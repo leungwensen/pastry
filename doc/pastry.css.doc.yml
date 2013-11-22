@@ -1,0 +1,21 @@
+- description: PT.DOM.style
+  filename: pastry.dom.style.js
+  requires: 
+    - pastry.js
+    - pastry.array.js
+    - pastry.dom.js
+- description: set a property of Element.
+  param: 
+    - type: String
+      name: name
+      description: property name.
+    - type: Function
+      name: Getter
+      description: property getter method.
+    - type: Function
+      name: Setter
+      description: property setter method.
+    - type: Object
+      name: option
+      description: defineProperty options.
+  syntax: "PT.DOM.setElementProperty(name, Getter[, Setter, option])"

@@ -1,0 +1,57 @@
+- description: PT.DOM.classList
+  filename: pastry.dom.classlist.js
+  requires: 
+    - pastry.js
+    - pastry.string.js
+    - pastry.array.js
+    - pastry.dom.js
+    - pastry.css.js
+- description: classList shim.
+  return: 
+    - type: Array
+      description: a list of classes of an element.
+  syntax: Element.classList
+  refference: 
+    type: link
+    url: "https://github.com/eligrey/classList.js"
+- description: check if an element has a class.
+  param: 
+    - type: String
+      name: token
+      description: class name.
+  return: 
+    - type: Boolean
+      description: if contans.
+  syntax: Element.classList.contains(token)
+- description: get a class by index.
+  param: 
+    - type: Number
+      name: index
+      description: index of class.
+  return: 
+    - type: String
+      description: class name.
+  syntax: Element.classList.item(index)
+- description: add classes to an element.
+  param: 
+    - type: String
+      name: token
+      description: class name.
+  syntax: "Element.classList.add(token1[, token2, ...,])"
+- description: remove classes from an element.
+  param: 
+    - type: String
+      name: token
+      description: class name.
+  syntax: "Element.classList.remove(token1[, token2, ...,])"
+- description: "if element has the given class then remove it, otherwise add it."
+  param: 
+    - type: String
+      name: token
+      description: class name.
+    - type: Boolean
+      name: forse
+      description: if forse toggle.
+  syntax: "Element.classList.toggle(token[, forse])"
+- description: stringify the class list.
+  syntax: Element.classList.toString()

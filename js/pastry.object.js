@@ -96,6 +96,9 @@
      * @syntax      : object.merge(that)
      */
     op.merge = function (that) {
+        if (!that || !PT.isObj(that)) {
+            return this;
+        }
         var result = {};
         this.each(function (value, key) {
             result[key] = value;

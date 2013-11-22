@@ -1,0 +1,22 @@
+[
+  {
+    "description": "PT.DOM.dataset",
+    "filename": "pastry.dom.dataset.js",
+    "requires": [
+      "pastry.js",
+      "pastry.function.js",
+      "pastry.array.js",
+      "pastry.dom.js"
+    ]
+  },
+  {
+    "description": "dataset shim.",
+    "syntax": "Element.dataset",
+    "refference": {
+      "type": "link",
+      "url": "https://gist.github.com/brettz9/4093766"
+    }
+  },
+  "Change to CamelCase",
+  "if accessors are not working"
+]
