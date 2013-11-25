@@ -1,4 +1,4 @@
-/* pastry v0.0.9
+/* pastry v0.0.91
 *  https://github.com/leungwensen/pastry
 *  Copyright (c) 2013 cookers;  Licensed MIT */
 
@@ -960,7 +960,7 @@ PASTRY  = PT = P = {};
             PT.HOST = win.location.host;
             PT.DOC  = win.document;
             PT.UA   = PT.userAgent = uaStr;
-            PT.PL   = PT.platform  = PT.detectPL(plStr);
+            PT.PL   = PT.platform  = PT.detectPL(plStr) || PT.detectPL(uaStr) || 'unknown';
             PT.PLUG = PT.plugins   = PT.detectPLUG(plugs);
             PT.VER  = PT.versions  = PT.detectVER(uaStr);
         }
@@ -986,7 +986,8 @@ PASTRY  = PT = P = {};
         if (!PT.isDef(str)) {
             return;
         }
-        return str.lc().match(/mac|windows|linux|ipad|ipod|iphone|android/)[0] || 'unknown';
+        var pls = str.lc().match(/mac|win|linux|ipad|ipod|iphone|android/);
+        return PT.isArr(pls) ? pls[0] : pls;
     };
 
     /*
@@ -1070,15 +1071,10 @@ PASTRY  = PT = P = {};
             setVer(versions, str, reg);
         });
         ieVer = versions.msie;
-        if (ieVer) {
-            switch (true) {
-                case (ieVer === 6):
-                    versions.trident = 4;
-                    break;
-                case (ieVer === 7 || ieVer === 8):
-                    versions.trident = 5;
-                    break;
-            }
+        if (ieVer === 6) {
+            versions.trident = 4;
+        } else if (ieVer === 7 || ieVer === 8) {
+            versions.trident = 5;
         }
 
         return versions;
