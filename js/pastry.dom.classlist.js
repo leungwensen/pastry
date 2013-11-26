@@ -25,8 +25,9 @@
              */
             ClassList = function (elem) {
                 var $self = this;
+                $self.list = [];
                 elem.getAttribute(classStr).trim().split(/\s+/).each(function (value) {
-                    $self.push(value);
+                    $self.list.push(value);
                 });
                 $self._updateClassName = function () {
                     elem.setAttribute(classStr, $self.toString());
@@ -45,7 +46,7 @@
              */
             contains : function (token) {
                 token = PT.S(token);
-                return validateClass(token) && this.has(token);
+                return validateClass(token) && this.list.hasVal(token);
             },
             /**
              * @description : get a class by index.
@@ -54,7 +55,7 @@
              * @syntax      : Element.classList.item(index)
              */
             item : function (index) {
-                return this[index] || null;
+                return this.list[index] || null;
             },
             /**
              * @description : add classes to an element.
@@ -66,8 +67,8 @@
                     updated = false;
                 arguments.each(function (token) {
                     token = PT.S(token);
-                    if (validateClass(token) && !$self.has(token)) {
-                        $self.push(token);
+                    if (validateClass(token) && !$self.list.hasVal(token)) {
+                        $self.list.push(token);
                         updated = true;
                     }
                 });
@@ -85,8 +86,8 @@
                     updated = false;
                 arguments.each(function (token) {
                     token = PT.S(token);
-                    if (validateClass(token) && $self.has(token)) {
-                        $self.splice($self.indexOf(token), 1);
+                    if (validateClass(token) && $self.list.hasVal(token)) {
+                        $self.list.splice($self.list.indexOf(token), 1);
                         updated = true;
                     }
                 });
@@ -116,7 +117,7 @@
              * @syntax      : Element.classList.toString()
              */
             toString : function () {
-                return this.join(' ');
+                return this.list.join(' ');
             }
         };
 
