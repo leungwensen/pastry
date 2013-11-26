@@ -1,4 +1,4 @@
-/* pastry v0.0.91
+/* pastry v0.0.92
 *  https://github.com/leungwensen/pastry
 *  Copyright (c) 2013 cookers;  Licensed MIT */
 
@@ -1432,8 +1432,9 @@ PASTRY  = PT = P = {};
              */
             ClassList = function (elem) {
                 var $self = this;
+                $self.list = [];
                 elem.getAttribute(classStr).trim().split(/\s+/).each(function (value) {
-                    $self.push(value);
+                    $self.list.push(value);
                 });
                 $self._updateClassName = function () {
                     elem.setAttribute(classStr, $self.toString());
@@ -1452,7 +1453,7 @@ PASTRY  = PT = P = {};
              */
             contains : function (token) {
                 token = PT.S(token);
-                return validateClass(token) && this.has(token);
+                return validateClass(token) && this.list.hasVal(token);
             },
             /**
              * @description : get a class by index.
@@ -1461,7 +1462,7 @@ PASTRY  = PT = P = {};
              * @syntax      : Element.classList.item(index)
              */
             item : function (index) {
-                return this[index] || null;
+                return this.list[index] || null;
             },
             /**
              * @description : add classes to an element.
@@ -1473,8 +1474,8 @@ PASTRY  = PT = P = {};
                     updated = false;
                 arguments.each(function (token) {
                     token = PT.S(token);
-                    if (validateClass(token) && !$self.has(token)) {
-                        $self.push(token);
+                    if (validateClass(token) && !$self.list.hasVal(token)) {
+                        $self.list.push(token);
                         updated = true;
                     }
                 });
@@ -1492,8 +1493,8 @@ PASTRY  = PT = P = {};
                     updated = false;
                 arguments.each(function (token) {
                     token = PT.S(token);
-                    if (validateClass(token) && $self.has(token)) {
-                        $self.splice($self.indexOf(token), 1);
+                    if (validateClass(token) && $self.list.hasVal(token)) {
+                        $self.list.splice($self.list.indexOf(token), 1);
                         updated = true;
                     }
                 });
@@ -1523,7 +1524,7 @@ PASTRY  = PT = P = {};
              * @syntax      : Element.classList.toString()
              */
             toString : function () {
-                return this.join(' ');
+                return this.list.join(' ');
             }
         };
 
