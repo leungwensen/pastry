@@ -1,14 +1,13 @@
 - description: PT.DOM
   filename: pastry.dom.js
   requires: 
-    - pastry.js
-    - pastry.object.js
+    - pastry.core.js
 - description: check if Element has a property.
   return: 
     - type: Boolean
       description: if has or not.
-  syntax: PT.DOM.hasElementProperty(name)
-- "//www.w3.org/2000/svg', 'svg').has(name)"
+  syntax: PT.DOM.elemHas(name)
+- "//www.w3.org/2000/svg', 'svg'), name)"
 - description: set a property of Element.
   param: 
     - type: String
@@ -23,6 +22,6 @@
     - type: Object
       name: option
       description: defineProperty options.
-  syntax: "PT.DOM.setElementProperty(name, Getter[, Setter, option])"
+  syntax: "PT.DOM.elemSet(name, Getter[, Setter, option])"
 - description: DOM
   syntax: PT.DOM

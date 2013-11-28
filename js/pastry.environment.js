@@ -7,13 +7,9 @@
 
 (function (PT) {
     var matched,
-        win     = PT.ON,
-        process = win.process   || {},
-        nav     = win.navigator || {},
-        plStr   = nav.platform,
-        plugs   = nav.plugins,
-        uaStr   = nav.userAgent;
-
+        win   = PT.ON,
+        nav   = win.navigator || {},
+        uaStr = nav.userAgent;
     /*
      * @description : init PT.PL | PT.PLUG | PT.VER for current enviroment
      * @syntax      : PT.initUA()
@@ -49,13 +45,13 @@
          */
 
         if (PT.NODEJS) {
-            PT.VER  = PT.versions = process.versions;
+            PT.VER  = PT.versions = win.process.versions;
         } else {
             PT.HOST = win.location.host;
             PT.DOC  = win.document;
             PT.UA   = PT.userAgent = uaStr;
-            PT.PL   = PT.platform  = PT.detectPL(plStr) || PT.detectPL(uaStr) || 'unknown';
-            PT.PLUG = PT.plugins   = PT.detectPLUG(plugs);
+            PT.PL   = PT.platform  = PT.detectPL(nav.platform) || PT.detectPL(uaStr) || 'unknown';
+            PT.PLUG = PT.plugins   = PT.detectPLUG(nav.plugins);
             PT.VER  = PT.versions  = PT.detectVER(uaStr);
         }
     };
@@ -80,7 +76,7 @@
         if (!PT.isDef(str)) {
             return;
         }
-        var pls = str.lc().match(/mac|win|linux|ipad|ipod|iphone|android/);
+        var pls = PT.lc(str).match(/mac|win|linux|ipad|ipod|iphone|android/);
         return PT.isArr(pls) ? pls[0] : pls;
     };
 
@@ -125,19 +121,19 @@
         if (!PT.isDef(str)) {
             return;
         }
-        str = str.lc();
+        str = PT.lc(str);
         var ieVer,
             versions = {};
 
         // browser versions
-        [
+        PT.each([
             /msie ([\d.]+)/     ,
             /firefox\/([\d.]+)/ ,
             /chrome\/([\d.]+)/  ,
             /crios\/([\d.]+)/   ,
             /opera.([\d.]+)/    ,
             /adobeair\/([\d.]+)/
-        ].each(function (reg) {
+        ], function (reg) {
             setVer(versions, str, reg);
         });
         // chrome
@@ -156,12 +152,12 @@
         }
 
         // engine versions
-        [
+        PT.each([
             /trident\/([\d.]+)/     ,
             /gecko\/([\d.]+)/       ,
             /applewebkit\/([\d.]+)/ ,
             /presto\/([\d.]+)/
-        ].each(function (reg) {
+        ], function (reg) {
             setVer(versions, str, reg);
         });
         ieVer = versions.msie;

@@ -12,8 +12,6 @@
     "node"    : true,
     "globals" : {
         "ActiveXObject"  : true,
-        "exports"        : true,
-        "PASTRY"         : true,
         "PT"             : true,
         "XMLHttpRequest" : true
     }

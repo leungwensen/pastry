@@ -1,131 +1,56 @@
-/* pastry v0.0.92
+/* pastry v0.1.0
 *  https://github.com/leungwensen/pastry
 *  Copyright (c) 2013 cookers;  Licensed MIT */
 
 "use strict";
 
-var PASTRY, PT, P;
-PASTRY  = PT = P = {};
-/* jshint -W040 */ P.OVEN  = P.ON = this;
+var PASTRY, PT;
+PASTRY  = PT = {};
+/* jshint -W040 */PT.OVEN  = PT.ON = this;
 
-(function () {
-    // alias. oh yeah, this is UNREADABLE !!
-    // just for saving bits.
+(function (PT) {
     /*
-     * @description : alias of Array
+     * @description : alias
      */
-    P.A  = Array;
-    P.AP = P.A.prototype;
-    /*
-     * @description : alias of Boolean
-     */
-    P.B  = Boolean;
-    P.BP = P.B.prototype;
-    /*
-     * @description : alias of Date
-     */
-    P.D  = Date;
-    P.DP = P.D.prototype;
-    /*
-     * @description : alias of Function
-     */
-    P.F  = Function;
-    P.FP = P.F.prototype;
-    /*
-     * @description : alias of Function
-     */
-    P.N  = Number;
-    P.NP = P.N.prototype;
-    /*
-     * @description : alias of Object
-     */
-    P.O  = Object;
-    P.OP = P.O.prototype;
-    /*
-     * @description : alias of String
-     */
-    P.S  = String;
-    P.SP = P.S.prototype;
-    /*
-     * @description : alias of Object.prototype.toString
-     */
-    P.toStr = P.OP.toString;
+    var A  = PT.A  = Array       ,
+        B  = PT.B  = Boolean     ,
+        D  = PT.D  = Date        ,
+        F  = PT.F  = Function    ,
+        N  = PT.N  = Number      ,
+        O  = PT.O  = Object      ,
+        S  = PT.S  = String      ,
+
+        PS = PT.PS = 'prototype' ,
+        US = PT.US = 'undefined' ,
+
+        AP = PT.AP = A[PS]       ,
+        BP = PT.BP = B[PS]       ,
+        DP = PT.DP = D[PS]       ,
+        FP = PT.FP = F[PS]       ,
+        NP = PT.NP = N[PS]       ,
+        OP = PT.OP = O[PS]       ,
+        SP = PT.SP = S[PS]       ,
+
+        toStr = PT.toStr = function (value) {
+            return OP.toString.call(value);
+        };
 
     /**
      * @description : isXxx, check if is Xxx.
-     * @parameters  : {unknown} value, value to be tested.
-     * @return      : {boolean} if test succeeded.
+     * @parameters  : {Unknown} value, value to be tested.
+     * @return      : {Boolean} if test succeeded.
      * @syntax      : PT.isXxx(value)
      */
-    /**
-     * @syntax : PT.isBool(value)
-     */
-    P.isBool = function (value) {
-        return (typeof value === 'boolean');
-    };
-    /**
-     * @syntax : PT.isDef(value)
-     */
-    P.isDef = function (value) {
-        return (value !== null && value !== void 0);
-    };
-     /**
-     * @syntax : PT.isFunc(value)
-     */
-    P.isFunc = function (value) {
-        return (typeof value === 'function');
-    };
-    /**
-     * @syntax : PT.isNum(value)
-     */
-    P.isNum = function (value) {
-        return (typeof value === 'number');
-    };
-    /**
-     * @syntax : PT.isStr(value)
-     */
-    P.isStr = function (value) {
-        return (typeof value === 'string');
-    };
-    /**
-     * @syntax : PT.isObj(value)
-     */
-    P.isObj = function (value) {
-        return (value !== null && typeof value === 'object');
-    };
-    // extend of Javascript 1.8.5
-    /**
-     * @syntax     : PT.isArr(value)
-     * @refference : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray
-     */
-    P.isArr = P.A.isArray || function (value) {
-        return P.toStr.call(value) === "[object Array]";
-    };
-    /**
-     * @syntax : PT.isDate(value)
-     */
-    P.isDate = function (value) {
-        return P.toStr.call(value) === '[object Date]';
-    };
-    /**
-     * @syntax : PT.isErr(value)
-     */
-    P.isErr = function (value) {
-        return P.toStr.call(value) === '[object Error]';
-    };
-    /**
-     * @syntax : PT.isRegExp(value)
-     */
-    P.isRegExp = function (value) {
-        return P.toStr.call(value) === '[object RegExp]';
-    };
-
-    /**
-     * @syntax : PT.toInt(value[, base])
-     */
-    P.toInt = function (value, base) {
-        return parseInt(value, base || 10);
-    };
+    PT.isBool   = function (value) { return (typeof value === 'boolean');                   };
+    PT.isFunc   = function (value) { return (typeof value === 'function');                  };
+    PT.isNum    = function (value) { return (typeof value === 'number');                    };
+    PT.isStr    = function (value) { return (typeof value === 'string');                    };
+    PT.isDef    = function (value) { return (value !== null && value !== void 0);           };
+    PT.isObj    = function (value) { return (value !== null && typeof value === 'object');  };
+    PT.isDate   = function (value) { return toStr(value) === '[object Date]';               };
+    PT.isErr    = function (value) { return toStr(value) === '[object Error]';              };
+    PT.isRegExp = function (value) { return toStr(value) === '[object RegExp]';             };
+    PT.isArr    = A.isArray || function (value) { return toStr(value) === '[object Array]'; };
 
     /*
      * @description : try to load original edition of global variables
@@ -133,7 +58,7 @@ PASTRY  = PT = P = {};
      * @return      : {unknown} value the callback functions try to return.
      * @syntax      : PT.tryEach(callbackList) || PT.tryEach(callbackList)
      */
-    P.tryAny = function (callbackList) {
+    PT.tryAny = function (callbackList) {
         var i, returnValue;
 
         for (i = 0; i < callbackList.length; i ++) {
@@ -144,317 +69,47 @@ PASTRY  = PT = P = {};
         }
         return returnValue;
     };
-
-    // export PT
     /*
      * @description : the environment global variable.
      * @syntax      : PT.OVEN
      * @return      : {browser} window.
      * @return      : {nodejs } exports.
      */
-
-    if (typeof exports !== 'undefined') {
-        if (typeof module !== 'undefined' && module.exports) {
-            exports = module.exports = P;
+    if (typeof exports !== US) {
+        if (typeof module !== US && module.exports) {
+            exports = module.exports = PT;
         }
-        exports.PASTRY = exports.PT = P;
-        P.NODEJS     = 1;
-        P.ON.process = process;
+        exports.PASTRY = exports.PT = PT;
+        PT.NODEJS      = true;
+        PT.ON.process  = process;
     } else {
-        P.ON.PASTRY = P.ON.PT = P;
-        P.BROWSER = 1;
+        PT.ON.PASTRY = PT.ON.PT = PT;
+        PT.BROWSER   = true;
     }
-
-    // ready for cooking!
-}());
-
-
-(function (PT) {
-    var sp = PT.SP;
-    // extend of Javascript 1.8.1
-    /**
-     * @description : Removes whitespace from both ends of the string.
-     * @return      : {string} result string.
-     * @syntax      : string.trim()
-     * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/Trim
-     */
-    sp.trim = sp.trim || function () {
-        return this.replace(/^\s+|\s+$/g, '');
-    };
-
-    // alias. black pastries again
-    /*
-     * @syntax : string.uc()
-     */
-    sp.uc = sp.toUpperCase;
-    /*
-     * @syntax : string.lc()
-     */
-    sp.lc = sp.toLowerCase;
-
-    /*
-     * @syntax : string.toInt()
-     */
-    sp.toInt = function (base){
-        return parseInt(this, base || 10);
-    };
-
-    /*
-     * @description : check if string has a given sub string.
-     * @syntax      : string.has(subStr)
-     * @param       : {String} subStr, given sub string.
-     * @return      : {Boolean} result.
-     */
-    sp.has = function (subStr) {
-        return (this.indexOf(subStr) > -1);
-    };
-}(PT));
-
-(function (PT) {
-    var dp = PT.DP,
-        f = function (n) {
-            return n < 10 ? '0' + n : n;
-        },
-        lms = function (ms) {
-            var str = ms.toString(),
-                len = str.length;
-            return len === 3 ? str : len === 2 ? '0' + str : '00' + str;
-        };
-    /**
-     * @description : return stringified date according to given pattern.
-     * @param       : {string} pattern, defines pattern for stringify.
-     * @return      : {string} result string.
-     * @syntax      : date.stringf([pattern])
-     * @example     : '{YYYY}-{MM}-{DD}T{hh}:{mm}:{ss}.{lms}Z' => '2013-10-03T00:57::13.180Z'
-     * @example     : '{YYYY}-{MM}-{DD} {hh}:{mm}:{ss}' => '2013-10-03 00:57::13'
-     * @example     : '{YY}-{M}-{D} {h}:{m}:{s}' => '13-10-3 0:57::13'
-     */
-    dp.stringf = function (pattern) {
-        var y, mo, d, h, mi, s, ms;
-        pattern = pattern || '{YYYY}-{MM}-{DD} {hh}:{mm}:{ss}';
-        return pattern.replace( '{YYYY}', y = PT.S(this.getFullYear())     )
-                      .replace( '{MM}'  , f(mo   = this.getMonth() + 1   ) )
-                      .replace( '{DD}'  , f(d    = this.getDate()        ) )
-                      .replace( '{hh}'  , f(h    = this.getHours()       ) )
-                      .replace( '{mm}'  , f(mi   = this.getMinutes()     ) )
-                      .replace( '{ss}'  , f(s    = this.getSeconds()     ) )
-                      .replace( '{lms}' , lms(ms = this.getMilliseconds()) )
-                      .replace( '{YY}'  , y.substring(2) )
-                      .replace( '{M}'   , mo )
-                      .replace( '{D}'   , d  )
-                      .replace( '{h}'   , h  )
-                      .replace( '{m}'   , mi )
-                      .replace( '{s}'   , s  )
-                      .replace( '{ms}'  , ms );
-    };
-}(PT));
-
-(function (PT) {
-    var o = PT.O, op = PT.OP;
-
-    // Javascript 1.5
-    /**
-     * @description : check if the object has the key
-     * @param       : {string} key, key to check
-     * @syntax      : object.hasKey(key) || object.has(key)
-     */
-    op.has = op.hasKey = op.hasOwnProperty;
-
-    // extend of Javascript 1.8.x
-    /**
-     * @description : Executes a provided function once per object element.
-     * @param       : {function} callback , Function to execute for each element.
-     * @param       : {object  } thisObj  , Object to use as this when executing callback.
-     * @syntax      : object.forEach(callback[, thisObj]) || object.each(callback[, thisObj])
-     */
-    op.each = op.forEach = op.forEach || function (callback, thisObj) {
-        var key,
-            obj = this;
-        for (key in obj){
-            if (obj.has(key)) {
-                callback.call(thisObj, obj[key], key, obj);
-            }
-        }
-    };
-    /**
-     * @description : returns an array whose elements are strings corresponding to the enumerable properties found directly upon object.
-     * @param       : {object} obj, Object to get keys from.
-     * @syntax      : o.keys(obj)
-     */
-    o.keys = o.keys || function (obj) {
-        var key,
-            result = [];
-        if (PT.isFunc(obj)) {
-            obj.each(function (value, key) {
-                if (key !== 'prototype') {
-                    result.push(key);
-                }
-            });
-        } else {
-            obj.each(function (value, key) {
-                result.push(key);
-            });
-        }
-        return result;
-    };
-
-    // extend of pastry
-    /**
-     * @description : returns keys of an object
-     * @syntax      : object.keys()
-     */
-    op.keys = function () {
-        return o.keys(this);
-    };
-    /**
-     * @description : returns an array whose elements are values of the object.
-     * @param       : {object} obj, Object to get values from.
-     * @syntax      : o.values(obj)
-     */
-    o.values = function (obj) {
-        var values = [];
-        obj.each(function (value) {
-            values.push(value);
-        });
-        return values;
-    };
-    /**
-     * @description : returns values of an object
-     * @syntax      : object.values()
-     */
-    op.values = function () {
-        return o.values(this);
-    };
-    /**
-     * @description : check if the object has the value
-     * @param       : {unknown} value, value to check.
-     * @syntax      : object.hasValue(value) || object.hasVal(value)
-     */
-    op.hasVal = op.hasValue = function (value) {
-        return (this.values().indexOf(value) > -1);
-    };
-
-    /**
-     * @description : merge another object
-     * @param       : {object} that, object to merge with.
-     * @syntax      : object.merge(that)
-     */
-    op.merge = function (that) {
-        if (!that || !PT.isObj(that)) {
-            return this;
-        }
-        var result = {};
-        this.each(function (value, key) {
-            result[key] = value;
-        });
-        that.each(function (value, key) {
-            result[key] = value;
-        });
-        return result;
-    };
-
-}(PT));
-
-(function (PT) {
-    var np = PT.NP;
-
-    /**
-     * @description : return stringified number according to given pattern.
-     * @param       : {object} option, defines pattern for stringify.
-     * @example     : {"comma": "1|0", "decimal": ">=0", "integer" : ">=0", "zero": "1|0"}
-     * @return      : {string} result string.
-     * @syntax      : number.stringf([option])
-     */
-    np.stringf = function (option) {
-        var i, len, placeHolder,
-            str = this.toString(),
-            strArr = str.split('.');
-        option = option || {
-            'comma'   : 1,
-            'decimal' : 2,
-            'integer' : 5,
-            'zero'    : 0
-        };
-        placeHolder = (option.has('zero') && option.zero > 0) ? '0' : ' ';
-        if (option.has('decimal') && option.decimal > 0) {
-            strArr[1] = strArr[1] || '';
-            strArr[1] = strArr[1].slice(0, option.decimal);
-            len = option.decimal - strArr[1].length;
-            for (i = 0; i < len; i ++) {
-                strArr[1] += '0';
-            }
-        }
-        if (option.has('integer') && option.integer > 0) {
-            len = option.integer - strArr[0].length;
-            for (i = 0; i < len; i ++) {
-                strArr[0] = placeHolder + strArr[0];
-            }
-        }
-        if (option.has('comma') && option.comma !== 0) {
-            strArr[0] = strArr[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-        }
-        if (strArr[1] !== '') {
-            return strArr.join('.');
-        }
-        return strArr[0];
-    };
-}(PT));
-
-(function (PT) {
-    var f = PT.F, fp = PT.FP;
-    // Javascript 1.8.5
-    /**
-     * @description : check if the object has the key
-     * @param       : {unkonwn} thisArg, The value to be passed as the this parameter to the target function when the bound function is called.
-     * @param       : {unkonwn} argx, Arguments to prepend to arguments provided to the bound function.
-     * @syntax      : fun.bind(thisArg[, arg1[, arg2[, ...]]])
-     * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind
-     */
-    fp.bind = fp.bind || function (oThis) {
-        if (PT.isFunc(oThis)) {
-            var aArgs = arguments.slice(1),
-                fToBind = this,
-                FNOP = function () {},
-                fBound = function () {
-                    return fToBind.apply(
-                            this instanceof FNOP && oThis ? this : oThis || PT.ON,
-                            aArgs.concat(arguments)
-                        );
-                };
-            FNOP.prototype   = this.prototype;
-            fBound.prototype = new FNOP();
-            return fBound;
-        }
-    };
-}(PT));
-
-(function (PT) {
-    var ap = PT.AP;
 
     // extend of Javascript 1.6
     /**
      * @description : Returns the first index at which a given element can be found in the array, or -1 if it is not present.
-     * @param       : {object} searchElement , Element to locate in the array.
-     * @param       : {number} fromIndex     , The index to start the search at. Default: 0 (Entire array is searched).
-     * @return      : {number} index of element.
-     * @syntax      : array.indexOf(searchElement[, fromIndex])
+     * @param       : {Array } arr           , Array to be searched from.
+     * @param       : {Object} searchElement , Element to locate in the array.
+     * @param       : {Number} fromIndex     , The index to start the search at. Default: 0 (Entire array is searched).
+     * @return      : {Number} index of element.
+     * @syntax      : PT.indexOf(arr, searchElement[, fromIndex])
+     * @refference  : javascript 1.6
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf
      */
-    ap.indexOf = ap.indexOf || function (searchElement, fromIndex) {
+    PT.indexOf = function (arr, searchElement, fromIndex) {
+        fromIndex = fromIndex || 0;
+        if (AP.indexOf) {
+            return arr.indexOf(searchElement, fromIndex);
+        }
         var i,
-            a = this,
-            len = a.length >>> 0;
-        if (len === 0) {
-            return -1;
-        }
-        if (!PT.isDef(fromIndex)) {
-            fromIndex = 0;
-        }
-        if (fromIndex >= len) {
+            len = arr.length >>> 0;
+        if (len === 0 || fromIndex >= len) {
             return -1;
         }
         for (i = fromIndex >= 0 ? fromIndex : Math.max(len - Math.abs(fromIndex), 0); i < len; i ++) {
-            if (a.has(i) && a[i] === searchElement) {
+            if /* jshint -W116 */ (arr[i] == searchElement) {
                 return i;
             }
         }
@@ -462,24 +117,25 @@ PASTRY  = PT = P = {};
     };
     /**
      * @description : Returns the last index at which a given element can be found in the array, or -1 if it is not present. The array is searched backwards, starting at fromIndex.
-     * @param       : {object} searchElement , Element to locate in the array.
-     * @param       : {number} fromIndex     , The index at which to start searching backwards. Defaults to the array's length.
-     * @return      : {number} index of element.
-     * @syntax      : array.lastIndexOf(searchElement[, fromIndex])
+     * @param       : {Array } arr           , Array to be searched from.
+     * @param       : {Object} searchElement , Element to locate in the array.
+     * @param       : {Number} fromIndex     , The index at which to start searching backwards. Defaults to the array's length.
+     * @return      : {Number} index of element.
+     * @syntax      : PT.lastIndexOf(arr, searchElement[, fromIndex])
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/lastIndexOf
      */
-    ap.lastIndexOf = ap.lastIndexOf || function (searchElement, fromIndex) {
+    PT.lastIndexOf = function (arr, searchElement, fromIndex) {
+        if (AP.lastIndexOf) {
+            return arr.lastIndexOf(searchElement, fromIndex);
+        }
         var i,
-            a = this,
-            len = a.length >>> 0;
+            len = arr.length >>> 0;
         if (len === 0) {
             return -1;
         }
-        if (!PT.isDef(fromIndex)) {
-            fromIndex = len;
-        }
+        fromIndex = fromIndex || len;
         for (i = fromIndex >= 0 ? Math.min(fromIndex, len - 1) : len - Math.abs(fromIndex); i >= 0; i --) {
-            if (a.has(i) && a[i] === searchElement) {
+            if /* jshint -W116 */ (arr[i] == searchElement) {
                 return i;
             }
         }
@@ -487,17 +143,20 @@ PASTRY  = PT = P = {};
     };
     /**
      * @description : Tests whether all elements in the array pass the test implemented by the provided function.
-     * @param       : {function} callback , Function to test for each element.
-     * @param       : {object  } thisObj  , Object to use as this when executing callback.
-     * @return      : {boolean } if test succeeded or not.
-     * @syntax      : array.every(callback[, thisObj])
+     * @param       : {Array   } arr      , array to test.
+     * @param       : {Function} callback , Function to test for each element.
+     * @param       : {Object  } thisObj  , Object to use as this when executing callback.
+     * @return      : {Boolean } if test succeeded or not.
+     * @syntax      : PT.every(arr, callback[, thisObj])
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/every
      */
-    ap.every = ap.every || function (callback, thisObj) {
-        var i,
-            a = this;
-        for (i = 0; i < a.length; i ++) {
-            if (a.has(i) && !callback.call(thisObj, a[i], i, a)) {
+    PT.every = function (arr, callback, thisObj) {
+        if (AP.every) {
+            return arr.every(callback, thisObj);
+        }
+        var i;
+        for (i = 0; i < arr.length; i ++) {
+            if (!callback.call(thisObj, arr[i], i, arr)) {
                 return false;
             }
         }
@@ -505,59 +164,60 @@ PASTRY  = PT = P = {};
     };
     /**
      * @description : Creates a new array with all elements that pass the test implemented by the provided function.
-     * @param       : {function} callback , Function to test each element of the array.
-     * @param       : {object  } thisObj  , Object to use as this when executing callback.
-     * @return      : {array   } result array.
-     * @syntax      : array.filter(callback[, thisObj])
+     * @param       : {Array   } arr      , array to execute function with.
+     * @param       : {Function} callback , Function to test each element of the array.
+     * @param       : {Object  } thisObj  , Object to use as this when executing callback.
+     * @return      : {Array   } result array.
+     * @syntax      : PT.filter(arr, callback[, thisObj])
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter
      */
-    ap.filter = ap.filter || function (callback, thisObj) {
-        var a = this,
-            res = [];
-        a.each(function (element, key) {
-            if (callback.call(thisObj, element, key, a)) {
+    PT.filter = function (arr, callback, thisObj) {
+        if (AP.filter) {
+            return arr.filter(callback, thisObj);
+        }
+        var res = [];
+        PT.each(arr, function (element, key) {
+            if (callback.call(thisObj, element, key, arr)) {
                 res.push(element);
             }
         });
         return res;
     };
     /**
-     * @description : Executes a provided function once per array element.
-     * @param       : {function} callback , Function to execute for each element.
-     * @param       : {object  } thisObj  , Object to use as this when executing callback.
-     * @syntax      : array.forEach(callback[, thisObj]) || array.each(callback[, thisObj])
-     * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach
-     */
-    // see pastry.object.js: object.forEach || object.each
-    /**
      * @description : Creates a new array with the results of calling a provided function on every element in this array.
-     * @param       : {function} callback , Function that produces an element of the new Array from an element of the current one.
-     * @param       : {object  } thisObj  , Object to use as this when executing callback.
-     * @return      : {array   } result array.
-     * @syntax      : array.map(callback[, thisObj])
+     * @param       : {Array   } arr      , array to call function with.
+     * @param       : {Function} callback , Function that produces an element of the new Array from an element of the current one.
+     * @param       : {Object  } thisObj  , Object to use as this when executing callback.
+     * @return      : {Array   } result array.
+     * @syntax      : PT.map(arr, callback[, thisObj])
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map
      */
-    ap.map = ap.map || function(callback, thisObj) {
-        var a = this,
-            res = [];
-        a.each(function (element, key) {
-            res.push(callback.call(thisObj, element, key, a));
+    PT.map = function(arr, callback, thisObj) {
+        if (AP.map) {
+            return arr.map(callback, thisObj);
+        }
+        var res = [];
+        PT.each(arr, function (element, key) {
+            res.push(callback.call(thisObj, element, key, arr));
         });
         return res;
     };
     /**
      * @description : Tests whether some element in the array passes the test implemented by the provided function.
-     * @param       : {function} callback , Function to test for each element.
-     * @param       : {object  } thisObj  , Object to use as this when executing callback.
-     * @return      : {boolean } if test succeeded or not.
-     * @syntax      : array.some(callback[, thisObj])
+     * @param       : {Array   } arr      , array to test.
+     * @param       : {Function} callback , Function to test for each element.
+     * @param       : {Object  } thisObj  , Object to use as this when executing callback.
+     * @return      : {Boolean } if test succeeded or not.
+     * @syntax      : PT.some(arr, callback[, thisObj])
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/some
      */
-    ap.some = ap.some || function (callback, thisObj) {
-        var i,
-            a = this;
-        for (i = 0; i < a.length; i ++) {
-            if (a.has(i) && callback.call(thisObj, a[i], i, a)) {
+    PT.some = function (arr, callback, thisObj) {
+        if (AP.some) {
+            return arr.some(callback, thisObj);
+        }
+        var i;
+        for (i = 0; i < arr.length; i ++) {
+            if (callback.call(thisObj, arr[i], i, arr)) {
                 return true;
             }
         }
@@ -567,140 +227,164 @@ PASTRY  = PT = P = {};
     // extend of Javascript 1.8
     /**
      * @description     : Apply a function against an accumulator and each value of the array (from left-to-right) as to reduce it to a single value.
-     * @param           : {function} callback      , Function to execute on each value in the array, taking four arguments:
-     * @param           : {object  } thisObj       , Object to use as the first argument to the first call of the callback.
-     * @paramOfCallback : {object  } previousValue , The value previously returned in the last invocation of the callback, or initialValue, if supplied.
-     * @paramOfCallback : {object  } currentValue  , The current element being processed in the array.
-     * @paramOfCallback : {number  } index         , The index of the current element being processed in the array.
-     * @paramOfCallback : {array   } array         , The array reduce was called upon.
-     * @return          : {object  } result value.
-     * @syntax          : array.reduce(callback[, thisObj])
+     * @param           : {Array   } arr           , array to reduce.
+     * @param           : {Function} callback      , Function to execute on each value in the array, taking four arguments:
+     * @param           : {Object  } thisObj       , Object to use as the first argument to the first call of the callback.
+     * @paramOfCallback : {Object  } previousValue , The value previously returned in the last invocation of the callback, or initialValue, if supplied.
+     * @paramOfCallback : {Object  } currentValue  , The current element being processed in the array.
+     * @paramOfCallback : {Number  } index         , The index of the current element being processed in the array.
+     * @paramOfCallback : {Array   } array         , The array reduce was called upon.
+     * @return          : {Object  } result value.
+     * @syntax          : PT.reduce(arr, callback[, thisObj])
      * @refference      : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Reduce
      */
-    ap.reduce = ap.reduce || function (callback, thisObj) {
-        var i, value,
-            a = this,
-            isValueSet = false;
-        if (PT.isDef(thisObj)) {
+    PT.reduce = function (arr, callback, thisObj) {
+        if (AP.reduce) {
+            return thisObj ? arr.reduce(callback, thisObj) : arr.reduce(callback);
+        }
+        var i, value;
+        if (thisObj) {
             value = thisObj;
-            isValueSet = true;
         }
-        for (i = 0; i < a.length; i ++) {
-            if (a.has(i)) {
-                if (isValueSet) {
-                    value = callback(value, a[i], i, a);
-                } else {
-                    value = a[i];
-                    isValueSet = true;
-                }
+        for (i = 0; i < arr.length; i ++) {
+            if (value) {
+                value = callback(value, arr[i], i, arr);
+            } else {
+                value = arr[i];
             }
-        }
-        if (!isValueSet) {
-            throw new TypeError();
         }
         return value;
     };
     /**
      * @description : Apply a function simultaneously against two values of the array (from right-to-left) as to reduce it to a single value.
-     * @param       : {function} callback , Function to execute on each value in the array.
-     * @param       : {object  } thisObj  , Object to use as the first argument to the first call of the callback.
-     * @return      : {object  } result value.
-     * @syntax      : array.reduceRight(callback[, thisObj])
+     * @param       : {Array   } arr      , array to reduce.
+     * @param       : {Function} callback , Function to execute on each value in the array.
+     * @param       : {Object  } thisObj  , Object to use as the first argument to the first call of the callback.
+     * @return      : {Object  } result value.
+     * @syntax      : PT.reduceRight(arr, callback[, thisObj])
      * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/ReduceRight
      */
-    ap.reduceRight = ap.reduceRight || function (callback, thisObj) {
-        var i, value,
-            a = this,
-            isValueSet = false;
-        if (PT.isDef(thisObj)) {
-            value = thisObj;
-            isValueSet = true;
+    PT.reduceRight = function (arr, callback, thisObj) {
+        if (AP.reduceRight) {
+            return thisObj ? arr.reduceRight(callback, thisObj) : arr.reduceRight(callback);
         }
-        for (i = a.length - 1; i >= 0; i --) {
-            if (a.has(i)) {
-                if (isValueSet) {
-                    value = callback(value, a[i], i, a);
-                } else {
-                    value = a[i];
-                    isValueSet = true;
+        var i, value;
+        if (thisObj) {
+            value = thisObj;
+        }
+        for (i = arr.length - 1; i >= 0; i --) {
+            if (value) {
+                value = callback(value, arr[i], i, arr);
+            } else {
+                value = arr[i];
+            }
+        }
+        return value;
+    };
+
+    /**
+     * @description : check if the object has the key
+     * @param       : {Object} obj, object to be checked
+     * @param       : {String} key, key to check
+     * @syntax      : PT.hasKey(obj, key) || PT.has(obj, key)
+     */
+    PT.has = PT.hasKey = function (obj, key) {
+        return obj.hasOwnProperty(key);
+    };
+
+    /**
+     * @description : Executes a provided function once per object element.
+     * @param       : {Object  } obj      , Object to traversal.
+     * @param       : {Function} callback , Function to execute for each element.
+     * @param       : {Object  } thisObj  , Object to use as this when executing callback.
+     * @syntax      : PT.forEach(obj, callback[, thisObj]) || PT.each(obj, callback[, thisObj])
+     */
+    PT.each = PT.forEach = function (obj, callback, thisObj) {
+        if (OP.forEach) {
+            obj.forEach(callback, thisObj);
+        } else {
+            var key;
+            for (key in obj){
+                if (PT.has(obj, key)) {
+                    callback.call(thisObj, obj[key], key, obj);
                 }
             }
         }
-        if (!isValueSet) {
-            throw new TypeError();
-        }
-        return value;
     };
 
     // extend of pastry
     /**
      * @description : binarySearch.
-     * @param       : {object  } element     , element to be searched.
-     * @param       : {function} compareFunc , compare function executed when searching.
-     * @return      : {number  } result index.
-     * @syntax      : array.binarySearch(element, compareFunc)
+     * @param       : {Array   } arr         , array to be searched from.
+     * @param       : {Object  } element     , element to be searched.
+     * @param       : {Function} compareFunc , compare function executed when searching.
+     * @return      : {Number  } result index.
+     * @syntax      : PT.binarySearch(arr, element, compareFunc)
      */
-    ap.binarySearch = function (element, compareFunc) {
-        var start = 0,
-            a = this,
-            end = a.length,
+    PT.binarySearch = function (arr, element, compareFunc) {
+        var start   = 0,
+            end     = arr.length,
             current = Math.floor(end/2);
         while (end !== current) {
-            if (compareFunc(element, a[current]) > 0) {
+            if (compareFunc(element, arr[current]) > 0) {
                 start = current + 1;
             } else {
                 end = current;
             }
             current = Math.floor((start + end) / 2);
         }
-        current = (current === 0 && compareFunc(element, a[current]) !== 0) ? -1 : current;
+        current = (current === 0 && compareFunc(element, arr[current]) !== 0) ? -1 : current;
         return current;
     };
     /**
      * @description : Remove elements according to the given fromIndex and toIndex, and return the rest array.
-     * @param       : {number} fromIndex , index to remove from.
-     * @param       : {number} toIndex   , index to remove to.
-     * @syntax      : array.remove([fromIndex[, toIndex]])
-     * @refference  : Array Remove - B. John Resig (MIT Licensed)
+     * @param       : {Array } arr       , array to remove from.
+     * @param       : {Number} fromIndex , index to remove from.
+     * @param       : {Number} toIndex   , index to remove to.
+     * @syntax      : PT.remove(arr, [fromIndex[, toIndex]])
+     * @refference  : http://ejohn.org/blog/javascript-array-remove/
      */
-    ap.remove = function (fromIndex, toIndex) {
+    PT.remove = function (arr, fromIndex, toIndex) {
         var rest,
-            a = this,
-            len = a.length;
-        if (!PT.isDef(fromIndex)) {
-            return a;
+            len = arr.length;
+        if (!fromIndex || !PT.isNum(fromIndex)) {
+            return arr;
         }
-        rest = a.slice((toIndex || fromIndex) + 1 || len);
-        a.length = fromIndex < 0 ? len + fromIndex : fromIndex;
-        a.push.apply(a, rest);
+        rest = arr.slice((toIndex || fromIndex) + 1 || len);
+        arr.length = fromIndex < 0 ? len + fromIndex : fromIndex;
+        return arr.push.apply(arr, rest);
     };
     /**
      * @description : replace.
-     * @param       : {object} element     , element to be replaced.
-     * @param       : {object} withElement , element to replace with.
-     * @syntax      : array.replace(element, withElement)
+     * @param       : {Array } arr         , array to be replaced.
+     * @param       : {Object} element     , element to be replaced.
+     * @param       : {Object} withElement , element to replace with.
+     * @syntax      : PT.replace(arr, element, withElement)
      */
-    ap.replace = function (element, withElement) {
-        var i,
-            a = this;
-        a.each(function (elem, i) {
-            if (elem === element) {
-                a[i] = withElement;
+    PT.replace = function (arr, element, withElement, isGlobal) {
+        var isReplaced = false;
+        PT.each(arr, function (e, i) {
+            if (e === element) {
+                arr[i] = withElement;
+                isReplaced = true;
+                if (isGlobal) {
+                    return isReplaced;
+                }
             }
         });
+        return isReplaced;
     };
-
     /**
      * @description : intersection set of two arrays (this ∩ that)
-     * @param       : {array} that, the array to get intersection set with.
-     * @return      : {array} result array.
-     * @syntax      : array.intersection(that)
+     * @param       : {Array} thisArr, the array to get intersection set from.
+     * @param       : {Array} thatArr, the array to get intersection set from.
+     * @return      : {Array} result array.
+     * @syntax      : PT.intersection(thisArr, thatArr)
      */
-    ap.intersection = function (that) {
-        var a = this,
-            resultArr = [];
-        a.each(function (element) {
-            if (that.hasVal(element) && !resultArr.hasVal(element)) {
+    PT.intersection = function (thisArr, thatArr) {
+        var resultArr = [];
+        PT.each(thisArr, function (element) {
+            if (PT.hasVal(thatArr, element) && !PT.hasVal(resultArr, element)) {
                 resultArr.push(element);
             }
         });
@@ -708,15 +392,30 @@ PASTRY  = PT = P = {};
     };
     /**
      * @description : complement set of two arrays (this - that)
-     * @param       : {array} that, the array to get complement set with.
-     * @return      : {array} result array.
-     * @syntax      : array.complement(that)
+     * @param       : {Array} thisArr, the array to get complement set from.
+     * @param       : {Array} thatArr, the array to get complement set from.
+     * @return      : {Array} result array.
+     * @syntax      : PT.complement(thisArr, thatArr)
      */
-    ap.complement = function (that) {
-        var a = this,
-            resultArr = [];
-        a.each(function (element) {
-            if (!that.hasVal(element) && !resultArr.hasVal(element)) {
+    PT.complement = function (thisArr, thatArr) {
+        var resultArr = [];
+        PT.each(thisArr, function (element) {
+            if (!PT.hasVal(thatArr, element) && !PT.hasVal(resultArr, element)) {
+                resultArr.push(element);
+            }
+        });
+        return resultArr;
+    };
+    /**
+     * @description : uniq sub array of an array.
+     * @param       : {Array} arr, the array to get a set from.
+     * @return      : {Array} result sub array.
+     * @syntax      : PT.uniq(arr)
+     */
+    PT.uniq = function (arr) {
+        var resultArr = [];
+        PT.each(arr, function (element) {
+            if (!PT.hasVal(resultArr, element)) {
                 resultArr.push(element);
             }
         });
@@ -724,27 +423,253 @@ PASTRY  = PT = P = {};
     };
     /**
      * @description : union set of two arrays (this U that)
-     * @param       : {array} that, the array to get union set with.
-     * @return      : {array} result array.
-     * @syntax      : array.intersection(that)
+     * @param       : {Array} thisArr, the array to get union set from.
+     * @param       : {Array} thatArr, the array to get union set from.
+     * @return      : {Array} result array.
+     * @syntax      : PT.union(thisArr, thatArr)
      */
-    ap.union = function (that) {
-        return this.concat(that).uniq();
+    PT.union = function (thisArr, thatArr) {
+        return PT.uniq(thisArr.concat(thatArr));
+    };
+
+    /**
+     * @description : returns an array whose elements are strings corresponding to the enumerable properties found directly upon object.
+     * @param       : {object} obj, Object to get keys from.
+     * @syntax      : PT.keys(obj)
+     */
+    PT.keys = function (obj) {
+        if (O.keys) {
+            return O.keys(obj);
+        }
+        var key,
+            result = [];
+        if (PT.isFunc(obj)) {
+            PT.each(obj, function (value, key) {
+                if (key !== PS) {
+                    result.push(key);
+                }
+            });
+        } else {
+            PT.each(obj, function (value, key) {
+                result.push(key);
+            });
+        }
+        return result;
+    };
+
+    // extend of pastry
+    /**
+     * @description : returns an array whose elements are values of the object.
+     * @param       : {object} obj, Object to get values from.
+     * @syntax      : PT.values(obj)
+     */
+    PT.values = function (obj) {
+        var values = [];
+        PT.each(obj, function (value) {
+            values.push(value);
+        });
+        return values;
     };
     /**
-     * @description : uniq sub array of an array.
-     * @return      : {array} result sub array.
-     * @syntax      : array.uniq()
+     * @description : check if the object has the value
+     * @param       : {Object } obj  , object to be checked.
+     * @param       : {unknown} value, value to check.
+     * @syntax      : PT.hasValue(obj, value) || PT.hasVal(obj, value)
      */
-    ap.uniq = function () {
-        var a = this,
-            resultArr = [];
-        a.each(function (element) {
-            if (!resultArr.hasVal(element)) {
-                resultArr.push(element);
-            }
+    PT.hasVal = PT.hasValue = function (obj, value) {
+        return (PT.indexOf(PT.values(obj), value) > -1);
+    };
+    /**
+     * @description : merge another object
+     * @param       : {Object} thisObj, object to be checked.
+     * @param       : {Object} thatObj, object to merge with.
+     * @syntax      : PT.merge(this, that)
+     */
+    PT.merge = function (thisObj, thatObj) {
+        if (!thatObj || !PT.isObj(thatObj)) {
+            return thisObj;
+        }
+        var result = {};
+        PT.each(thisObj, function (value, key) {
+            result[key] = value;
         });
-        return resultArr;
+        PT.each(thatObj, function (value, key) {
+            result[key] = value;
+        });
+        return result;
+    };
+
+    /**
+     * @description : check if the object has the key
+     * @param       : {unkonwn} thisArg, The value to be passed as the this parameter to the target function when the bound function is called.
+     * @param       : {unkonwn} argx, Arguments to prepend to arguments provided to the bound function.
+     * @syntax      : fun.bind(thisArg[, arg1[, arg2[, ...]]])
+     * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind
+     */
+    PT.bind = function (func, oThis) {
+        if (PT.isFunc(oThis) && PT.isFunc(func)) {
+            var aArgs  = arguments.slice(2),
+                FNOP   = function () {},
+                fBound = function () {
+                    return func.apply(
+                            this instanceof FNOP && oThis ? this : oThis || PT.ON,
+                            aArgs.concat(arguments)
+                        );
+                };
+            if (FP.bind) {
+                return func.bind(oThis, aArgs);
+            }
+            FNOP[PS]   = func[PS];
+            fBound[PS] = new FNOP();
+            return fBound;
+        }
+    };
+
+    /**
+     * @syntax : PT.toInt(value[, base])
+     */
+    PT.toInt = function (value, base) {
+        return parseInt(value, base || 10);
+    };
+    /**
+     * @description : Removes whitespace from both ends of the string.
+     * @param       : {string} str, string to trim.
+     * @return      : {string} result string.
+     * @syntax      : PT.trim(str)
+     * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/Trim
+     */
+    PT.trim = function (str) {
+        if (SP.trim) {
+            return str.trim();
+        }
+        return str.replace(/^\s+|\s+$/g, '');
+    };
+    /**
+     * @syntax      : PT.trimLeft(str)
+     * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/TrimLeft
+     */
+    PT.trimLeft = function (str) {
+        if (SP.trimLeft) {
+            return str.trimLeft();
+        }
+        return str.replace(/^\s+/g, '');
+    };
+    /**
+     * @syntax      : PT.trimRight(str)
+     * @refference  : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/TrimRight
+     */
+    PT.trimRight = function (str) {
+        if (SP.trimRight) {
+            return str.trimRight();
+        }
+        return str.replace(/\s+$/g, '');
+    };
+
+    /*
+     * @param  : {String} str, string to get upper cases.
+     * @return : {String} upper cases version string.
+     * @syntax : PT.uc(str)
+     */
+    PT.uc = function (str) {
+        return str.toUpperCase();
+    };
+    /*
+     * @param  : {String} str, string to get lower cases.
+     * @return : {String} lower cases version string.
+     * @syntax : PT.uc(str)
+     */
+    PT.lc = function (str) {
+        return str.toLowerCase();
+    };
+    /*
+     * @description : check if string has a given sub string.
+     * @param       : {String} str   , given string.
+     * @param       : {String} subStr, given sub string.
+     * @syntax      : PT.hasSub(str, subStr)
+     * @return      : {Boolean} result.
+     */
+    PT.hasSub = function (str, subStr) {
+        return (str.indexOf(subStr) > -1);
+    };
+}(PT));
+
+(function (PT) {
+    PT.FMT = {
+        /**
+         * @description : return stringified date according to given pattern.
+         * @param       : {string} pattern, defines pattern for stringify.
+         * @return      : {string} result string.
+         * @syntax      : date.stringf([pattern])
+         * @example     : '{YYYY}-{MM}-{DD}T{hh}:{mm}:{ss}.{lms}Z' => '2013-10-03T00:57::13.180Z'
+         * @example     : '{YYYY}-{MM}-{DD} {hh}:{mm}:{ss}' => '2013-10-03 00:57::13'
+         * @example     : '{YY}-{M}-{D} {h}:{m}:{s}' => '13-10-3 0:57::13'
+         */
+        date : function (date, pattern) {
+            var y, mo, d, h, mi, s, ms,
+                f = function (n) {
+                    return n < 10 ? '0' + n : n;
+                },
+                lms = function (ms) {
+                    var str = ms.toString(),
+                        len = str.length;
+                    return len === 3 ? str : len === 2 ? '0' + str : '00' + str;
+                };
+            pattern = pattern || '{YYYY}-{MM}-{DD} {hh}:{mm}:{ss}';
+            return pattern.replace( '{YYYY}', y = PT.S(date.getFullYear())     )
+                          .replace( '{MM}'  , f(mo   = date.getMonth() + 1   ) )
+                          .replace( '{DD}'  , f(d    = date.getDate()        ) )
+                          .replace( '{hh}'  , f(h    = date.getHours()       ) )
+                          .replace( '{mm}'  , f(mi   = date.getMinutes()     ) )
+                          .replace( '{ss}'  , f(s    = date.getSeconds()     ) )
+                          .replace( '{lms}' , lms(ms = date.getMilliseconds()) )
+                          .replace( '{YY}'  , y.substring(2) )
+                          .replace( '{M}'   , mo )
+                          .replace( '{D}'   , d  )
+                          .replace( '{h}'   , h  )
+                          .replace( '{m}'   , mi )
+                          .replace( '{s}'   , s  )
+                          .replace( '{ms}'  , ms );
+        },
+        /**
+         * @description : return stringified number according to given pattern.
+         * @param       : {object} option, defines pattern for stringify.
+         * @example     : {"comma": "1|0", "decimal": ">=0", "integer" : ">=0", "zero": "1|0"}
+         * @return      : {string} result string.
+         * @syntax      : number.stringf([option])
+         */
+        num : function (num, option) {
+            var i, len, placeHolder,
+                str    = num.toString(),
+                strArr = str.split('.');
+            option = option || {
+                'comma'   : 1,
+                'decimal' : 2,
+                'integer' : 5,
+                'zero'    : 0
+            };
+            placeHolder = (option.zero && option.zero > 0) ? '0' : ' ';
+            if (option.decimal && option.decimal > 0) {
+                strArr[1] = strArr[1] || '';
+                strArr[1] = strArr[1].slice(0, option.decimal);
+                len = option.decimal - strArr[1].length;
+                for (i = 0; i < len; i ++) {
+                    strArr[1] += '0';
+                }
+            }
+            if (option.integer && option.integer > 0) {
+                len = option.integer - strArr[0].length;
+                for (i = 0; i < len; i ++) {
+                    strArr[0] = placeHolder + strArr[0];
+                }
+            }
+            if (option.comma && option.comma !== 0) {
+                strArr[0] = strArr[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            }
+            if (strArr[1] !== '') {
+                return strArr.join('.');
+            }
+            return strArr[0];
+        }
     };
 }(PT));
 
@@ -753,20 +678,20 @@ PASTRY  = PT = P = {};
             function () { return JSON;         },
             function () { return PT.OVEN.JSON; }
         ]);
-    if (PT.isDef(PT.JSON)) {
+    if (PT.JSON) {
         return;
     }
 
     var D2JSON = PT.DP.toJSON,
         S = PT.S;
     if (!PT.isFunc(D2JSON)) {
-        [PT.SP, PT.NP, PT.BP].each(function (p) {
+        PT.each([PT.SP, PT.NP, PT.BP], function (p) {
             p.toJSON = function () {
                 return this.valueOf();
             };
         });
         D2JSON = function () {
-            return isFinite(this.valueOf()) ? this.stringf('{YYY}-{MM}-{DD}T{hh}:{mm}:{ss}Z') : null;
+            return isFinite(this.valueOf()) ? PT.format.date(this, '{YYY}-{MM}-{DD}T{hh}:{mm}:{ss}Z') : null;
         };
     }
 
@@ -822,7 +747,7 @@ PASTRY  = PT = P = {};
                         return v;
                     }
                     if (rep && PT.isObj(rep)) {
-                        rep.each(function (element) {
+                        PT.each(rep, function (element) {
                             if (PT.isStr(element)) {
                                 k = element;
                                 v = str(k, value);
@@ -832,7 +757,7 @@ PASTRY  = PT = P = {};
                             }
                         });
                     } else {
-                        value.each(function (element, k) {
+                        PT.each(value, function (element, k) {
                             v = str(k, value);
                             if (v) {
                                 partial.push(quote(k) + (gap ? ': ' : ':') + v);
@@ -883,7 +808,7 @@ PASTRY  = PT = P = {};
             var k, v,
                 value = holder[key];
             if (value && PT.isObj(value)) {
-                value.each(function (element, k) {
+                PT.each(value, function (element, k) {
                     v = walk(value, k);
                     if (PT.isDef(v)) {
                         value[k] = v;
@@ -913,13 +838,9 @@ PASTRY  = PT = P = {};
 
 (function (PT) {
     var matched,
-        win     = PT.ON,
-        process = win.process   || {},
-        nav     = win.navigator || {},
-        plStr   = nav.platform,
-        plugs   = nav.plugins,
-        uaStr   = nav.userAgent;
-
+        win   = PT.ON,
+        nav   = win.navigator || {},
+        uaStr = nav.userAgent;
     /*
      * @description : init PT.PL | PT.PLUG | PT.VER for current enviroment
      * @syntax      : PT.initUA()
@@ -955,13 +876,13 @@ PASTRY  = PT = P = {};
          */
 
         if (PT.NODEJS) {
-            PT.VER  = PT.versions = process.versions;
+            PT.VER  = PT.versions = win.process.versions;
         } else {
             PT.HOST = win.location.host;
             PT.DOC  = win.document;
             PT.UA   = PT.userAgent = uaStr;
-            PT.PL   = PT.platform  = PT.detectPL(plStr) || PT.detectPL(uaStr) || 'unknown';
-            PT.PLUG = PT.plugins   = PT.detectPLUG(plugs);
+            PT.PL   = PT.platform  = PT.detectPL(nav.platform) || PT.detectPL(uaStr) || 'unknown';
+            PT.PLUG = PT.plugins   = PT.detectPLUG(nav.plugins);
             PT.VER  = PT.versions  = PT.detectVER(uaStr);
         }
     };
@@ -986,7 +907,7 @@ PASTRY  = PT = P = {};
         if (!PT.isDef(str)) {
             return;
         }
-        var pls = str.lc().match(/mac|win|linux|ipad|ipod|iphone|android/);
+        var pls = PT.lc(str).match(/mac|win|linux|ipad|ipod|iphone|android/);
         return PT.isArr(pls) ? pls[0] : pls;
     };
 
@@ -1031,19 +952,19 @@ PASTRY  = PT = P = {};
         if (!PT.isDef(str)) {
             return;
         }
-        str = str.lc();
+        str = PT.lc(str);
         var ieVer,
             versions = {};
 
         // browser versions
-        [
+        PT.each([
             /msie ([\d.]+)/     ,
             /firefox\/([\d.]+)/ ,
             /chrome\/([\d.]+)/  ,
             /crios\/([\d.]+)/   ,
             /opera.([\d.]+)/    ,
             /adobeair\/([\d.]+)/
-        ].each(function (reg) {
+        ], function (reg) {
             setVer(versions, str, reg);
         });
         // chrome
@@ -1062,12 +983,12 @@ PASTRY  = PT = P = {};
         }
 
         // engine versions
-        [
+        PT.each([
             /trident\/([\d.]+)/     ,
             /gecko\/([\d.]+)/       ,
             /applewebkit\/([\d.]+)/ ,
             /presto\/([\d.]+)/
-        ].each(function (reg) {
+        ], function (reg) {
             setVer(versions, str, reg);
         });
         ieVer = versions.msie;
@@ -1081,6 +1002,143 @@ PASTRY  = PT = P = {};
     };
 
     PT.initUA();
+}(PT));
+
+(function (PT) {
+    if (PT.NODEJS) {
+        return;
+    }
+
+    /*
+     * @description : XMLHttpRequest Object
+     * @syntax      : PT.getXHR()
+     */
+    PT.getXHR = function () {
+        return PT.tryAny([
+            function () { return new XMLHttpRequest();                   },
+            function () { return new ActiveXObject('MSXML2.XMLHTTP');    },
+            function () { return new ActiveXObject('Microsoft.XMLHTTP'); }
+        ]);
+    };
+
+    /*
+     * @description : ajax.
+     * @syntax      : PT.ajax(uri[, option])[.error(callback)][.success(callback)]..
+     * @param       : {String} uri, uri.
+     * @param       : {Object} option, option.
+     * @return      : {this  } return itself for chain operations.
+     */
+    PT.ajax = function (uri, option) {
+        option = option || {};
+        var xhr         = PT.getXHR(),
+            method      = option.method ? PT.uc(option.method)               : 'GET',
+            type        = option.type   ? PT.lc(option.type)                 : 'xml',
+            data        = option.data   ? PT.QueryStr.stringify(option.data) : null,
+            contentType = option.contentType,
+            isAsync     = option.isAsync;
+
+        /*
+         * @description : event handlers.
+         * @syntax      : PT.ajax(uri[, option]).xxx(callback)..
+         * @param       : {Function} callback, callback function.
+         */
+        /*
+         * @syntax : PT.ajax(uri[, option]).abort(callback)..
+         */
+        /*
+         * @syntax : PT.ajax(uri[, option]).error(callback)..
+         */
+        /*
+         * @syntax : PT.ajax(uri[, option]).load(callback)..
+         */
+        /*
+         * @syntax : PT.ajax(uri[, option]).loadend(callback)..
+         */
+        /*
+         * @syntax : PT.ajax(uri[, option]).loadstart(callback)..
+         */
+        /*
+         * @syntax : PT.ajax(uri[, option]).progress(callback)..
+         */
+        /*
+         * @description : success event handler
+         * @syntax      : PT.ajax(uri[, option]).success(callback)..
+         */
+        /*
+         * @syntax : PT.ajax(uri[, option]).timeout(callback)..
+         */
+        PT.each([
+            'abort'     ,
+            'error'     ,
+            'load'      ,
+            'loadend'   ,
+            'loadstart' ,
+            'progress'  ,
+            'success'   ,
+            'timeout'
+        ], function (handler) {
+            if (option[handler]) {
+                xhr['on' + handler] = option[handler];
+            }
+        });
+
+        /*
+         * @description : is ajax request success
+         * @syntax      : $PT.ajax.isSuccess()
+         * @return      : {Boolean} is ajax request successfully porformed
+         */
+        xhr.isSuccess = function () {
+            return (xhr.status >= 200 && xhr.status < 300)              ||
+                   (xhr.status === 304)                                 ||
+                   (!xhr.status && PT.ON.location.protocol === 'file:') ||
+                   (!xhr.status && PT.VER.safari);
+        };
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                if (xhr.isSuccess() && option.success) {
+                    var response = xhr.responseText;
+                    if (type === 'json') {
+                        response = PT.tryAny([function () { return PT.JSON.parse(response); }]) || response;
+                    }
+                    xhr.onsuccess(response);
+                } else if (option.error) {
+                    xhr.onerror(xhr.statusText);
+                }
+            }
+        };
+
+        // progress ajax
+        if (method === 'GET') {
+            if (data) {
+                uri += (PT.hasSub(uri, '?') ? '&' : '?') + data;
+            }
+            xhr.open(method, uri, isAsync);
+            xhr.setRequestHeader(
+                    'Content-Type',
+                    contentType || 'text/plain;charset=UTF-8'
+                );
+        } else if (method === 'POST'){
+            xhr.open(method, uri, isAsync);
+            xhr.setRequestHeader(
+                    'Content-Type',
+                    contentType || 'application/x-www-form-urlencoded;charset=UTF-8'
+                );
+        } else {
+            xhr.open(method, uri, isAsync);
+        }
+        xhr.send(data);
+    };
+
+    PT.each([
+        'get' ,
+        'post'
+    ], function (method) {
+        PT[method] = function (uri, option) {
+            option.method = method;
+            PT.ajax(uri, option);
+        };
+    });
 }(PT));
 
 (function (PT) {
@@ -1123,7 +1181,7 @@ PASTRY  = PT = P = {};
                 obj = {},
                 pieces = qs.split(sep);
 
-            pieces.each(function (elem) {
+            PT.each(pieces, function (elem) {
                 tuple = elem.split(eq);
                 if (tuple.length > 0) {
                     obj[unescape(tuple.shift())] = unescape(tuple.join(eq));
@@ -1142,9 +1200,9 @@ PASTRY  = PT = P = {};
             var qs = [],
                 s = c && c.arrayKey ? true : false;
 
-            obj.each(function (value, key) {
+            PT.each(obj, function (value, key) {
                 if (PT.isArr(value)) {
-                    value.each(function (elem) {
+                    PT.each(value, function (elem) {
                         qs.push(escape(s ? key + '[]' : key) + '=' + escape(elem));
                     });
                 }
@@ -1167,23 +1225,21 @@ PASTRY  = PT = P = {};
                 rcheckableTypes   = /^(?:checkbox|radio)$/i,
                 rsubmitterTypes   = /^(?:submit|button|image|reset|file)$/i,
                 rsubmittableTypes = /^(?:input|select|textarea|keygen)/i;
-            form.elements.each(function (elem) {
+            PT.each(form.elements, function (elem) {
                 elementArray.push(elem);
             });
 
-            elementArray
-                .filter(function (elem) {
+            PT.map(PT.filter(elementArray, function (elem) {
                     return elem.name                                          &&
                            !elem.disabled                                     &&
                            rsubmittableTypes.test(elem.nodeName)              &&
                            !rsubmitterTypes.test(elem.type)                   &&
                            (!rcheckableTypes.test(elem.type) || elem.checked);
-                })
-                .map(function (elem) {
+                }), function (elem) {
                     var val = elem.value;
-                    if (PT.isDef(val)) {
+                    if (val) {
                         if (PT.isArr(val)) {
-                            val.map(function (element) {
+                            PT.map(val, function (element) {
                                 resultObj[element.name] = element.value;
                             });
                         } else {
@@ -1191,7 +1247,6 @@ PASTRY  = PT = P = {};
                         }
                     }
                 });
-
             return resultObj;
         };
 
@@ -1203,7 +1258,6 @@ PASTRY  = PT = P = {};
          * @return      : {Object} form data object.
          */
         data      : data,
-
         /*
          * @description : return form data query string.
          * @syntax      : PT.Form.serialize(form)
@@ -1221,157 +1275,21 @@ PASTRY  = PT = P = {};
         return;
     }
 
-    /*
-     * @description : XMLHttpRequest Object
-     * @syntax      : PT.getXHR()
-     */
-    PT.getXHR = function () {
-        return PT.tryAny([
-            function () { return new XMLHttpRequest();                   },
-            function () { return new ActiveXObject('MSXML2.XMLHTTP');    },
-            function () { return new ActiveXObject('Microsoft.XMLHTTP'); }
-        ]);
-    };
-
-    /*
-     * @description : ajax.
-     * @syntax      : PT.ajax(uri[, option])[.error(callback)][.success(callback)]..
-     * @param       : {String} uri, uri.
-     * @param       : {Object} option, option.
-     * @return      : {this  } return itself for chain operations.
-     */
-    PT.ajax = function (uri, option) {
-        option = option || {};
-        var xhr         = PT.getXHR(),
-            method      = option.method ? option.method.uc()                 : 'GET',
-            type        = option.type   ? option.type.lc()                   : 'xml',
-            data        = option.data   ? PT.QueryStr.stringify(option.data) : null,
-            contentType = option.contentType,
-            isAsync     = option.isAsync;
-
-        /*
-         * @description : event handlers.
-         * @syntax      : PT.ajax(uri[, option]).xxx(callback)..
-         * @param       : {Function} callback, callback function.
-         */
-        /*
-         * @syntax : PT.ajax(uri[, option]).abort(callback)..
-         */
-        /*
-         * @syntax : PT.ajax(uri[, option]).error(callback)..
-         */
-        /*
-         * @syntax : PT.ajax(uri[, option]).load(callback)..
-         */
-        /*
-         * @syntax : PT.ajax(uri[, option]).loadend(callback)..
-         */
-        /*
-         * @syntax : PT.ajax(uri[, option]).loadstart(callback)..
-         */
-        /*
-         * @syntax : PT.ajax(uri[, option]).progress(callback)..
-         */
-        /*
-         * @description : success event handler
-         * @syntax      : PT.ajax(uri[, option]).success(callback)..
-         */
-        /*
-         * @syntax : PT.ajax(uri[, option]).timeout(callback)..
-         */
-        [
-            'abort'     ,
-            'error'     ,
-            'load'      ,
-            'loadend'   ,
-            'loadstart' ,
-            'progress'  ,
-            'success'   ,
-            'timeout'
-        ].each(function (handler) {
-            if (option[handler]) {
-                xhr['on' + handler] = option[handler];
-            }
-        });
-
-        /*
-         * @description : is ajax request success
-         * @syntax      : $PT.ajax.isSuccess()
-         * @return      : {Boolean} is ajax request successfully porformed
-         */
-        xhr.isSuccess = function () {
-            return (xhr.status >= 200 && xhr.status < 300)              ||
-                   (xhr.status === 304)                                 ||
-                   (!xhr.status && PT.ON.location.protocol === 'file:') ||
-                   (!xhr.status && PT.VER.safari);
-        };
-
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === 4) {
-                if (xhr.isSuccess() && option.success) {
-                    var response = xhr.responseText;
-                    if (type === 'json') {
-                        response = PT.tryAny([function () { return PT.JSON.parse(response); }]) || response;
-                    }
-                    xhr.onsuccess(response);
-                } else if (option.error) {
-                    xhr.onerror(xhr.statusText);
-                }
-            }
-        };
-
-        // progress ajax
-        if (method === 'GET') {
-            if (data) {
-                uri += (uri.has('?') ? '&' : '?') + data;
-            }
-            xhr.open(method, uri, isAsync);
-            xhr.setRequestHeader(
-                    'Content-Type',
-                    contentType || 'text/plain;charset=UTF-8'
-                );
-        } else if (method === 'POST'){
-            xhr.open(method, uri, isAsync);
-            xhr.setRequestHeader(
-                    'Content-Type',
-                    contentType || 'application/x-www-form-urlencoded;charset=UTF-8'
-                );
-        } else {
-            xhr.open(method, uri, isAsync);
-        }
-        xhr.send(data);
-    };
-
-    [
-        'get' ,
-        'post'
-    ].each(function (method) {
-        PT[method] = function (uri, option) {
-            option.method = method;
-            PT.ajax(uri, option);
-        };
-    });
-}(PT));
-
-(function (PT) {
-    if (PT.NODEJS) {
-        return;
-    }
-
     var DOC = PT.DOC ,
         Obj = PT.O   ,
         WIN = PT.ON  ,
+        HAS = PT.has ,
         elementStr = 'Element',
         /**
          * @description : check if Element has a property.
          * @return      : {Boolean} if has or not.
-         * @syntax      : PT.DOM.hasElementProperty(name)
+         * @syntax      : PT.DOM.elemHas(name)
          */
-        hasElementProperty = function (name) {
+        elemHas = function (name) {
             return (
-                    WIN.has(elementStr) && (
-                        DOC.createElement('_').has(name) &&
-                        DOC.createElementNS('http://www.w3.org/2000/svg', 'svg').has(name)
+                    HAS(WIN, elementStr) && (
+                        HAS(DOC.createElement('_'), name) &&
+                        HAS(DOC.createElementNS('http://www.w3.org/2000/svg', 'svg'), name)
                 ));
         },
         /**
@@ -1380,11 +1298,14 @@ PASTRY  = PT = P = {};
          * @param       : {Function} Getter, property getter method.
          * @param       : {Function} Setter, property setter method.
          * @param       : {Object  } option, defineProperty options.
-         * @syntax      : PT.DOM.setElementProperty(name, Getter[, Setter, option])
+         * @syntax      : PT.DOM.elemSet(name, Getter[, Setter, option])
          */
-        setElementProperty = function (name, Getter, Setter, option) {
+        elemSet = function (name, Getter, Setter, option) {
+            if (elemHas(name)) {
+                return;
+            }
             var propDesc  = {},
-                elemProto = WIN[elementStr].prototype;
+                elemProto = WIN[elementStr][PT.PS];
             if (Obj.defineProperty) {
                 if (Getter) {
                     propDesc.get = Getter;
@@ -1393,7 +1314,7 @@ PASTRY  = PT = P = {};
                     propDesc.set = Setter;
                 }
                 if (option) {
-                    propDesc = propDesc.merge(option);
+                    propDesc = PT.merge(propDesc, option);
                 }
                 Obj.defineProperty(elemProto, name, propDesc);
             } else if (PT.OP.__defineGetter__) {
@@ -1401,14 +1322,13 @@ PASTRY  = PT = P = {};
                 elemProto.__defineSetter__(name, Setter);
             }
         };
-
     /**
      * @description : DOM
      * @syntax      : PT.DOM
      */
     PT.DOM = {
-        hasElementProperty : hasElementProperty,
-        setElementProperty : setElementProperty
+        elemHas : elemHas,
+        elemSet : elemSet
     };
 }(PT));
 
@@ -1418,204 +1338,196 @@ PASTRY  = PT = P = {};
     }
 
     var classStr     = 'class',
-        classListStr = 'classList';
-
-    if (!PT.DOM.hasElementProperty(classListStr)) {
-        var validateClass = function (token) {
-                return (token === '' || /\s/.test(token)) ? false : true;
-            },
-            /**
-             * @description : classList shim.
-             * @return      : {Array} a list of classes of an element.
-             * @syntax      : Element.classList
-             * @refference  : https://github.com/eligrey/classList.js
-             */
-            ClassList = function (elem) {
-                var $self = this;
-                $self.list = [];
-                elem.getAttribute(classStr).trim().split(/\s+/).each(function (value) {
-                    $self.list.push(value);
-                });
-                $self._updateClassName = function () {
-                    elem.setAttribute(classStr, $self.toString());
-                };
-            },
-            classListGetter = function () {
-                return new ClassList(this);
+        classListStr = 'classList',
+        validateClass = function (token) {
+            return (token === '' || /\s/.test(token)) ? false : true;
+        },
+        /**
+         * @description : classList shim.
+         * @return      : {Array} a list of classes of an element.
+         * @syntax      : Element.classList
+         * @refference  : https://github.com/eligrey/classList.js
+         */
+        ClassList = function (elem) {
+            var $self = this;
+            $self.list = [];
+            PT.each(PT.trim(elem.getAttribute(classStr)).split(/\s+/), function (value) {
+                $self.list.push(value);
+            });
+            $self._updateClassName = function () {
+                elem.setAttribute(classStr, $self.toString());
             };
-
-        ClassList.prototype = {
-            /**
-             * @description : check if an element has a class.
-             * @param       : {String } token, class name.
-             * @return      : {Boolean} if contans.
-             * @syntax      : Element.classList.contains(token)
-             */
-            contains : function (token) {
-                token = PT.S(token);
-                return validateClass(token) && this.list.hasVal(token);
-            },
-            /**
-             * @description : get a class by index.
-             * @param       : {Number} index, index of class.
-             * @return      : {String} class name.
-             * @syntax      : Element.classList.item(index)
-             */
-            item : function (index) {
-                return this.list[index] || null;
-            },
-            /**
-             * @description : add classes to an element.
-             * @param       : {String} token, class name.
-             * @syntax      : Element.classList.add(token1[, token2, ...,])
-             */
-            add : function () {
-                var $self   = this,
-                    updated = false;
-                arguments.each(function (token) {
-                    token = PT.S(token);
-                    if (validateClass(token) && !$self.list.hasVal(token)) {
-                        $self.list.push(token);
-                        updated = true;
-                    }
-                });
-                if (updated) {
-                    $self._updateClassName();
-                }
-            },
-            /**
-             * @description : remove classes from an element.
-             * @param       : {String} token, class name.
-             * @syntax      : Element.classList.remove(token1[, token2, ...,])
-             */
-            remove : function () {
-                var $self   = this,
-                    updated = false;
-                arguments.each(function (token) {
-                    token = PT.S(token);
-                    if (validateClass(token) && $self.list.hasVal(token)) {
-                        $self.list.splice($self.list.indexOf(token), 1);
-                        updated = true;
-                    }
-                });
-                if (updated) {
-                    $self._updateClassName();
-                }
-            },
-            /**
-             * @description : if element has the given class then remove it, otherwise add it.
-             * @param       : {String } token, class name.
-             * @param       : {Boolean} forse, if forse toggle.
-             * @syntax      : Element.classList.toggle(token[, forse])
-             */
-            toggle : function (token, forse) {
-                token = PT.S(token);
-                if (!validateClass(token)) {
-                    return;
-                }
-                var $self  = this,
-                    method = $self.contains(token) ? forse !== true && 'remove' : forse !== false && 'add';
-                if (method) {
-                    $self[method](token);
-                }
-            },
-            /**
-             * @description : stringify the class list.
-             * @syntax      : Element.classList.toString()
-             */
-            toString : function () {
-                return this.list.join(' ');
-            }
+        },
+        classListGetter = function () {
+            return new ClassList(this);
         };
 
-        PT.DOM.setElementProperty(classListStr, classListGetter);
-    }
-}(PT));
-
-(function (PT) {
-    if (PT.NODEJS) {
-        return;
-    }
-
-    var datasetStr = 'dataset';
-
-    if (!PT.DOM.hasElementProperty(datasetStr)) {
+    ClassList[PT.PS] = {
         /**
-         * @description : dataset shim.
-         * @syntax      : Element.dataset
-         * @refference  : https://gist.github.com/brettz9/4093766
+         * @description : check if an element has a class.
+         * @param       : {String } token, class name.
+         * @return      : {Boolean} if contans.
+         * @syntax      : Element.classList.contains(token)
          */
-        PT.DOM.setElementProperty(datasetStr, function () {
-            var attrVal, attrName, propName,
-                $this              = this,
-                HTML5_DOMStringMap = {},
-                attributes         = $this.attributes,
-                toUpperCase        = function (n0) {
-                    return n0.charAt(1).toUpperCase();
-                },
-                getter = function () {
-                    return this;
-                },
-                setter = function (attrName, value) {
-                    return value ? this.setAttribute(attrName, value) : this.removeAttribute(attrName);
-                };
-            attributes.each(function (attribute) {
-                if (attribute && attribute.name && (/^data-\w[\w\-]*$/).test(attribute.name)) {
-                    attrVal  = attribute.value;
-                    attrName = attribute.name;
-                    propName = attrName.substr(5).replace(/-./g, toUpperCase); // Change to CamelCase
-                    try {
-                        PT.O.defineProperty(HTML5_DOMStringMap, propName, {
-                            get : getter.bind(attrVal || '')  ,
-                            set : setter.bind($this, attrName)
-                        });
-                    }
-                    catch (e) { // if accessors are not working
-                        HTML5_DOMStringMap[propName] = attrVal;
-                    }
+        contains : function (token) {
+            token = PT.S(token);
+            return validateClass(token) && PT.hasVal(this.list, token);
+        },
+        /**
+         * @description : get a class by index.
+         * @param       : {Number} index, index of class.
+         * @return      : {String} class name.
+         * @syntax      : Element.classList.item(index)
+         */
+        item : function (index) {
+            return this.list[index] || null;
+        },
+        /**
+         * @description : add classes to an element.
+         * @param       : {String} token, class name.
+         * @syntax      : Element.classList.add(token1[, token2, ...,])
+         */
+        add : function () {
+            var $self   = this,
+                updated = false;
+            PT.each(arguments, function (token) {
+                token = PT.S(token);
+                if (validateClass(token) && !PT.hasVal($self.list, token)) {
+                    $self.list.push(token);
+                    updated = true;
                 }
             });
-            return HTML5_DOMStringMap;
-        });
-    }
-}(PT));
-
-(function (PT) {
-    if (PT.NODEJS) {
-        return;
-    }
-    var assets = {
+            if (updated) {
+                $self._updateClassName();
+            }
+        },
         /**
-         * @description : set a property of Element.
-         * @param       : {String  } name, property name.
-         * @param       : {Function} Getter, property getter method.
-         * @param       : {Function} Setter, property setter method.
-         * @param       : {Object  } option, defineProperty options.
-         * @syntax      : PT.DOM.setElementProperty(name, Getter[, Setter, option])
+         * @description : remove classes from an element.
+         * @param       : {String} token, class name.
+         * @syntax      : Element.classList.remove(token1[, token2, ...,])
          */
-        show : function () {
-            this.style.display = 'block';
+        remove : function () {
+            var $self   = this,
+                updated = false;
+            PT.each(arguments, function (token) {
+                token = PT.S(token);
+                if (validateClass(token) && PT.hasVal($self.list, token)) {
+                    $self.list.splice(PT.indexOf($self.list, token), 1);
+                    updated = true;
+                }
+            });
+            if (updated) {
+                $self._updateClassName();
+            }
         },
-        hide : function () {
-            this.style.display = 'none';
+        /**
+         * @description : if element has the given class then remove it, otherwise add it.
+         * @param       : {String } token, class name.
+         * @param       : {Boolean} forse, if forse toggle.
+         * @syntax      : Element.classList.toggle(token[, forse])
+         */
+        toggle : function (token, forse) {
+            token = PT.S(token);
+            if (!validateClass(token)) {
+                return;
+            }
+            var $self  = this,
+                method = $self.contains(token) ? forse !== true && 'remove' : forse !== false && 'add';
+            if (method) {
+                $self[method](token);
+            }
         },
-        toggle : function () {
-            var $self = this,
-                oldDisplay = $self.style.display;
-            $self.style.display = (oldDisplay === 'block') ? 'none' : 'block';
+        /**
+         * @description : stringify the class list.
+         * @syntax      : Element.classList.toString()
+         */
+        toString : function () {
+            return this.list.join(' ');
         }
     };
 
-    [
-        'show'   ,
-        'hide'   ,
-        'toggle'
-    ].each(function (prop) {
-        if (!PT.DOM.hasElementProperty(prop)) {
-            PT.DOM.setElementProperty(prop, function () {
-                return assets[prop];
-            });
-        }
+    PT.DOM.elemSet(classListStr, classListGetter);
+}(PT));
+
+(function (PT) {
+    if (PT.NODEJS) {
+        return;
+    }
+
+    /**
+     * @description : dataset shim.
+     * @syntax      : Element.dataset
+     * @refference  : https://gist.github.com/brettz9/4093766
+     */
+    PT.DOM.elemSet('dataset', function () {
+        var attrVal, attrName, propName,
+            $this              = this,
+            HTML5_DOMStringMap = {},
+            attributes         = $this.attributes,
+            toUpperCase        = function (n0) {
+                return PT.uc(n0.charAt(1));
+            },
+            getter = function () {
+                return this;
+            },
+            setter = function (attrName, value) {
+                return value ? this.setAttribute(attrName, value) : this.removeAttribute(attrName);
+            };
+        PT.each(attributes, function (attribute) {
+            if (attribute && attribute.name && (/^data-\w[\w\-]*$/).test(attribute.name)) {
+                attrVal  = attribute.value;
+                attrName = attribute.name;
+                propName = attrName.substr(5).replace(/-./g, toUpperCase); // Change to CamelCase
+                try {
+                    PT.O.defineProperty(HTML5_DOMStringMap, propName, {
+                        get : PT.bind(getter, attrVal || ''  ),
+                        set : PT.bind(setter, $this, attrName)
+                    });
+                } catch (e) { // if accessors are not working
+                    HTML5_DOMStringMap[propName] = attrVal;
+                }
+            }
+        });
+        return HTML5_DOMStringMap;
+    });
+}(PT));
+
+(function (PT) {
+    if (PT.NODEJS) {
+        return;
+    }
+    var BS = 'block',
+        NS = 'none' ,
+        assets = {
+            /**
+             * @description : show an element.
+             * @syntax      : element.show().
+             */
+            show : function () {
+                this.style.display = BS;
+            },
+            /**
+             * @description : hide an element.
+             * @syntax      : element.hide().
+             */
+            hide : function () {
+                this.style.display = NS;
+            },
+            /**
+             * @description : show or hide an element.
+             * @syntax      : element.toggle().
+             */
+            toggle : function () {
+                var $self = this,
+                    oldDisplay = $self.style.display;
+                $self.style.display = (oldDisplay === BS) ? NS : BS;
+            }
+        };
+
+    PT.each(PT.keys(assets), function (prop) {
+        PT.DOM.elemSet(prop, function () {
+            return assets[prop];
+        });
     });
 }(PT));
 
@@ -1637,17 +1549,17 @@ PASTRY  = PT = P = {};
             contentIds   = 'ids',
             activeClass  = option.activeClass || 'PT-activeTab',
             showContents = function ($tab) {
-                $tab.dataset[contentIds].split(/\s/).each(function (id) {
+                PT.each($tab.dataset[contentIds].split(/\s/), function (id) {
                     PT.DOC.getElementById(id).show();
                 });
             },
             hideContents = function ($tab) {
-                $tab.dataset[contentIds].split(/\s/).each(function (id) {
+                PT.each($tab.dataset[contentIds].split(/\s/), function (id) {
                     PT.DOC.getElementById(id).hide();
                 });
             };
 
-        $tabsMenu.children.each(function ($child) {
+        PT.each($tabsMenu.children, function ($child) {
             if (PT.isObj($child)) {
                 var currentTabId = $tabsMenu.dataset[currentTab];
                 if ($child.id === currentTabId) {

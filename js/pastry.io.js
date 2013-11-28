@@ -32,8 +32,8 @@
     PT.ajax = function (uri, option) {
         option = option || {};
         var xhr         = PT.getXHR(),
-            method      = option.method ? option.method.uc()                 : 'GET',
-            type        = option.type   ? option.type.lc()                   : 'xml',
+            method      = option.method ? PT.uc(option.method)               : 'GET',
+            type        = option.type   ? PT.lc(option.type)                 : 'xml',
             data        = option.data   ? PT.QueryStr.stringify(option.data) : null,
             contentType = option.contentType,
             isAsync     = option.isAsync;
@@ -68,7 +68,7 @@
         /*
          * @syntax : PT.ajax(uri[, option]).timeout(callback)..
          */
-        [
+        PT.each([
             'abort'     ,
             'error'     ,
             'load'      ,
@@ -77,7 +77,7 @@
             'progress'  ,
             'success'   ,
             'timeout'
-        ].each(function (handler) {
+        ], function (handler) {
             if (option[handler]) {
                 xhr['on' + handler] = option[handler];
             }
@@ -112,7 +112,7 @@
         // progress ajax
         if (method === 'GET') {
             if (data) {
-                uri += (uri.has('?') ? '&' : '?') + data;
+                uri += (PT.hasSub(uri, '?') ? '&' : '?') + data;
             }
             xhr.open(method, uri, isAsync);
             xhr.setRequestHeader(
@@ -131,10 +131,10 @@
         xhr.send(data);
     };
 
-    [
+    PT.each([
         'get' ,
         'post'
-    ].each(function (method) {
+    ], function (method) {
         PT[method] = function (uri, option) {
             option.method = method;
             PT.ajax(uri, option);

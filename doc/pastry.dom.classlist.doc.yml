@@ -1,11 +1,8 @@
 - description: PT.DOM.classList
   filename: pastry.dom.classlist.js
   requires: 
-    - pastry.js
-    - pastry.string.js
-    - pastry.array.js
+    - pastry.core.js
     - pastry.dom.js
-    - pastry.css.js
 - description: classList shim.
   return: 
     - type: Array

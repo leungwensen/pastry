@@ -23,17 +23,17 @@
             contentIds   = 'ids',
             activeClass  = option.activeClass || 'PT-activeTab',
             showContents = function ($tab) {
-                $tab.dataset[contentIds].split(/\s/).each(function (id) {
+                PT.each($tab.dataset[contentIds].split(/\s/), function (id) {
                     PT.DOC.getElementById(id).show();
                 });
             },
             hideContents = function ($tab) {
-                $tab.dataset[contentIds].split(/\s/).each(function (id) {
+                PT.each($tab.dataset[contentIds].split(/\s/), function (id) {
                     PT.DOC.getElementById(id).hide();
                 });
             };
 
-        $tabsMenu.children.each(function ($child) {
+        PT.each($tabsMenu.children, function ($child) {
             if (PT.isObj($child)) {
                 var currentTabId = $tabsMenu.dataset[currentTab];
                 if ($child.id === currentTabId) {

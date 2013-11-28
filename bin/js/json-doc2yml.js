@@ -22,7 +22,7 @@ var child, targetFile, command,
     };
 
 if (process.argv.length > 2) {
-    process.argv.slice(2).each(function (file) {
+    PT.each(process.argv.slice(2), function (file) {
         json2yml(file);
     });
 } else {
@@ -30,7 +30,7 @@ if (process.argv.length > 2) {
         if (err) {
             console.error(err);
         }
-        files.each(function (file) {
+        PT.each(files, function (file) {
             json2yml('doc/' + file);
         });
     });

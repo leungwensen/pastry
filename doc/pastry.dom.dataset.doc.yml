@@ -1,9 +1,7 @@
 - description: PT.DOM.dataset
   filename: pastry.dom.dataset.js
   requires: 
-    - pastry.js
-    - pastry.function.js
-    - pastry.array.js
+    - pastry.core.js
     - pastry.dom.js
 - description: dataset shim.
   syntax: Element.dataset

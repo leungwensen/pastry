@@ -1,0 +1,395 @@
+- author: 
+    type: link
+    url: "https://github.com/leungwensen/pastry/graphs/contributors"
+  description: first pastry of the building
+  filename: pastry.core.js
+- {}
+- description: alias
+- description: "isXxx, check if is Xxx."
+  parameters: 
+    - type: Unknown
+      name: value
+      description: value to be tested.
+  return: 
+    - type: Boolean
+      description: if test succeeded.
+  syntax: PT.isXxx(value)
+- description: try to load original edition of global variables
+  param: 
+    - type: array
+      name: callbackList
+      description: list of callback functions.
+  return: 
+    - type: unknown
+      description: value the callback functions try to return.
+  syntax: "PT.tryEach(callbackList) || PT.tryEach(callbackList)"
+- description: the environment global variable.
+  syntax: PT.OVEN
+  return: 
+    - type: browser
+      description: window.
+    - type: nodejs
+      description: exports.
+- extend of Javascript 1.6
+- description: "Returns the first index at which a given element can be found in the array, or -1 if it is not present."
+  param: 
+    - type: Array
+      name: arr
+      description: Array to be searched from.
+    - type: Object
+      name: searchElement
+      description: Element to locate in the array.
+    - type: Number
+      name: fromIndex
+      description: "The index to start the search at. Default: 0 (Entire array is searched)."
+  return: 
+    - type: Number
+      description: index of element.
+  syntax: "PT.indexOf(arr, searchElement[, fromIndex])"
+  refference: 
+    - javascript 1.6
+    - type: link
+      url: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf"
+- {}
+- description: "Returns the last index at which a given element can be found in the array, or -1 if it is not present. The array is searched backwards, starting at fromIndex."
+  param: 
+    - type: Array
+      name: arr
+      description: Array to be searched from.
+    - type: Object
+      name: searchElement
+      description: Element to locate in the array.
+    - type: Number
+      name: fromIndex
+      description: "The index at which to start searching backwards. Defaults to the array's length."
+  return: 
+    - type: Number
+      description: index of element.
+  syntax: "PT.lastIndexOf(arr, searchElement[, fromIndex])"
+  refference: 
+    type: link
+    url: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/lastIndexOf"
+- {}
+- description: Tests whether all elements in the array pass the test implemented by the provided function.
+  param: 
+    - type: Array
+      name: arr
+      description: array to test.
+    - type: Function
+      name: callback
+      description: Function to test for each element.
+    - type: Object
+      name: thisObj
+      description: Object to use as this when executing callback.
+  return: 
+    - type: Boolean
+      description: if test succeeded or not.
+  syntax: "PT.every(arr, callback[, thisObj])"
+  refference: 
+    type: link
+    url: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/every"
+- description: Creates a new array with all elements that pass the test implemented by the provided function.
+  param: 
+    - type: Array
+      name: arr
+      description: array to execute function with.
+    - type: Function
+      name: callback
+      description: Function to test each element of the array.
+    - type: Object
+      name: thisObj
+      description: Object to use as this when executing callback.
+  return: 
+    - type: Array
+      description: result array.
+  syntax: "PT.filter(arr, callback[, thisObj])"
+  refference: 
+    type: link
+    url: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter"
+- description: Creates a new array with the results of calling a provided function on every element in this array.
+  param: 
+    - type: Array
+      name: arr
+      description: array to call function with.
+    - type: Function
+      name: callback
+      description: Function that produces an element of the new Array from an element of the current one.
+    - type: Object
+      name: thisObj
+      description: Object to use as this when executing callback.
+  return: 
+    - type: Array
+      description: result array.
+  syntax: "PT.map(arr, callback[, thisObj])"
+  refference: 
+    type: link
+    url: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map"
+- description: Tests whether some element in the array passes the test implemented by the provided function.
+  param: 
+    - type: Array
+      name: arr
+      description: array to test.
+    - type: Function
+      name: callback
+      description: Function to test for each element.
+    - type: Object
+      name: thisObj
+      description: Object to use as this when executing callback.
+  return: 
+    - type: Boolean
+      description: if test succeeded or not.
+  syntax: "PT.some(arr, callback[, thisObj])"
+  refference: 
+    type: link
+    url: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/some"
+- extend of Javascript 1.8
+- description: "Apply a function against an accumulator and each value of the array (from left-to-right) as to reduce it to a single value."
+  param: 
+    - type: Array
+      name: arr
+      description: array to reduce.
+    - type: Function
+      name: callback
+      description: "Function to execute on each value in the array taking four arguments:"
+    - type: Object
+      name: thisObj
+      description: Object to use as the first argument to the first call of the callback.
+  paramOfCallback: 
+    - type: Object
+      name: previousValue
+      description: The value previously returned in the last invocation of the callback or initialValue if supplied.
+    - type: Object
+      name: currentValue
+      description: The current element being processed in the array.
+    - type: Number
+      name: index
+      description: The index of the current element being processed in the array.
+    - type: Array
+      name: array
+      description: The array reduce was called upon.
+  return: 
+    - type: Object
+      description: result value.
+  syntax: "PT.reduce(arr, callback[, thisObj])"
+  refference: 
+    type: link
+    url: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Reduce"
+- description: "Apply a function simultaneously against two values of the array (from right-to-left) as to reduce it to a single value."
+  param: 
+    - type: Array
+      name: arr
+      description: array to reduce.
+    - type: Function
+      name: callback
+      description: Function to execute on each value in the array.
+    - type: Object
+      name: thisObj
+      description: Object to use as the first argument to the first call of the callback.
+  return: 
+    - type: Object
+      description: result value.
+  syntax: "PT.reduceRight(arr, callback[, thisObj])"
+  refference: 
+    type: link
+    url: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/ReduceRight"
+- description: check if the object has the key
+  param: 
+    - type: Object
+      name: obj
+      description: object to be checked
+    - type: String
+      name: key
+      description: key to check
+  syntax: "PT.hasKey(obj, key) || PT.has(obj, key)"
+- description: Executes a provided function once per object element.
+  param: 
+    - type: Object
+      name: obj
+      description: Object to traversal.
+    - type: Function
+      name: callback
+      description: Function to execute for each element.
+    - type: Object
+      name: thisObj
+      description: Object to use as this when executing callback.
+  syntax: "PT.forEach(obj, callback[, thisObj]) || PT.each(obj, callback[, thisObj])"
+- extend of pastry
+- description: binarySearch.
+  param: 
+    - type: Array
+      name: arr
+      description: array to be searched from.
+    - type: Object
+      name: element
+      description: element to be searched.
+    - type: Function
+      name: compareFunc
+      description: compare function executed when searching.
+  return: 
+    - type: Number
+      description: result index.
+  syntax: "PT.binarySearch(arr, element, compareFunc)"
+- description: "Remove elements according to the given fromIndex and toIndex, and return the rest array."
+  param: 
+    - type: Array
+      name: arr
+      description: array to remove from.
+    - type: Number
+      name: fromIndex
+      description: index to remove from.
+    - type: Number
+      name: toIndex
+      description: index to remove to.
+  syntax: "PT.remove(arr, [fromIndex[, toIndex]])"
+  refference: 
+    type: link
+    url: "http://ejohn.org/blog/javascript-array-remove/"
+- description: replace.
+  param: 
+    - type: Array
+      name: arr
+      description: array to be replaced.
+    - type: Object
+      name: element
+      description: element to be replaced.
+    - type: Object
+      name: withElement
+      description: element to replace with.
+  syntax: "PT.replace(arr, element, withElement)"
+- description: intersection set of two arrays (this ∩ that)
+  param: 
+    - type: Array
+      name: thisArr
+      description: the array to get intersection set from.
+    - type: Array
+      name: thatArr
+      description: the array to get intersection set from.
+  return: 
+    - type: Array
+      description: result array.
+  syntax: "PT.intersection(thisArr, thatArr)"
+- description: "complement set of two arrays (this - that)"
+  param: 
+    - type: Array
+      name: thisArr
+      description: the array to get complement set from.
+    - type: Array
+      name: thatArr
+      description: the array to get complement set from.
+  return: 
+    - type: Array
+      description: result array.
+  syntax: "PT.complement(thisArr, thatArr)"
+- description: uniq sub array of an array.
+  param: 
+    - type: Array
+      name: arr
+      description: the array to get a set from.
+  return: 
+    - type: Array
+      description: result sub array.
+  syntax: PT.uniq(arr)
+- description: union set of two arrays (this U that)
+  param: 
+    - type: Array
+      name: thisArr
+      description: the array to get union set from.
+    - type: Array
+      name: thatArr
+      description: the array to get union set from.
+  return: 
+    - type: Array
+      description: result array.
+  syntax: "PT.union(thisArr, thatArr)"
+- description: returns an array whose elements are strings corresponding to the enumerable properties found directly upon object.
+  param: 
+    - type: object
+      name: obj
+      description: Object to get keys from.
+  syntax: PT.keys(obj)
+- extend of pastry
+- description: returns an array whose elements are values of the object.
+  param: 
+    - type: object
+      name: obj
+      description: Object to get values from.
+  syntax: PT.values(obj)
+- description: check if the object has the value
+  param: 
+    - type: Object
+      name: obj
+      description: object to be checked.
+    - type: unknown
+      name: value
+      description: value to check.
+  syntax: "PT.hasValue(obj, value) || PT.hasVal(obj, value)"
+- description: merge another object
+  param: 
+    - type: Object
+      name: thisObj
+      description: object to be checked.
+    - type: Object
+      name: thatObj
+      description: object to merge with.
+  syntax: "PT.merge(this, that)"
+- description: check if the object has the key
+  param: 
+    - type: unkonwn
+      name: thisArg
+      description: The value to be passed as the this parameter to the target function when the bound function is called.
+    - type: unkonwn
+      name: argx
+      description: Arguments to prepend to arguments provided to the bound function.
+  syntax: "fun.bind(thisArg[, arg1[, arg2[, ...]]])"
+  refference: 
+    type: link
+    url: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind"
+- syntax: "PT.toInt(value[, base])"
+- description: Removes whitespace from both ends of the string.
+  param: 
+    - type: string
+      name: str
+      description: string to trim.
+  return: 
+    - type: string
+      description: result string.
+  syntax: PT.trim(str)
+  refference: 
+    type: link
+    url: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/Trim"
+- syntax: PT.trimLeft(str)
+  refference: 
+    type: link
+    url: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/TrimLeft"
+- syntax: PT.trimRight(str)
+  refference: 
+    type: link
+    url: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/TrimRight"
+- param: 
+    - type: String
+      name: str
+      description: string to get upper cases.
+  return: 
+    - type: String
+      description: upper cases version string.
+  syntax: PT.uc(str)
+- param: 
+    - type: String
+      name: str
+      description: string to get lower cases.
+  return: 
+    - type: String
+      description: lower cases version string.
+  syntax: PT.uc(str)
+- description: check if string has a given sub string.
+  param: 
+    - type: String
+      name: str
+      description: given string.
+    - type: String
+      name: subStr
+      description: given sub string.
+  syntax: "PT.hasSub(str, subStr)"
+  return: 
+    - type: Boolean
+      description: result.

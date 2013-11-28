@@ -7,7 +7,7 @@
 </head>
 <body>
     <h1>ajax</h1>
-    <form id="ajax-demo" action="/pastry/example/ua.html" method="get">
+    <form id="ajax-demo" action="/example/environment.html" method="get">
         <button type="submit">ajax</button>
     </form>
 
@@ -25,6 +25,7 @@
                         PT.DOC.getElementById('result').innerHTML = text;
                     },
                     'error'   : function (err) {
+                        console.log(err);
                         alert(err);
                     }
                 });

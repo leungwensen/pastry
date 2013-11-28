@@ -45,7 +45,7 @@
                 obj = {},
                 pieces = qs.split(sep);
 
-            pieces.each(function (elem) {
+            PT.each(pieces, function (elem) {
                 tuple = elem.split(eq);
                 if (tuple.length > 0) {
                     obj[unescape(tuple.shift())] = unescape(tuple.join(eq));
@@ -64,9 +64,9 @@
             var qs = [],
                 s = c && c.arrayKey ? true : false;
 
-            obj.each(function (value, key) {
+            PT.each(obj, function (value, key) {
                 if (PT.isArr(value)) {
-                    value.each(function (elem) {
+                    PT.each(value, function (elem) {
                         qs.push(escape(s ? key + '[]' : key) + '=' + escape(elem));
                     });
                 }

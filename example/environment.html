@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>pastry.ua.js example</title>
+    <title>pastry.environment.js example</title>
     <link rel="stylesheet" href="../dist/css/pastry.css" />
 </head>
 <body>
@@ -40,12 +40,12 @@
     <script type="text/javascript">
         (function(PT){
             PT.ON.addEventListener('load', function(){
-                [
+                PT.each([
                     'platform'  ,
                     'plugins'   ,
                     'userAgent' ,
                     'versions'
-                ].each(function(item){
+                ], function(item){
                     PT.DOC.getElementById(item).innerHTML = PT.JSON.stringify(PT[item]);
                 });
             });

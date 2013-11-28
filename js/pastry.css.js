@@ -1,7 +1,7 @@
 /**
  * @description : PT.DOM.style
  * @filename    : pastry.dom.style.js
- * @requires    : [pastry.js, pastry.array.js, pastry.dom.js]
+ * @requires    : [pastry.core.js, pastry.dom.js]
  */
 'use strict';
 
@@ -9,37 +9,37 @@
     if (PT.NODEJS) {
         return;
     }
-    var assets = {
-        /**
-         * @description : set a property of Element.
-         * @param       : {String  } name, property name.
-         * @param       : {Function} Getter, property getter method.
-         * @param       : {Function} Setter, property setter method.
-         * @param       : {Object  } option, defineProperty options.
-         * @syntax      : PT.DOM.setElementProperty(name, Getter[, Setter, option])
-         */
-        show : function () {
-            this.style.display = 'block';
-        },
-        hide : function () {
-            this.style.display = 'none';
-        },
-        toggle : function () {
-            var $self = this,
-                oldDisplay = $self.style.display;
-            $self.style.display = (oldDisplay === 'block') ? 'none' : 'block';
-        }
-    };
+    var BS = 'block',
+        NS = 'none' ,
+        assets = {
+            /**
+             * @description : show an element.
+             * @syntax      : element.show().
+             */
+            show : function () {
+                this.style.display = BS;
+            },
+            /**
+             * @description : hide an element.
+             * @syntax      : element.hide().
+             */
+            hide : function () {
+                this.style.display = NS;
+            },
+            /**
+             * @description : show or hide an element.
+             * @syntax      : element.toggle().
+             */
+            toggle : function () {
+                var $self = this,
+                    oldDisplay = $self.style.display;
+                $self.style.display = (oldDisplay === BS) ? NS : BS;
+            }
+        };
 
-    [
-        'show'   ,
-        'hide'   ,
-        'toggle'
-    ].each(function (prop) {
-        if (!PT.DOM.hasElementProperty(prop)) {
-            PT.DOM.setElementProperty(prop, function () {
-                return assets[prop];
-            });
-        }
+    PT.each(PT.keys(assets), function (prop) {
+        PT.DOM.elemSet(prop, function () {
+            return assets[prop];
+        });
     });
 }(PT));

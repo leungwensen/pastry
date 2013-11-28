@@ -1,7 +1,7 @@
 /**
  * @description : PT.DOM
  * @filename    : pastry.dom.js
- * @requires    : [pastry.js, pastry.object.js]
+ * @requires    : [pastry.core.js]
  */
 'use strict';
 
@@ -13,17 +13,18 @@
     var DOC = PT.DOC ,
         Obj = PT.O   ,
         WIN = PT.ON  ,
+        HAS = PT.has ,
         elementStr = 'Element',
         /**
          * @description : check if Element has a property.
          * @return      : {Boolean} if has or not.
-         * @syntax      : PT.DOM.hasElementProperty(name)
+         * @syntax      : PT.DOM.elemHas(name)
          */
-        hasElementProperty = function (name) {
+        elemHas = function (name) {
             return (
-                    WIN.has(elementStr) && (
-                        DOC.createElement('_').has(name) &&
-                        DOC.createElementNS('http://www.w3.org/2000/svg', 'svg').has(name)
+                    HAS(WIN, elementStr) && (
+                        HAS(DOC.createElement('_'), name) &&
+                        HAS(DOC.createElementNS('http://www.w3.org/2000/svg', 'svg'), name)
                 ));
         },
         /**
@@ -32,11 +33,14 @@
          * @param       : {Function} Getter, property getter method.
          * @param       : {Function} Setter, property setter method.
          * @param       : {Object  } option, defineProperty options.
-         * @syntax      : PT.DOM.setElementProperty(name, Getter[, Setter, option])
+         * @syntax      : PT.DOM.elemSet(name, Getter[, Setter, option])
          */
-        setElementProperty = function (name, Getter, Setter, option) {
+        elemSet = function (name, Getter, Setter, option) {
+            if (elemHas(name)) {
+                return;
+            }
             var propDesc  = {},
-                elemProto = WIN[elementStr].prototype;
+                elemProto = WIN[elementStr][PT.PS];
             if (Obj.defineProperty) {
                 if (Getter) {
                     propDesc.get = Getter;
@@ -45,7 +49,7 @@
                     propDesc.set = Setter;
                 }
                 if (option) {
-                    propDesc = propDesc.merge(option);
+                    propDesc = PT.merge(propDesc, option);
                 }
                 Obj.defineProperty(elemProto, name, propDesc);
             } else if (PT.OP.__defineGetter__) {
@@ -53,13 +57,12 @@
                 elemProto.__defineSetter__(name, Setter);
             }
         };
-
     /**
      * @description : DOM
      * @syntax      : PT.DOM
      */
     PT.DOM = {
-        hasElementProperty : hasElementProperty,
-        setElementProperty : setElementProperty
+        elemHas : elemHas,
+        elemSet : elemSet
     };
 }(PT));

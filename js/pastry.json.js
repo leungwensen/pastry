@@ -11,20 +11,20 @@
             function () { return JSON;         },
             function () { return PT.OVEN.JSON; }
         ]);
-    if (PT.isDef(PT.JSON)) {
+    if (PT.JSON) {
         return;
     }
 
     var D2JSON = PT.DP.toJSON,
         S = PT.S;
     if (!PT.isFunc(D2JSON)) {
-        [PT.SP, PT.NP, PT.BP].each(function (p) {
+        PT.each([PT.SP, PT.NP, PT.BP], function (p) {
             p.toJSON = function () {
                 return this.valueOf();
             };
         });
         D2JSON = function () {
-            return isFinite(this.valueOf()) ? this.stringf('{YYY}-{MM}-{DD}T{hh}:{mm}:{ss}Z') : null;
+            return isFinite(this.valueOf()) ? PT.format.date(this, '{YYY}-{MM}-{DD}T{hh}:{mm}:{ss}Z') : null;
         };
     }
 
@@ -80,7 +80,7 @@
                         return v;
                     }
                     if (rep && PT.isObj(rep)) {
-                        rep.each(function (element) {
+                        PT.each(rep, function (element) {
                             if (PT.isStr(element)) {
                                 k = element;
                                 v = str(k, value);
@@ -90,7 +90,7 @@
                             }
                         });
                     } else {
-                        value.each(function (element, k) {
+                        PT.each(value, function (element, k) {
                             v = str(k, value);
                             if (v) {
                                 partial.push(quote(k) + (gap ? ': ' : ':') + v);
@@ -141,7 +141,7 @@
             var k, v,
                 value = holder[key];
             if (value && PT.isObj(value)) {
-                value.each(function (element, k) {
+                PT.each(value, function (element, k) {
                     v = walk(value, k);
                     if (PT.isDef(v)) {
                         value[k] = v;

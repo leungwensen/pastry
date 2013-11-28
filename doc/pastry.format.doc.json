@@ -1,7 +1,7 @@
 [
   {
-    "description": "extend for Date",
-    "filename": "pastry.date.js",
+    "description": "formatting things",
+    "filename": "pastry.format.js",
     "requires": [
       "pastry.js"
     ]
@@ -27,5 +27,28 @@
       "'{YYYY}-{MM}-{DD} {hh}:{mm}:{ss}' => '2013-10-03 00:57::13'",
       "'{YY}-{M}-{D} {h}:{m}:{s}' => '13-10-3 0:57::13'"
     ]
+  },
+  {
+    "description": "return stringified number according to given pattern.",
+    "param": [
+      {
+        "type": "object",
+        "name": "option",
+        "description": "defines pattern for stringify."
+      }
+    ],
+    "example": {
+      "comma": "1|0",
+      "decimal": ">=0",
+      "integer": ">=0",
+      "zero": "1|0"
+    },
+    "return": [
+      {
+        "type": "string",
+        "description": "result string."
+      }
+    ],
+    "syntax": "number.stringf([option])"
   }
 ]

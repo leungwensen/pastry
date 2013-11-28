@@ -15,23 +15,21 @@
                 rcheckableTypes   = /^(?:checkbox|radio)$/i,
                 rsubmitterTypes   = /^(?:submit|button|image|reset|file)$/i,
                 rsubmittableTypes = /^(?:input|select|textarea|keygen)/i;
-            form.elements.each(function (elem) {
+            PT.each(form.elements, function (elem) {
                 elementArray.push(elem);
             });
 
-            elementArray
-                .filter(function (elem) {
+            PT.map(PT.filter(elementArray, function (elem) {
                     return elem.name                                          &&
                            !elem.disabled                                     &&
                            rsubmittableTypes.test(elem.nodeName)              &&
                            !rsubmitterTypes.test(elem.type)                   &&
                            (!rcheckableTypes.test(elem.type) || elem.checked);
-                })
-                .map(function (elem) {
+                }), function (elem) {
                     var val = elem.value;
-                    if (PT.isDef(val)) {
+                    if (val) {
                         if (PT.isArr(val)) {
-                            val.map(function (element) {
+                            PT.map(val, function (element) {
                                 resultObj[element.name] = element.value;
                             });
                         } else {
@@ -39,7 +37,6 @@
                         }
                     }
                 });
-
             return resultObj;
         };
 
@@ -51,7 +48,6 @@
          * @return      : {Object} form data object.
          */
         data      : data,
-
         /*
          * @description : return form data query string.
          * @syntax      : PT.Form.serialize(form)

@@ -3,8 +3,7 @@
     "description": "PT.DOM",
     "filename": "pastry.dom.js",
     "requires": [
-      "pastry.js",
-      "pastry.object.js"
+      "pastry.core.js"
     ]
   },
   {
@@ -15,9 +14,9 @@
         "description": "if has or not."
       }
     ],
-    "syntax": "PT.DOM.hasElementProperty(name)"
+    "syntax": "PT.DOM.elemHas(name)"
   },
-  "//www.w3.org/2000/svg', 'svg').has(name)",
+  "//www.w3.org/2000/svg', 'svg'), name)",
   {
     "description": "set a property of Element.",
     "param": [
@@ -42,7 +41,7 @@
         "description": "defineProperty options."
       }
     ],
-    "syntax": "PT.DOM.setElementProperty(name, Getter[, Setter, option])"
+    "syntax": "PT.DOM.elemSet(name, Getter[, Setter, option])"
   },
   {
     "description": "DOM",

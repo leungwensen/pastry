@@ -7,11 +7,11 @@ var resultStr,
     PT      = require('pastry'),
     uglify  = require('uglify-js'),
     fs      = require('fs'),
-    list = function (val) {      // for commander, get an array of strings
+    arr = function (val) {
         return val.split(',');
     },
-    stringify = function (val) { // for commander, get a string
-        return val.trim();
+    str = function (val) {
+        return PT.trim(val);
     },
     packageInfo = (function () {
         var data,
@@ -50,12 +50,12 @@ var resultStr,
         var i, fileJSON, requireFile, reg,
             tempfiles    = [],
             requireFiles = ['js/pastry.js'];
-        files.each(function (file) {
+        PT.each(files, function (file) {
             if (isRoot(file)) {
                 return;
             }
             reg = new RegExp(file);
-            if (!packageInfo.jsFiles.some(function (name) {
+            if (!PT.some(packageInfo.jsFiles, function (name) {
                     return reg.test(name);
                 })){
                 console.error('concat failed: cannot validate this file: ' + file);
@@ -63,14 +63,14 @@ var resultStr,
             }
             file = getFullPath(file);
             fileJSON = './' + file.replace(/^js\//, 'doc/').replace(/\.js$/, '.doc.json');
-            getRequireFiles(fileJSON).each( function (requireFile) {
+            PT.each(getRequireFiles(fileJSON), function (requireFile) {
                 tempfiles.push(getFullPath(requireFile));
             });
             tempfiles.push(file);
         });
         for (i = 0; i < packageInfo.jsFiles.length; i ++) {
             requireFile = getFullPath(packageInfo.jsFiles[i]);
-            if (tempfiles.hasVal(requireFile) && !requireFiles.hasVal(requireFile)) {
+            if (PT.hasVal(tempfiles, requireFile) && !PT.hasVal(requireFiles, requireFile)) {
                 requireFiles.push(requireFile);
             }
         }
@@ -78,7 +78,7 @@ var resultStr,
     },
     concatFileContents = function (files) {
         var resultStr = '';
-        files.each(function (file) {
+        PT.each(files, function (file) {
             resultStr += fs.readFileSync(file);
         });
         return resultStr;
@@ -86,9 +86,9 @@ var resultStr,
 
 // parse argv
 concat.version('0.0.1')
-      .option('-f, --files <items>' , 'files', list)
+      .option('-f, --files <items>' , 'files', arr)
       .option('-m, --minify'        , 'if minify file')
-      .option('-t, --targetFile <s>', 'target file', stringify)
+      .option('-t, --targetFile <s>', 'target file', str)
       .parse(process.argv);
 
 if (!PT.isDef(concat.files) || !PT.isArr(concat.files)) {

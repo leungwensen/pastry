@@ -1,5 +1,9 @@
-
 _site/
+
+.grunt/
 .sass-cache/
+
 node_modules/
 
+
+ _SpecRunner.html

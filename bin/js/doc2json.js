@@ -8,17 +8,17 @@ var genJSON  = require('commander'),
 
     list = function (val) {      // for commander, get an array of strings
         var list = val.split(',');
-        list.each(function (val, i) {
-            list[i] = val.trim();
+        PT.each(list, function (val, i) {
+            list[i] = PT.trim(val);
         });
         return list;
     },
     stringify = function (val) { // for commander, get a string
-        return val.trim();
+        return PT.trim(val);
     },
     str2arr = function (str) {   // '[xxx, xxx]' => ['xxx', 'xxx']
-        return str.replace(/\[|\]/gm, '').split(',').map(function (val) {
-            return val.trim();
+        return PT.map(str.replace(/\[|\]/gm, '').split(','), function (val) {
+            return PT.trim(val);
         });
     },
 
@@ -31,9 +31,9 @@ var genJSON  = require('commander'),
         val = val.replace(type, '');
         parts = val.split(',');
         return {
-            'type'        : type.replace(/\{|\}/gm, '').trim(),
-            'name'        : parts[0].trim(),
-            'description' : parts.slice(1).join('').trim()
+            'type'        : PT.trim(type.replace(/\{|\}/gm, '')),
+            'name'        : PT.trim(parts[0]),
+            'description' : PT.trim(parts.slice(1).join(''))
         };
     },
     /*
@@ -43,8 +43,8 @@ var genJSON  = require('commander'),
         var type = val.match(/\{\w+\s*\}/)[0],
             description = val.replace(type, '');
         return {
-            'type'        : type.replace(/\{|\}/gm, '').trim(),
-            'description' : description.trim()
+            'type'        : PT.trim(type.replace(/\{|\}/gm, '')),
+            'description' : PT.trim(description)
         };
     },
     /*
@@ -72,23 +72,19 @@ var genJSON  = require('commander'),
      * @description: every line of comment like this one would be parsed as an object and added into the result list
      */
     addComment = function (ret, key, value) {
-        switch (true) {
-        case /^param/.test(key):
+        if (/^param/.test(key)) {
             ret[key] = ret[key] || [];
             ret[key].push(embellishParam(value));
-            break;
-        case /^return/.test(key):
+        } else if (/^return/.test(key)) {
             ret[key] = ret[key] || [];
             ret[key].push(embellishReturn(value));
-            break;
-        case /^require/.test(key):
-            if (!ret.has(key)) {
+        } else if (/^require/.test(key)) {
+            if (!PT.has(ret, key)) {
                 ret[key] = [];
             }
             ret[key] = ret[key].concat(str2arr(value));
-            break;
-        default:
-            if (ret.has(key)) {
+        } else {
+            if (PT.has(ret, key)) {
                 var oldValue = ret[key],
                     newValue = embellishValue(value);
                 if (PT.isArr(oldValue) && !PT.isArr(newValue)) {
@@ -100,7 +96,6 @@ var genJSON  = require('commander'),
             } else {
                 ret[key] = embellishValue(value);
             }
-            break;
         }
     },
     /*
@@ -118,8 +113,8 @@ var genJSON  = require('commander'),
                  .replace(/\*\s+/gm          , '' )  // remove '*'
                  .replace(/\s+/gm            , ' '); // '\s+' => '\s'
         stringList = doc.split('@'); // params[i]: xxxx : xxxx xxx, xxx.
-        stringList.each(function (str) {
-            str = str.trim();
+        PT.each(stringList, function (str) {
+            str = PT.trim(str);
             if (str === '' || str === null) {
                 return;
             }
@@ -127,7 +122,7 @@ var genJSON  = require('commander'),
             try {
                 key = str.match(/^\w+\s*:\s*/)[0];
                 value = str.replace(key, '');
-                key = key.trim().replace(/\s*\:\s*/ , '');
+                key = PT.trim(key).replace(/\s*\:\s*/ , '');
                 addComment(ret, key, value);
             } catch (e) {
                 console.log(e, str);
@@ -148,7 +143,7 @@ var genJSON  = require('commander'),
                 fileContent = PT.S(data),
                 docs = fileContent.match(/(\/\*([\s\S]*?)\*\/)|(\/\/(.*)$)/gm),
                 targetContent = [];
-            docs.each(function (doc) {
+            PT.each(docs, function (doc) {
                 targetContent.push(doc2JSON(doc));
             });
             fs.writeFile(targetFilename, PT.JSON.stringify(targetContent, undefined, 2), function (err) {
@@ -171,7 +166,7 @@ genJSON.directory  = genJSON.directory || 'doc';
 genJSON.directory += /\/$/.test(genJSON.directory) ? '' : '/';
 
 // deal with each source file
-genJSON.files.each(function (path) {
+PT.each(genJSON.files, function (path) {
     if (/\.js$/.test(path)) {
         // when path is a .js source file already
         genJSONFromFile(path);
@@ -181,7 +176,7 @@ genJSON.files.each(function (path) {
             if (err) {
                 console.log('reading directory ' + path + " failed:\n" + err);
             }
-            files.each(function (file) {
+            PT.each(files, function (file) {
                 if (/\.js$/.test(file)) {
                     genJSONFromFile(path + file);
                 }
