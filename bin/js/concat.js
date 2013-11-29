@@ -49,7 +49,7 @@ var resultStr,
     getFromFiles = function (files) {
         var i, fileJSON, requireFile, reg,
             tempfiles    = [],
-            requireFiles = ['js/pastry.js'];
+            requireFiles = ['js/pastry.core.js'];
         PT.each(files, function (file) {
             if (isRoot(file)) {
                 return;
