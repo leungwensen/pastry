@@ -86,9 +86,9 @@ var resultStr,
 
 // parse argv
 concat.version('0.0.1')
-      .option('-f, --files <items>' , 'files', arr)
       .option('-m, --minify'        , 'if minify file')
-      .option('-t, --targetFile <s>', 'target file', str)
+      .option('-f, --files <items>' , 'files'       , arr)
+      .option('-t, --targetFile <s>', 'target file' , str)
       .parse(process.argv);
 
 if (!PT.isDef(concat.files) || !PT.isArr(concat.files)) {

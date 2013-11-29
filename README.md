@@ -45,9 +45,9 @@ then use pastry like this:
 you can get pieces of it like this:
 
     $ cd /path/to/pastry
-    $ ./bin/js/concat.js -f array,json -t /path/to/target-file.js -m
+    $ ./bin/js/concat.js -f core,json -t /path/to/target-file.js -m
 
-and then you will have a piece of pastry with array and json functions only! good for health, isn't it?
+and then you will have a piece of pastry with core and json functions only! good for health, isn't it?
 
 to know a little bit more about the DIY thing, just:
 
@@ -58,7 +58,12 @@ enjoy it!
 
 ## [the menu](https://github.com/leungwensen/pastry/wiki/the-menu)
 
-for more info, checkout [test files](https://github.com/leungwensen/pastry/tree/master/spec) or [documents](https://github.com/leungwensen/pastry/tree/master/doc) or the [source code](https://github.com/leungwensen/pastry/tree/master/js)
+for more info, checkout
+[test files](https://github.com/leungwensen/pastry/tree/master/spec)
+or
+[documents](https://github.com/leungwensen/pastry/tree/master/doc)
+or
+[source code](https://github.com/leungwensen/pastry/tree/master/js)
 
 
 ## [cooks](https://github.com/leungwensen/pastry/graphs/contributors)
