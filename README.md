@@ -65,6 +65,18 @@ or
 or
 [source code](https://github.com/leungwensen/pastry/tree/master/js)
 
+## use cases
+
+#### leungwensen.com (server/client)
+[url](http://leungwensen.com)
+[repository](https://github.com/leungwensen/leungwensen.com)
+
+#### js-projects (client)
+[url](http://leungwensen.github.io/js-projects/)
+[repository](https://github.com/leungwensen/js-projects)
+
+#### LET ME KNOW if you are tasting pastry!
+
 
 ## [cooks](https://github.com/leungwensen/pastry/graphs/contributors)
 

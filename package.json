@@ -61,7 +61,6 @@
         "grunt-jekyll"          : "*" ,
         "moment"                : "*" ,
         "npm-download-counts"   : "*" ,
-        "npm-downloads"         : "*" ,
         "uglify-js"             : "*"
     },
 

@@ -8,15 +8,17 @@ var PT       = require('pastry'),
     pkg      = 'pastry',
     start    = moment().subtract('months', 6).toDate(),
     end      = new Date(),
-    counts   = require('npm-download-counts');
+    counts   = require('npm-download-counts'),
+    result   = {
+        'pkg'       : pkg,
+        'downloads' : [],
+        'total'     : 0
+    };
 
 counts(pkg, start, end, function (err, data) {
-        var result = {
-            'pkg'       : pkg,
-            'downloads' : []
-        };
         PT.each(data, function (d) {
             result.downloads.push(d);
+            result.total += d.count;
         });
         process.stdout.write(PT.JSON.stringify(result, undefined, 2));
     });
