@@ -1,43 +1,20 @@
 {
+    "description" : "easing SPA(single page application) development.",
+    "homepage"    : "https://github.com/leungwensen/pastry",
+    "main"        : "release/pastry.core.min.js",
     "name"        : "pastry",
     "title"       : "pastry",
-    "version"     : "0.1.0",
-    "description" : "a simple, easy to be customized html5 UI tookit.",
-    "homepage"    : "https://github.com/leungwensen/pastry",
-    "main"        : "release/js/pastry.min.js",
 
-    "keywords" : [
-        "pastry"                     ,
-        "html5"                      ,
-        "UI"                         ,
-        "javascript language extend" ,
-        "tookit"
-    ],
-
-    "author" : {
-        "name" : "cookers",
-        "url"  : "https://github.com/leungwensen/pastry/graphs/contributors"
-    },
-
-    "repository" : {
-        "type" : "git",
-        "url"  : "git://github.com/leungwensen/pastry.git"
+    "author": {
+        "description" : "team of pastry",
+        "url"         : "https://github.com/leungwensen/pastry/graphs/contributors"
     },
 
     "bugs" : {
         "url" : "https://github.com/leungwensen/pastry/issues"
     },
 
-    "licenses" : [{
-        "type" : "MIT",
-        "url"  : "https://github.com/leungwensen/pastry/blob/master/LICENSE.md"
-    }],
-
-    "engines" : {
-        "node": ">=0.8.0"
-    },
-
-    "dependencies" : { },
+    "dependencies"    : {},
     "devDependencies" : {
         "assert"                : "*" ,
         "browserstack-runner"   : "*" ,
@@ -46,7 +23,7 @@
         "js-beautify"           : "*" ,
         "js-yaml"               : "*" ,
         "grunt"                 : "*" ,
-        "pastry"                : "*" ,
+        "pastry"               : "*" ,
         "grunt-contrib-clean"   : "*" ,
         "grunt-contrib-connect" : "*" ,
         "grunt-contrib-concat"  : "*" ,
@@ -64,22 +41,22 @@
         "uglify-js"             : "*"
     },
 
-    "jsFiles" : [
-        "js/pastry.core.js"          ,
-        "js/pastry.format.js"        ,
-        "js/pastry.json.js"          ,
-        "js/pastry.environment.js"   ,
-        "js/pastry.io.js"            ,
-        "js/pastry.querystring.js"   ,
-        "js/pastry.form.js"          ,
-        "js/pastry.dom.js"           ,
-        "js/pastry.dom.classlist.js" ,
-        "js/pastry.dom.dataset.js"   ,
-        "js/pastry.css.js"           ,
-        "js/pastry.ui.tabs.js"
+    "engines" : {
+        "node": ">=0.8.0"
+    },
+
+    "keywords": [
+        "CRO",
+        "JS",
+        "single page application",
+        "SPA",
+        "pastry"
     ],
 
-    "scripts" : {
-        "test" : "grunt travis --verbose"
-    }
+    "licenses": [{
+        "type" : "MIT",
+        "url"  : "https://github.com/leungwensen/pastry/blob/master/LICENSE.MIT.md"
+    }],
+
+    "version": "0.0.1"
 }

@@ -323,7 +323,7 @@ PASTRY  = PT = {};
      * @syntax      : PT.binarySearch(arr, element, compareFunc)
      */
     PT.binarySearch = function (arr, element, compareFunc) {
-        var start   = 0,
+        var start   = 0, // TODO 0
             end     = arr.length,
             current = Math.floor(end/2);
         while (end !== current) {
