@@ -26,7 +26,6 @@
         toStr = {}.toString,
         slice = AP.slice;
     // }
-
     // 版本号 {
         P.VERSION = '0.2.0';
     // }
@@ -85,7 +84,7 @@
              */
             function (arr, searchElement, fromIndex) {
                 return arr.lastIndexOf(searchElement, fromIndex);
-            } : P.index(false);
+            } : P.index();
 
         P.each = P.forEach = OP.forEach ?
             /*

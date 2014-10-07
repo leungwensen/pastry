@@ -86,13 +86,22 @@
             });
             expect(arrB).toEqual([2, 3, 4, 4, 5, 5, 5, 6]);
         });
-        it('P.remove(arr, fromIndex, toIndex)', function () { // alias
+        it('P.remove(arr, fromIndex, toIndex)', function () {
             P.remove(arrA, 0, 2);
             expect(arrA).toEqual([3, 4, 4, 4, 5]);
             P.remove(arrA, 0);
             expect(arrA).toEqual([4, 4, 4, 5]);
             P.remove(arrA, 0, -1);
             expect(arrA).toEqual([]);
+        });
+        it('CANNOT use P.remove() inside of P.each() callback to THE SAME ARRAY', function () {
+            P.each(arrA, function (num, i) {
+                if (num === 4) {
+                    P.remove(arrA, i);
+                }
+            });
+            // expect(arrA).toEqual([1, 2, 3, 3, 5]); // !!!!!!!!!! REMEMBER THIS !!!!!!!!!!
+            expect(arrA).toEqual([1, 2, 3, 3, 4, 4, 4, 5]);
         });
     });
 
