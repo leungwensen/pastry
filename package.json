@@ -23,7 +23,7 @@
         "js-beautify"           : "*" ,
         "js-yaml"               : "*" ,
         "grunt"                 : "*" ,
-        "pastry"               : "*" ,
+        "pastry"                : "*" ,
         "grunt-contrib-clean"   : "*" ,
         "grunt-contrib-connect" : "*" ,
         "grunt-contrib-concat"  : "*" ,
