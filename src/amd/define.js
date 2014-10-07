@@ -56,6 +56,7 @@
             ifn = fn;
         } else {
             var count = len;
+
             ifn = function() {
                 if (!--count) {
                     fn();
@@ -65,6 +66,7 @@
 
         pastry.each(dependencies, function (dep) {
             var depFn = required[dep];
+
             if (depFn === true) {
                 ifn();
             } else {
@@ -74,6 +76,7 @@
     }
     function satisfy (dep) {
         var go = required[dep];
+
         required[dep] = true;
         if (go && go !== true) {
             go();

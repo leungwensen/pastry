@@ -25,6 +25,7 @@ define('amd/loader', [
     function noop () {}
     function maybeLoad (id) {
         var urls, callback;
+
         if (!require(id) && (urls = mappings[id])) {
             delete mappings[id];
             callback = callbacks[id];
@@ -56,7 +57,6 @@ define('amd/loader', [
         if (prevCallback) {
             return;
         }
-
         var firstScript = document.getElementsByTagName('script')[0],
             head        = firstScript.parentNode,
             script      = document.createElement('script');
@@ -75,11 +75,11 @@ define('amd/loader', [
         head.insertBefore(script, firstScript);
     }
     function clearValue (map, value) {
-        for (var k in map) {
-            if (map.hasOwnProperty(k) && map[k] === value) {
-                delete map[k];
+        pastry.each(map, function (v, key) {
+            if (v === value) {
+                delete map[key];
             }
-        }
+        });
     }
     function chain (f, g) {
         return function() {
@@ -100,9 +100,9 @@ define('amd/loader', [
     }
 
     hooks.on('define', function(id, dependencies, factory, next) {
-        for (var i = 0; i < dependencies.length; i++) {
-            maybeLoad(dependencies[i]);
-        }
+        pastry.each(dependencies, function (dep) {
+            maybeLoad(dep);
+        });
         next(id, dependencies, factory);
     });
 

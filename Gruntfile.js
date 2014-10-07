@@ -7,10 +7,13 @@ module.exports = function (grunt) {
     grunt.initConfig({
         pkg: pkg,
 
+        path: {
+            release: 'release'
+        },
+
         clean: {
             src: [
-                'dist/',
-                'release/'
+                '<%= path.release %>'
             ]
         },
 
@@ -50,7 +53,8 @@ module.exports = function (grunt) {
             },
             core: {
                 files: {
-                    '<%= pkg.main %>': 'src/core.js'
+                    '<%= pkg.main %>' : 'src/core.js',
+                    '<%= path.release%>/<%= pkg.name %>.amd.min.js' : 'src/amd/*.js'
                 }
             }
         }

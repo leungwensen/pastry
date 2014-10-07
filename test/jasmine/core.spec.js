@@ -103,6 +103,21 @@
             // expect(arrA).toEqual([1, 2, 3, 3, 5]); // !!!!!!!!!! REMEMBER THIS !!!!!!!!!!
             expect(arrA).toEqual([1, 2, 3, 3, 4, 4, 4, 5]);
         });
+        var obj = {
+            foo: 'bar',
+            hoo: 'goo'
+        };
+        it('delete in P.each()', function () {
+            P.each(obj, function (value, key) {
+                if (value === 'bar') {
+                    delete obj[key];
+                }
+            });
+            expect(obj).toEqual({
+                hoo: 'goo'
+            });
+            expect(obj.foo).toBe(undefined);
+        });
     });
 
     describe('core->others', function () {

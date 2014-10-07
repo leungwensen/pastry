@@ -22,10 +22,12 @@ define('amd/hooks', [
     function getQueue (eventType, id) {
         var typeSpecific = queues[eventType] = queues[eventType] || {},
             queue = typeSpecific[id] = typeSpecific[id] || [];
+
         return queue;
     }
     function runCallbacks (eventType, args, callback) {
         var callbacks = getQueue(eventType, allId).concat(getQueue(eventType, args[0]));
+
         (function run(as) {
             if (callbacks.length) {
                 callbacks.shift().apply(undef, as.concat(function() {
@@ -49,6 +51,7 @@ define('amd/hooks', [
             id = allId; // hook runs on every module
         }
         var queue = getQueue(eventType, id || allId);
+
         for (var i = 0; i < queue.length; i++) {
             if (queue[i] === callback || !callback) {
                 queue.splice(i, 1); // Removes the matching callback from the array.

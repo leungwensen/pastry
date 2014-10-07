@@ -1,12 +1,13 @@
 /* jshint strict: true, undef: true, unused: true */
 /* global exports, module */
-/*
- * @author      : 绝云(wensen.lws@alibaba-inc.com)
- * @date        : 2014-07-07
- * @description : 定义全局命名空间以及核心函数库
- */
 (function (GLOBAL) {
     'use strict';
+    /*
+     * @author      : 绝云(wensen.lws@alibaba-inc.com)
+     * @date        : 2014-07-07
+     * @description : 定义全局命名空间以及核心函数库
+     */
+
     var
     // 命名空间 {
         P = {},
