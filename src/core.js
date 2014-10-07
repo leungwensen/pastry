@@ -8,6 +8,7 @@
      * @description : 定义全局命名空间以及核心函数库
      */
 
+    GLOBAL = GLOBAL || {};
     var
     // 命名空间 {
         P = {},
@@ -341,7 +342,7 @@
             P.isUndefined = function(obj) {
                 return obj === undefined;
             };
-            P.isNull      = function(obj) {
+            P.isNull = function(obj) {
                 return obj === null;
             };
         // }
@@ -571,5 +572,10 @@
         ], function (alias) {
             P.setGLOBAL(alias, P);
         });
+    // }
+    // 获取全局变量 {
+        P.getGLOBAL = function (key) {
+            return GLOBAL[key];
+        };
     // }
 }(this));

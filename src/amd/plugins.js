@@ -1,8 +1,8 @@
 /* jshint strict: true, undef: true, unused: true */
 /* global define */
-define('tAMD/plugins', [
-    'tAMD/hooks',
-    'tAMD/normalize'
+define('amd/plugins', [
+    'amd/hooks',
+    'amd/normalize'
 ], function(
     hooks,
     normalize
@@ -19,7 +19,8 @@ define('tAMD/plugins', [
         exp = /^(.*?)!(.*)/;
 
     hooks.on('require', function(id, contextId, next) {
-        var matches = exp.exec(id), plugin, resource;
+        var matches = exp.exec(id),
+            plugin, resource;
 
         if (!matches) {
             next(id, contextId);
@@ -28,7 +29,8 @@ define('tAMD/plugins', [
             resource = matches[2];
 
             require([plugin], function(p) {
-                var normResource;
+                var normResource, normDep;
+
                 if (p.normalize) {
                     normResource = p.normalize(resource, function(r) {
                         return normalize(r, contextId);
@@ -37,8 +39,7 @@ define('tAMD/plugins', [
                     normResource = normalize(resource, contextId);
                 }
 
-                var normDep = plugin +'!'+ normResource;
-
+                normDep = plugin +'!'+ normResource;
                 if (!started[normDep]) {
                     started[normDep] = true;
                     p.load(normResource, require, function(value) {
@@ -47,7 +48,6 @@ define('tAMD/plugins', [
                         });
                     });
                 }
-
                 next(normDep, contextId);
             });
         }

@@ -1,8 +1,8 @@
 /* jshint strict: true, undef: true, unused: true */
 /* global define */
-define('tAMD/normalize', [
+define('amd/normalize', [
     'pastry',
-    'tAMD/hooks'
+    'amd/hooks'
 ], function(
     pastry,
     hooks
