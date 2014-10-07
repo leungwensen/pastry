@@ -7,7 +7,7 @@
  * @description : AMD 模块 - define
  * @reference   : https://github.com/jivesoftware/tAMD.git
  */
-(function (C) {
+(function (P) {
     'use strict';
 
     var definitions = {},
@@ -15,7 +15,7 @@
         undef,
 
         stubHook = function (next) {
-            next.apply(undef, C.toArray(arguments).slice(1));
+            next.apply(undef, P.toArray(arguments).slice(1));
         },
 
         AMD = {
@@ -31,7 +31,7 @@
                         satisfy(id_);
                     }
                 }, id,
-                (C.isFunction(factory) ? factory.apply(undef, dependencies) : factory)
+                (P.isFunction(factory) ? factory.apply(undef, dependencies) : factory)
             );
         },
 
@@ -55,7 +55,7 @@
 
         map = function (f, array) {
             var results = [];
-            C.each(array, function (item) {
+            P.each(array, function (item) {
                 results.push(f(item));
             });
             return results;
@@ -84,7 +84,7 @@
                 };
             }
 
-            C.each(dependencies, function (dep) {
+            P.each(dependencies, function (dep) {
                 var depFn = required[dep];
                 if (depFn === true) {
                     ifn();
@@ -104,8 +104,8 @@
 
         define = function (/* [id], [dependencies], factory */) {
             // 解释参数 {
-                var args         = C.toArray(arguments).slice(),
-                    id           = C.isString(args[0]) ? args.shift() : undef,
+                var args         = P.toArray(arguments).slice(),
+                    id           = P.isString(args[0]) ? args.shift() : undef,
                     dependencies = args.length > 1 ? args.shift() : [],
                     factory      = args[0];
             // }
@@ -131,7 +131,7 @@
     define('AMD', AMD);
     satisfy('require');
 
-    C.setGLOBAL('define'  , define );
-    C.setGLOBAL('require' , require);
-}(this.C));
+    P.setGLOBAL('define'  , define );
+    P.setGLOBAL('require' , require);
+}(this.P));
 
