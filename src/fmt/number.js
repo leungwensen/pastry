@@ -9,16 +9,17 @@ define('fmt/number', [
     /*
      * @author      : 绝云(wensen.lws@alibaba-inc.com)
      * @date        : 2014-10-07
-     * @description : fmt 模块 - date
+     * @description : fmt 模块 - number
      */
 
     return function (num, option) {
         /**
          * @description : return stringified number according to given pattern.
-         * @param       : {object} option, defines pattern for stringify.
+         * @parameter   : {number} option, defines pattern for stringify.
+         * @parameter   : {object} option, defines pattern for stringify.
          * @example     : {"comma": "1|0", "decimal": ">=0", "integer" : ">=0", "zero": "1|0"}
          * @return      : {string} result string.
-         * @syntax      : number.stringf([option])
+         * @syntax      : fmtNumber(number, [option])
          */
 
         var i, len, placeHolder,
