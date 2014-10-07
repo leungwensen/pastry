@@ -4,6 +4,8 @@
     "main"        : "release/pastry.core.min.js",
     "name"        : "pastry",
     "title"       : "pastry",
+    "version"     : "0.2.0",
+
 
     "author": {
         "description" : "team of pastry",
@@ -58,5 +60,7 @@
         "url"  : "https://github.com/leungwensen/pastry/blob/master/LICENSE.MIT.md"
     }],
 
-    "version": "0.2.0"
+    "scripts" : {
+        "test" : "grunt travis --verbose"
+    }
 }

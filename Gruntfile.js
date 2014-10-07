@@ -1,5 +1,7 @@
 /* jshint strict: true, undef: true, unused: true */
 /* global module */
+var pastry = require('pastry');
+
 module.exports = function (grunt) {
     'use strict';
     var pkg = grunt.file.readJSON('package.json');
@@ -63,14 +65,22 @@ module.exports = function (grunt) {
         }
     });
 
-    grunt.loadNpmTasks('grunt-contrib-jasmine');
-    grunt.loadNpmTasks('grunt-contrib-jshint');
-    grunt.loadNpmTasks('grunt-contrib-uglify');
-
-    grunt.registerTask('default' , [
+    pastry.each([
         'jasmine',
         'jshint',
         'uglify'
+    ], function (task) {
+        grunt.loadNpmTasks('grunt-contrib-' + task);
+    });
+
+    grunt.registerTask('default', [
+        'jasmine',
+        'jshint',
+        'uglify'
+    ]);
+    grunt.registerTask('travis', [
+        'jasmine',
+        'jshint'
     ]);
 };
 
