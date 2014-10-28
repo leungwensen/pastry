@@ -4,8 +4,8 @@
     "description" : "easing SPA(single page application) development.",
     "homepage"    : "https://github.com/leungwensen/pastry",
 
-    "main"    : "release/0.2.0/pastry.core.min.js",
-    "version" : "0.2.0",
+    "main"    : "release/0.2.1/pastry.core.min.js",
+    "version" : "0.2.1",
 
     "author": {
         "description" : "team of pastry",

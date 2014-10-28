@@ -77,7 +77,7 @@ module.exports = function (grunt) {
     grunt.registerTask('default', [
         'jasmine',
         'jshint',
-        'clean',
+        // 'clean',
         'uglify'
     ]);
     grunt.registerTask('travis', [
