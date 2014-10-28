@@ -55,6 +55,30 @@
         }
     }
 
+    function classById (id) {
+        switch (true) {
+            case /^core/.test(id):
+                return 'type-core';
+            case /^amd/.test(id):
+                return 'type-core';
+            case /shim\//.test(id):
+                return 'type-common';
+            case /fmt\//.test(id):
+                return 'type-common';
+            default:
+                return 'type-default';
+        }
+    }
+
+    function processNodes (nodes) {
+        pastry.each(nodes, function(node) {
+            pastry.extend(node, {
+                label     : node.name,
+                nodeclass : classById(node.id)
+            });
+        });
+    }
+
     function draw (graph) {
         /*
          * @description: 画图
@@ -122,6 +146,7 @@
     $.get('./json/nodes.json', function(nodes) {
         $.get('./json/links.json', function(links) {
             // 备份图数据 {
+                processNodes(nodes);
                 graphData = {
                     nodes: nodes,
                     links: links

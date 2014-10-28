@@ -8,6 +8,9 @@
  * @author      : 绝云
  * @description : 分析项目的依赖情况，并图形化显示
  * @syntax      : 在 bin 文件夹所在的父文件夹中 ./bin/dependencyTree.js
+ * @TODO        :
+ *     * 筛选 namespace
+ *     * 定位某个 模块
  */
 
 // 数据准备 {
@@ -43,26 +46,11 @@
     // }
 // }
 // 私有函数 {
-    function classById (id) {
-        switch (true) {
-            case /^core/.test(id):
-                return 'type-core';
-            case /^amd/.test(id):
-                return 'type-core';
-            case /shim\//.test(id):
-                return 'type-common';
-            case /fmt\//.test(id):
-                return 'type-common';
-            default:
-                return 'type-default';
-        }
-    }
     function addNodeById (id) {
         if (!nodeLoaded[id]) {
             nodes.push({
-                id        : id,
-                label     : id,
-                nodeclass : classById(id)
+                id   : id,
+                name : id
             });
             nodeLoaded[id] = true;
         }
