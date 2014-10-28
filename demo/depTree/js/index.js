@@ -21,8 +21,8 @@
                 links: []
             },
             layout = dagreD3.layout()
-                .nodeSep(50)
-                .rankSep(200)
+                .nodeSep(40)
+                .rankSep(120)
                 .rankDir('TB');
         // }
 
@@ -57,10 +57,10 @@
 
     function classById (id) {
         switch (true) {
-            case /^core/.test(id):
+            case /^pastry/.test(id):
                 return 'type-core';
             case /^amd/.test(id):
-                return 'type-core';
+                return id === 'amd/define' ? 'type-default' : 'type-core';
             case /shim\//.test(id):
                 return 'type-common';
             case /fmt\//.test(id):
@@ -73,7 +73,9 @@
     function processNodes (nodes) {
         pastry.each(nodes, function(node) {
             pastry.extend(node, {
-                label     : node.name,
+                label     : '<div>' + node.name + '</div>',
+                rx        : 3,
+                ry        : 3,
                 nodeclass : classById(node.id)
             });
         });
@@ -149,23 +151,35 @@
                 result.push(id.split('/')[0]);
             }
         });
+        $namespaces.append('<button data-ns="all" class="namespace">all</button>');
         pastry.each(pastry.uniq(result), function(NS) {
             $namespaces.append('<button data-ns="' + NS + '" class="namespace">' + NS + '</button>');
         });
-        $namespaces.append('<button data-ns="all" class="namespace">all</button>');
+    }
+    function bindEvents () {
         $('div#namespaces').on('click', 'button.namespace', function() {
             var $btn = $(this),
                 ns = $btn.data('ns'),
-                filterNodes = [];
+                filteredNodes = [];
             if (ns === 'all') {
-                filterNodes = graphData.nodes;
+                filteredNodes = graphData.nodes;
             } else {
-                filterNodes = pastry.filter(graphData.nodes, function(node) {
+                filteredNodes = pastry.filter(graphData.nodes, function(node) {
                     return node.id.indexOf(ns) === 0;
                 });
             }
             draw({
-                nodes: filterNodes,
+                nodes: filteredNodes,
+                links: graphData.links
+            });
+        });
+        $('input#module-q').keyup(function () {
+            var $input = $(this),
+                filteredNodes = pastry.filter(graphData.nodes, function (node) {
+                    return node.id.indexOf($input.val()) > -1;
+                });
+            draw({
+                nodes: filteredNodes,
                 links: graphData.links
             });
         });
@@ -182,6 +196,7 @@
             // }
             // 生成 namespaces 菜单 {
                 initNamespaces();
+                bindEvents();
             // }
             // 画图 {
                 draw(graphData);
