@@ -1,0 +1,28 @@
+{
+	"amd/define": [],
+	"amd/hooks": [
+		"amd",
+		"pastry"
+	],
+	"amd/loader": [
+		"amd/hooks",
+		"pastry"
+	],
+	"amd/normalize": [
+		"amd/hooks",
+		"pastry"
+	],
+	"amd/plugins": [
+		"amd/hooks",
+		"amd/normalize"
+	],
+	"core": [],
+	"fmt/date": [],
+	"fmt/sprintf": [
+		"pastry"
+	],
+	"shim/json": [
+		"fmt/date",
+		"pastry"
+	]
+}

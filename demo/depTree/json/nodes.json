@@ -1,0 +1,57 @@
+[
+	{
+		"id": "amd/define",
+		"label": "amd/define",
+		"nodeclass": "type-core"
+	},
+	{
+		"id": "amd/hooks",
+		"label": "amd/hooks",
+		"nodeclass": "type-core"
+	},
+	{
+		"id": "amd/loader",
+		"label": "amd/loader",
+		"nodeclass": "type-core"
+	},
+	{
+		"id": "amd/normalize",
+		"label": "amd/normalize",
+		"nodeclass": "type-core"
+	},
+	{
+		"id": "amd/plugins",
+		"label": "amd/plugins",
+		"nodeclass": "type-core"
+	},
+	{
+		"id": "core",
+		"label": "core",
+		"nodeclass": "type-core"
+	},
+	{
+		"id": "fmt/date",
+		"label": "fmt/date",
+		"nodeclass": "type-common"
+	},
+	{
+		"id": "fmt/sprintf",
+		"label": "fmt/sprintf",
+		"nodeclass": "type-common"
+	},
+	{
+		"id": "shim/json",
+		"label": "shim/json",
+		"nodeclass": "type-common"
+	},
+	{
+		"id": "amd",
+		"label": "amd",
+		"nodeclass": "type-core"
+	},
+	{
+		"id": "pastry",
+		"label": "pastry",
+		"nodeclass": "type-default"
+	}
+]
