@@ -26,7 +26,9 @@
         SP = S[PS],
 
         toStr = {}.toString,
-        slice = AP.slice;
+        slice = AP.slice,
+
+        noop = function() { };
     // }
     // 版本号 {
         P.VERSION = '0.2.0';
@@ -513,6 +515,23 @@
                         return fBound;
                     }
                 };
+        // }
+        // debug {
+            /*
+             * @description : debug 相关函数
+             * @syntax      : pastry.[INFO|LOG|WARN|ERROR]
+             */
+            P.each([
+                'info',
+                'log',
+                'warn'
+            ], function(type) {
+                P[type.toUpperCase()] = (typeof console === U) ? noop : console[type];
+            });
+            P.ERROR = function(err) {
+                P.warn(P.toArray(arguments));
+                throw new Error(err);
+            };
         // }
         // 其它 {
             P.getAny = function (callbackList) {

@@ -59,13 +59,14 @@ module.exports = function (grunt) {
             core: {
                 files: {
                     '<%= pkg.main %>' : 'src/core.js',
-                    '<%= path.release%>/<%= pkg.name %>.amd.min.js' : 'src/amd/*.js'
+                    '<%= path.release%>/<%= pkg.version %>/<%= pkg.name %>.amd.min.js' : 'src/amd/*.js'
                 }
             }
         }
     });
 
     pastry.each([
+        'clean',
         'jasmine',
         'jshint',
         'uglify'
@@ -76,6 +77,7 @@ module.exports = function (grunt) {
     grunt.registerTask('default', [
         'jasmine',
         'jshint',
+        'clean',
         'uglify'
     ]);
     grunt.registerTask('travis', [

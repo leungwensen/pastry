@@ -151,7 +151,7 @@ define('shim/json', [
                         !pastry.isNumber(replacer.length)
                     )
                 ) {
-                    throw new Error('JSON.stringify');
+                    pastry.ERROR('JSON.stringify');
                 }
                 return str('', {'': value});
             },
@@ -197,7 +197,7 @@ define('shim/json', [
                     /* jshint -W061 */ j = eval('(' + text + ')');
                     return pastry.isFunction(reviver) ? walk({'': j}, '') : j;
                 }
-                throw new SyntaxError('JSON.parse');
+                pastry.ERROR('JSON.parse');
             }
         };
 

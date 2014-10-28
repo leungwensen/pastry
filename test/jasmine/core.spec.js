@@ -128,10 +128,10 @@ require([
         it('pastry.getAny', function () {
             expect(pastry.getAny([
                 function () {
-                    throw new Error('hi');
+                    pastry.ERROR('hi');
                 },
                 function () {
-                    throw new Error('error');
+                    pastry.ERROR('error');
                 },
                 function () {
                     return 'hello';

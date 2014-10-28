@@ -34,7 +34,7 @@ define('amd/normalize', [
                     break;
                 case '..':
                     if (normalized.length < 1) {
-                        throw "Module id, "+ id +", with context, "+ contextId +", has too many '..' components.";
+                        pastry.ERROR("Module id, "+ id +", with context, "+ contextId +", has too many '..' components.");
                     }
                     normalized.pop();
                     break;
