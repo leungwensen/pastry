@@ -470,7 +470,7 @@
                  */
                 var resultArr = [];
                 P.each(arr, function (element) {
-                    if (!P.hasVal(resultArr, element)) {
+                    if (!P.hasValue(resultArr, element)) {
                         resultArr.push(element);
                     }
                 });

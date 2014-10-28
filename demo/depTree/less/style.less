@@ -20,13 +20,8 @@
         font-family      : "Helvetica Neue", Helvetica, Arial, sans-serf;
         overflow         : hidden;
     }
-    h1 {
-        font-size   : 3em;
-        font-weight : 300;
-    }
-    h2 {
-        font-size   : 1.5em;
-        font-weight : 300;
+    h3:hover {
+        color: @color-font-hightlight;
     }
     header {
         background-color : @color-bg-header;
@@ -59,13 +54,27 @@
         bottom   : 0;
         overflow : hidden;
     }
-    div#namespaces {
-        position: absolute;
-        float: right;
-        width: 100px;
-        height: 100px;
-        right: 0px;
-        top: 60px;
+    div#right-panel {
+        background-color : @color-bg-header;
+        float            : right;
+        height           : auto;
+        max-height       : 100%;
+        min-height       : 100px;
+        min-width        : 100px;
+        padding          : 5px;
+        position         : absolute;
+        right            : 5px;
+        top              : 65px;
+        width            : auto;
+        hr {
+            border        : 0;
+            border-bottom : 1px dashed @color-font-main;
+            background    : @color-bg;
+        }
+        button {
+            display : block;
+            width   : 100%;
+        }
     }
 /* } */
 /* 图定制样式 { */
@@ -81,7 +90,8 @@
             fill: @color-content-error;
         }
         &>.type-core > rect {
-            fill: @color-content-warning;
+            /* fill: @color-content-warning; */
+            fill: @color-content-success;
         }
         &>.type-common > rect {
             fill: @color-content-primary;
@@ -98,7 +108,7 @@
         fill         : none;
     }
     .edgePath path:hover {
-        stroke       : @color-content-info;
+        stroke       : @color-content-warning;
         stroke-width : 2px;
         fill         : none;
     }

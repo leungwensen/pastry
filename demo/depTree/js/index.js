@@ -93,7 +93,12 @@
         // }
         // 加 link {
             pastry.each(graph.links, function(link) {
-                g.addEdge(link.id, link.source, link.target);
+                if (g.hasNode(link.source) && g.hasNode(link.target)) {
+                    /*
+                     * 过滤了不存在的节点的连线
+                     */
+                    g.addEdge(link.id, link.source, link.target);
+                }
             });
         // }
         // 画图 {
@@ -134,12 +139,35 @@
     }
     function initNamespaces () {
         var id,
-            result = [];
+            result = [],
+            $namespaces = $('#namespaces');
+
+        $namespaces.html('');
         pastry.each(graphData.nodes, function(node) {
             id = node.id;
             if (pastry.isString(id)) {
                 result.push(id.split('/')[0]);
             }
+        });
+        pastry.each(pastry.uniq(result), function(NS) {
+            $namespaces.append('<button data-ns="' + NS + '" class="namespace">' + NS + '</button>');
+        });
+        $namespaces.append('<button data-ns="all" class="namespace">all</button>');
+        $('div#namespaces').on('click', 'button.namespace', function() {
+            var $btn = $(this),
+                ns = $btn.data('ns'),
+                filterNodes = [];
+            if (ns === 'all') {
+                filterNodes = graphData.nodes;
+            } else {
+                filterNodes = pastry.filter(graphData.nodes, function(node) {
+                    return node.id.indexOf(ns) === 0;
+                });
+            }
+            draw({
+                nodes: filterNodes,
+                links: graphData.links
+            });
         });
     }
 
