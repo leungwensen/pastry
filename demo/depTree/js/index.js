@@ -185,23 +185,18 @@
         });
     }
 
-    $.get('./json/nodes.json', function(nodes) {
-        $.get('./json/links.json', function(links) {
-            // 备份图数据 {
-                processNodes(nodes);
-                graphData = {
-                    nodes: nodes,
-                    links: links
-                };
-            // }
-            // 生成 namespaces 菜单 {
-                initNamespaces();
-                bindEvents();
-            // }
-            // 画图 {
-                draw(graphData);
-            // }
-        });
+    $.get('./json/depTree.json', function(tree) {
+        // 备份图数据 {
+            graphData = tree;
+            processNodes(graphData.nodes);
+        // }
+        // 生成 namespaces 菜单 {
+            initNamespaces();
+            bindEvents();
+        // }
+        // 画图 {
+            draw(graphData);
+        // }
     });
 }());
 

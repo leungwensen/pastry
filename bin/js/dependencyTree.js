@@ -19,8 +19,10 @@
     // }
     // 文件服务器相关 {
         fileServer,
-        port = 3000,
-        path = 'demo/depTree',
+        browser = '/Applications/Google Chrome.app',
+        host    = 'http://127.0.0.1',
+        port    = 3000,
+        path    = 'demo/depTree',
     // }
     // 系统依赖 {
         exec        = require('child_process').exec,
@@ -79,9 +81,14 @@
     console.log(circular.getArray(), !!circular.getArray().length);
 // }
 // 写入 graph 数据 {
-    fs.writeFile(path + '/json/nodes.json'  , JSON.stringify(nodes  , null, '\t'), 'utf-8', errorTracing);
-    fs.writeFile(path + '/json/links.json'  , JSON.stringify(links  , null, '\t'), 'utf-8', errorTracing);
-    fs.writeFile(path + '/json/depTree.json', JSON.stringify(depTree, null, '\t'), 'utf-8', errorTracing);
+    fs.writeFile(path + '/json/nodes.json', pastry.JSON.stringify(nodes, null, '\t'), 'utf-8', errorTracing);
+    fs.writeFile(path + '/json/links.json', pastry.JSON.stringify(links, null, '\t'), 'utf-8', errorTracing);
+
+    fs.writeFile(path + '/json/depTree.json', pastry.JSON.stringify({
+        nodes   : nodes,
+        links   : links,
+        circles : circular.getArray()
+    }, null, '\t'), 'utf-8', errorTracing);
 // }
 // 启动一个文件服务器 {
     fileServer = new staticSever.Server('./');
@@ -93,12 +100,6 @@
     }).listen(port);
 // }
 // 打开浏览器 {
-    exec('open -a "/Applications/Google Chrome.app" \'http://127.0.0.1:3000/' + path + '/index.html\'',
-        function (error) {
-            if (error !== null) {
-                console.log('exec error: ' + error);
-            }
-        }
-    );
+    exec(pastry.sprintf('open -a "%s" \'%s:%d/%s/\'', browser, host, port, path), errorTracing);
 // }
 

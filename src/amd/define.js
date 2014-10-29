@@ -1,6 +1,9 @@
 /* jshint strict: true, undef: true, unused: true */
 // /* global xxx, yyy */
-(function (pastry) {
+
+var define;
+
+(function (GLOBAL) {
     'use strict';
     /*
      * @author      : 绝云(wensen.lws@alibaba-inc.com)
@@ -9,6 +12,8 @@
      * @reference   : https://github.com/jivesoftware/tamd.git
      * @reference   : https://gist.github.com/388e70bccd3fdb8a6617
      */
+
+    var pastry = GLOBAL.pastry;
 
     function stubHook (next) {
         next.apply(undef, pastry.toArray(arguments).slice(1));
@@ -82,7 +87,8 @@
             go();
         }
     }
-    function define (/* [id], [dependencies], factory */) {
+
+    define = GLOBAL.define = function (/* [id], [dependencies], factory */) {
         // 解释参数 {
             var args         = pastry.toArray(arguments).slice(),
                 id           = pastry.isString(args[0]) ? args.shift() : undef,
@@ -102,7 +108,7 @@
                 }, dependencies_);
             }, id, dependencies, factory);
         // }
-    }
+    };
 
     var undef,
         definitions = {},
@@ -124,7 +130,6 @@
     satisfy('require');
 
     // 全局变量 {
-        pastry.setGLOBAL('define'  , define );
         pastry.setGLOBAL('require' , require);
     // }
-}(this.pastry));
+}(this));

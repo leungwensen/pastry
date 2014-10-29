@@ -593,13 +593,9 @@
              * @syntax      : pastry.setGLOBAL(key String, value Any);
              */
             if (typeof exports !== U) {
-                if (typeof module !== U && module.exports) {
-                    module.exports = value;
-                }
                 exports[key] = value;
-            } else {
-                GLOBAL[key] = value;
             }
+            GLOBAL[key] = value;
         };
         P.each([
             'P',
@@ -608,6 +604,12 @@
         ], function (alias) {
             P.setGLOBAL(alias, P);
         });
+
+        if (typeof exports !== U) {
+            if (typeof module !== U && module.exports) {
+                module.exports = P;
+            }
+        }
     // }
     // 获取全局变量 {
         P.getGLOBAL = function (key) {
