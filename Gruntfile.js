@@ -58,8 +58,8 @@ module.exports = function (grunt) {
             },
             core: {
                 files: {
-                    '<%= pkg.main %>' : 'src/core.js',
-                    '<%= path.release%>/<%= pkg.version %>/<%= pkg.name %>.amd.min.js' : 'src/amd/*.js'
+                    '<%= pkg.main %>'    : pkg.nodeModules,
+                    '<%= pkg.browser %>' : pkg.browserModules
                 }
             }
         }

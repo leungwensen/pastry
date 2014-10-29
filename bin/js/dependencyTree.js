@@ -8,9 +8,6 @@
  * @author      : 绝云
  * @description : 分析项目的依赖情况，并图形化显示
  * @syntax      : 在 bin 文件夹所在的父文件夹中 ./bin/dependencyTree.js
- * @TODO        :
- *     * 筛选 namespace
- *     * 定位某个 模块
  */
 
 // 数据准备 {
@@ -55,6 +52,11 @@
             nodeLoaded[id] = true;
         }
     }
+    function errorTracing (err) {
+        if (err) {
+            pastry.ERROR(err);
+        }
+    }
 // }
 // 生成 graph 数据 {
     ids = pastry.keys(depTree);
@@ -77,21 +79,9 @@
     console.log(circular.getArray(), !!circular.getArray().length);
 // }
 // 写入 graph 数据 {
-    fs.writeFile(path + '/json/nodes.json', JSON.stringify(nodes, null, '\t'), 'utf-8', function(err) {
-        if (err) {
-            console.log(err);
-        }
-    });
-    fs.writeFile(path + '/json/links.json', JSON.stringify(links, null, '\t'), 'utf-8', function(err) {
-        if (err) {
-            console.log(err);
-        }
-    });
-    fs.writeFile(path + '/json/depTree.json', JSON.stringify(depTree, null, '\t'), 'utf-8', function(err) {
-        if (err) {
-            console.log(err);
-        }
-    });
+    fs.writeFile(path + '/json/nodes.json'  , JSON.stringify(nodes  , null, '\t'), 'utf-8', errorTracing);
+    fs.writeFile(path + '/json/links.json'  , JSON.stringify(links  , null, '\t'), 'utf-8', errorTracing);
+    fs.writeFile(path + '/json/depTree.json', JSON.stringify(depTree, null, '\t'), 'utf-8', errorTracing);
 // }
 // 启动一个文件服务器 {
     fileServer = new staticSever.Server('./');

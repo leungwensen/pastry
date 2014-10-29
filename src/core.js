@@ -567,6 +567,23 @@
             };
         // }
     // }
+    // 增加 pastry 函数 {
+        /*
+         * @description : 把对象中的属性／方法加到 pastry 这个 namespace 下
+         * @parameter   : {Object } obj, 扩展对象
+         * @parameter   : {Boolean} override, 是否覆盖
+         * @syntax      : pastry.mixin(obj Object[, override Boolean]);
+         */
+        P.mixin = function(obj, override) {
+            P.each(obj, function(value, key) {
+                if (P[key] && !override) {
+                    P.ERROR('P.' + key + ' already exists');
+                } else {
+                    P[key] = value;
+                }
+            });
+        };
+    // }
     // 输出全局变量 {
         P.setGLOBAL = function (key, value) {
             /*

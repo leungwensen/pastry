@@ -124,5 +124,8 @@ define('fmt/sprintf', [
             return newString;
         };
 
+    pastry.mixin({
+        sprintf: sprintf
+    });
     return sprintf;
 });

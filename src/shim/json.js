@@ -15,7 +15,15 @@ define('shim/json', [
      * @reference   : https://github.com/douglascrockford/JSON-js
      */
 
+    function exportJSON (obj) {
+        pastry.mixin({
+            JSON: obj
+        });
+        pastry.setGLOBAL('JSON', obj);
+    }
+
     if (JSON && !!JSON.parse && !!JSON.stringify) {
+        exportJSON(JSON);
         return JSON;
     }
 
@@ -201,6 +209,6 @@ define('shim/json', [
             }
         };
 
-    pastry.setGLOBAL('JSON', shim);
+    exportJSON(shim);
     return shim;
 });

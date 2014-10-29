@@ -21,6 +21,10 @@
 	"fmt/sprintf": [
 		"pastry"
 	],
+	"fmt/vsprintf": [
+		"fmt/sprintf",
+		"pastry"
+	],
 	"shim/json": [
 		"fmt/date",
 		"pastry"

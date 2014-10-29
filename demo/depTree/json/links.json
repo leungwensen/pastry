@@ -45,6 +45,16 @@
 		"target": "fmt/sprintf"
 	},
 	{
+		"id": "Sfmt/sprintfTfmt/vsprintf",
+		"source": "fmt/sprintf",
+		"target": "fmt/vsprintf"
+	},
+	{
+		"id": "SpastryTfmt/vsprintf",
+		"source": "pastry",
+		"target": "fmt/vsprintf"
+	},
+	{
 		"id": "Sfmt/dateTshim/json",
 		"source": "fmt/date",
 		"target": "shim/json"
