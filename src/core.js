@@ -529,7 +529,7 @@
                 P[type.toUpperCase()] = (typeof console === U) ? noop : console[type];
             });
             P.ERROR = function(err) {
-                P.warn(P.toArray(arguments));
+                P.WARN(P.toArray(arguments));
                 throw new Error(err);
             };
         // }

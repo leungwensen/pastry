@@ -4,9 +4,9 @@
     "description" : "easing SPA(single page application) development.",
     "homepage"    : "https://github.com/leungwensen/pastry",
 
-    "main"    : "release/0.2.3/pastry.node.min.js",
-    "browser" : "release/0.2.3/pastry.min.js",
-    "version" : "0.2.3",
+    "main"    : "release/0.2.4/pastry.node.min.js",
+    "browser" : "release/0.2.4/pastry.min.js",
+    "version" : "0.2.4",
 
     "nodeModules" : [
         "src/core.js",
