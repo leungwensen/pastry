@@ -1,5 +1,6 @@
 /* jshint strict: true, undef: true, unused: true */
 /* global exports, module */
+
 (function (GLOBAL) {
     'use strict';
     /*
@@ -617,3 +618,4 @@
         };
     // }
 }(this));
+

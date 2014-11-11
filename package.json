@@ -10,6 +10,7 @@
 
     "nodeModules" : [
         "src/core.js",
+        "src/event.js",
         "src/amd/define.js",
         "src/fmt/date.js",
         "src/fmt/sprintf.js",
@@ -18,6 +19,7 @@
     ],
     "browserModules" : [
         "src/core.js",
+        "src/event.js",
         "src/amd/define.js",
         "src/amd/hooks.js",
         "src/amd/loader.js",
