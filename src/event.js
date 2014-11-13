@@ -13,7 +13,7 @@
         pastry = GLOBAL.pastry,
 
         // defination of event function {
-            event  = function(target) {
+            event = function(target) {
                 target = target || this;
 
                 var events = target._events = {}; // all events stores in the the collection: *._events
@@ -23,7 +23,7 @@
                      * @description: 绑定事件
                      */
                     events[name] = events[name] || [];
-                    events.push({
+                    events[name].push({
                         callback : callback,
                         context  : context
                     });

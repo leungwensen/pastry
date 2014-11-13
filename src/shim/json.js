@@ -41,7 +41,7 @@ define('shim/json', [
                 };
             });
             D2JSON = function () {
-                return isFinite(this.valueOf()) ? fmtDate(this, '{YYY}-{MM}-{DD}T{hh}:{mm}:{ss}Z') : null;
+                return isFinite(this.valueOf()) ? fmtDate(this) : null;
             };
         }
     // }

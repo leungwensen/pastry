@@ -44,7 +44,7 @@ define('fmt/date', [
             mi = date.getMinutes(),
             s  = date.getSeconds(),
             ms = date.getMilliseconds();
-        pattern = pattern || '{YYYY}-{MM}-{DD} {hh}:{mm}:{ss}';
+        pattern = pattern || '{YYYY}-{MM}-{DD}T{hh}:{mm}:{ss}Z';
 
         return pattern
             .replace( '{YYYY}', y              )

@@ -108,6 +108,22 @@
                 }
             };
 
+        P.eachReverse = function (arr, callback, thisObj) {
+            /*
+             * @description : 逆序遍历
+             * @parameter*  : {Array   } arr      , 待循环数组
+             * @parameter*  : {Function} callback , 回调函数
+             * @parameter   : {Object  } thisObj  , 上下文变量
+             * @syntax      : pastry.eachReverse(arr Array, callback Function[, thisObj Object]);
+             */
+            if (arr) {
+                var i = arr.length - 1;
+                for (; i > -1; i -= 1) {
+                    callback.call(thisObj, arr[i], i, arr);
+                }
+            }
+        };
+
         P.every = AP.every ?
             /*
              * @description : 测试是否对于 arr 中的元素，callback 都返回 true
@@ -527,10 +543,10 @@
                 'log',
                 'warn'
             ], function(type) {
-                P[type.toUpperCase()] = (typeof console === U) ? noop : console[type];
+                P[type.toUpperCase()] = (typeof console === U) ? noop : P.bind(console[type], console);
             });
             P.ERROR = function(err) {
-                P.WARN(P.toArray(arguments));
+                P.WARN(err);
                 throw new Error(err);
             };
         // }
