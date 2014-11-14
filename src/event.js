@@ -22,8 +22,8 @@
                     /*
                      * @description: 绑定事件
                      */
-                    events[name] = events[name] || [];
-                    events[name].push({
+                    var list = events[name] || (events[name] = []);
+                    list.push({
                         callback : callback,
                         context  : context
                     });
