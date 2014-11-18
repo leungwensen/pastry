@@ -44,14 +44,9 @@ module.exports = function (grunt) {
         },
 
         jasmine: {
-            src: 'src/**/*.js',
+            src: 'release/<%= pkg.version %>/pastry.node.min.js',
             options: {
-                specs: 'test/jasmine/**/*.spec.js',
-                vendor: [
-                    'src/core.js',
-                    'src/event.js',
-                    'src/module/define.js'
-                ]
+                specs: 'test/jasmine/**/*.spec.js'
             }
         },
 
@@ -77,14 +72,13 @@ module.exports = function (grunt) {
     });
 
     grunt.registerTask('default', [
-        'jasmine',
         'jshint',
-        // 'clean',
-        'uglify'
+        'uglify',
+        'jasmine'
     ]);
     grunt.registerTask('travis', [
-        'jasmine',
-        'jshint'
+        'jshint',
+        'jasmine'
     ]);
 };
 
