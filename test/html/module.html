@@ -9,15 +9,16 @@
     <script src="../../src/event.js"></script>
     <script src="../../src/module/define.js"></script>
     <script src="../../src/module/path.js"></script>
-    <script src="./module/moduleA.js"></script>
-    <script src="./module/moduleB.js"></script>
-    <script src="./module/moduleC.js"></script>
+    <script src="../../src/module/request.js"></script>
+    <script src="../../src/module/loader.js"></script>
+    <!-- <script src="./module/moduleA.js"></script> -->
+    <!-- <script src="./module/moduleB.js"></script> -->
+    <!-- <script src="./module/moduleC.js"></script> -->
     <script>
-
         define([
             // 'pastry',
             'Module',
-            'moduleB'
+            './module/moduleB'
         ], function (
             // pastry,
             Module,
@@ -32,7 +33,7 @@
         });
 
         define([
-            'moduleC'
+            './module/moduleC'
         ], function (
             moduleC
         ) {
@@ -40,14 +41,20 @@
         });
 
         define('moduleD', [
-            'moduleC'
+            './module/moduleC'
         ], function (
             moduleC
         ) {
             console.log('loaded ' + moduleC);
             return 'D';
         });
-
+        define([
+            'Module'
+        ], function (
+            Module
+        ) {
+            console.log(Module);
+        });
     </script>
 </body>
 </html>

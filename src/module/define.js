@@ -4,13 +4,12 @@
 var define;
 
 (function (GLOBAL, undef) {
+    'use strict';
     /*
      * @author      : wensen.lws
      * @description : 模块加载
      * @note        : 和 seajs、requirejs 的不同之一：define 的模块即时运行
      */
-    'use strict';
-
     if (define) { // 避免反复执行
         return;
     }
@@ -19,18 +18,20 @@ var define;
         event  = pastry.event,
 
         Module = function (meta) {
+            /*
+             * @description: 模块构造函数
+             */
             var mod = this;
             mod.init(meta);
             return mod;
         },
 
-        data = Module._data = {
-            moduleByUri  : {}, // 缓存的模块
-            exportsByUri : {}  // 缓存的模块输出
-        },
+        data = Module._data = {},
 
-        moduleByUri  = data.moduleByUri ,
-        exportsByUri = data.exportsByUri,
+        moduleByUri   = data.moduleByUri   = {},
+        exportsByUri  = data.exportsByUri  = {},
+        executedByUri = data.executedByUri = {},
+        queueByUri    = data.queueByUri    = {},
 
         require;
 
@@ -44,93 +45,52 @@ var define;
             var mod = this;
             pastry.extend(mod, meta);
             Module.emit('module-inited', mod);
-            return mod;
-        },
-        load: function (callback) {
-            /*
-             * @description: 加载
-             */
-            var mod = this;
-            callback();
-            Module.emit('module-loaded', mod);
-            return mod;
-        },
-        save: function () {
-            /*
-             * @description: 保存
-             */
-            var mod = this;
             moduleByUri[mod.uri] = mod;
-            Module.emit('module-saved', mod);
+            queueByUri[mod.uri]  = mod;
             return mod;
         },
-        processDeps: function (callback) {
-            /*
-             * @description : 获取依赖项，并且运行工厂函数得到返回值
-             * @note        : 这里要记得处理迟早会遇到的循环依赖的问题
-             */
-            var mod         = this,
-                deps        = mod.deps,
-                depsExports = [],
-                length      = pastry.isArray(deps) ? deps.length : 0,
-                count       = 0, // 标记递归逻辑退出点
-                depModule;
-
-            if (length === 0) {
-                callback(depsExports);
-            } else {
-                pastry.each(deps, function (depId, index) {
-                    depModule = moduleByUri[depId];
-                    if (depModule) {
-                        depsExports[index] = exportsByUri[depId];
-                        // 递归结束点 {
-                            count ++;
-                            if (count === length) {
-                                callback(depsExports);
-                            }
-                        // }
-                    } else {
-                        depModule = new Module({
-                            id: depId
-                        });
-                        depModule.load(function () {
-                            depModule
-                                .save()
-                                .execute(function () {
-                                    depsExports[index] = depModule.exports;
-                                    // 递归结束点 {
-                                        count ++;
-                                        if (count === length) {
-                                            callback(depsExports);
-                                        }
-                                    // }
-                                });
-                        });
-                    }
-                });
-            }
-            return mod;
-        },
-        execute: function (callback) {
-            /*
-             * @description: 执行
-             */
+        processDeps: function () {
             var mod = this;
-            if (mod.exports) {
+            Module.emit('module-depsProcessed', mod);
+            return mod;
+        },
+        execute: function () {
+            var mod           = this,
+                depModExports = [];
+            if ('exports' in mod) {
                 return mod;
             }
-            // 获取依赖项并得到 exports 值 {
-                mod.processDeps(function (depsList) {
-                    mod.exports = exportsByUri[mod.uri] = mod.factory.apply(undef, depsList);
-                    Module.emit('module-executed', mod);
-                    if (pastry.isFunction(callback)) {
-                        callback();
-                    }
+
+            if (pastry.every(mod.deps, function (uri) {
+                return !!executedByUri[uri];
+            })) {
+                var modFactory = mod.factory,
+                    modUri     = mod.uri;
+
+                pastry.each(mod.deps, function (uri) {
+                    depModExports.push(exportsByUri[uri]);
                 });
-            // }
+                mod.exports = exportsByUri[modUri] = pastry.isFunction(modFactory) ?
+                    modFactory.apply(undef, depModExports) : modFactory;
+                executedByUri[modUri] = true;
+                delete queueByUri[modUri];
+                Module.emit('module-executed', mod);
+            }
             return mod;
         }
     };
+
+    Module.on('module-executed', function () {
+        /*
+         * @description : 执行所有依赖于该模块的模块
+         * @note        : hacking so hard
+         */
+        pastry.each(queueByUri, function (mod2BeExecuted/*, uri */) {
+            if (mod2BeExecuted instanceof Module) {
+                mod2BeExecuted.execute();
+            }
+        });
+    });
 
     define = GLOBAL.define = Module.define = function (/* id, deps, factory */) {
         // 解释参数 {
@@ -143,15 +103,19 @@ var define;
                     uri     : id,
                     deps    : deps,
                     factory : factory
-                };
+                },
+                mod;
         // }
         // 需要对元数据进行处理就绑定这个事件 {
-            Module.emit('meta-got', meta);
+            Module.emit('module-metaGot', meta);
         // }
         // 新建实例、保存并且即时运行 {
-            new Module(meta)
-                .save()
+            mod = new Module(meta)
+                .processDeps()
                 .execute();
+        // }
+        // define事件 {
+            Module.emit('module-defined', mod);
         // }
     };
 

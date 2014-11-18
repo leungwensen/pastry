@@ -1,6 +1,6 @@
 
 define('moduleB', [
-    'moduleA'
+    './moduleA'
 ], function(
     A
 ) {

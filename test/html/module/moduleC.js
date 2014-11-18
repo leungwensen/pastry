@@ -1,7 +1,7 @@
 
 define('moduleC', [
-    'moduleA',
-    'moduleB'
+    './moduleA',
+    './moduleB'
 ], function(
     A,
     B

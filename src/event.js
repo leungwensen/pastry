@@ -27,6 +27,7 @@
                         callback : callback,
                         context  : context
                     });
+                    return target;
                 };
                 target.off = function(name, callback) {
                     /*
@@ -47,6 +48,7 @@
                             }
                         }
                     }
+                    return target;
                 };
                 target.emit = function() {
                     /*
@@ -57,6 +59,7 @@
                     pastry.each(list, function(event) {
                         event.callback.apply(event.context, args);
                     });
+                    return target;
                 };
                 target.trigger = target.emit; // alias
                 return target;
