@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>module</title>
+</head>
+<body>
+    <script src="../../release/0.2.8/pastry.min.js"></script>
+    <!-- <script src="./module/moduleA.js"></script> -->
+    <!-- <script src="./module/moduleB.js"></script> -->
+    <!-- <script src="./module/moduleC.js"></script> -->
+    <script>
+        define('hello', [
+            'Module',
+            'bom/info'
+        ], function (
+            Module,
+            bomInfo
+        ) {
+            console.log(Module);
+            console.log(bomInfo);
+            return 'hello';
+        });
+        define([
+            'hello'
+        ], function(
+            hello
+        ) {
+            'use strict';
+            console.log(hello);
+        });
+
+    </script>
+</body>
+</html>

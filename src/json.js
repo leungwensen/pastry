@@ -1,6 +1,7 @@
 /* jshint strict: true, undef: true, unused: true */
 /* global define */
-define('shim/json', [
+
+define('json', [
     'pastry',
     'fmt/date'
 ], function(
@@ -212,3 +213,4 @@ define('shim/json', [
     exportJSON(shim);
     return shim;
 });
+

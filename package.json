@@ -4,9 +4,9 @@
     "description" : "easing SPA(single page application) development.",
     "homepage"    : "https://github.com/leungwensen/pastry",
 
-    "main"    : "release/0.2.7/pastry.node.min.js",
-    "browser" : "release/0.2.7/pastry.min.js",
-    "version" : "0.2.7",
+    "main"    : "release/0.2.8/pastry.node.min.js",
+    "browser" : "release/0.2.8/pastry.min.js",
+    "version" : "0.2.8",
 
     "nodeModules" : [
         "src/core.js",
@@ -15,7 +15,7 @@
         "src/fmt/date.js",
         "src/fmt/sprintf.js",
         "src/fmt/vsprintf.js",
-        "src/shim/json.js"
+        "src/json.js"
     ],
     "browserModules" : [
         "src/core.js",
@@ -28,7 +28,10 @@
         "src/fmt/date.js",
         "src/fmt/sprintf.js",
         "src/fmt/vsprintf.js",
-        "src/shim/json.js"
+        "src/json.js",
+        "src/querystring.js",
+        "src/bom/info.js",
+        "src/io/ajax.js"
     ],
 
     "author": {

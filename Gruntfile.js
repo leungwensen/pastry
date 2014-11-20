@@ -9,6 +9,11 @@ module.exports = function (grunt) {
     grunt.initConfig({
         pkg: pkg,
 
+        dist: {
+            browser : 'dist/browser-debug.js',
+            node    : 'dist/node-debug.js'
+        },
+
         path: {
             release: 'release'
         },
@@ -17,6 +22,20 @@ module.exports = function (grunt) {
             src: [
                 '<%= path.release %>'
             ]
+        },
+
+        concat: {
+            options: {
+                separator: ';',
+            },
+            browserDebug: {
+                src  : pkg.browserModules,
+                dest : '<%= dist.browser %>'
+            },
+            nodeDebug: {
+                src  : pkg.nodeModules,
+                dest : '<%= dist.node %>'
+            },
         },
 
         jshint: {
@@ -55,8 +74,8 @@ module.exports = function (grunt) {
             },
             core: {
                 files: {
-                    '<%= pkg.main %>'    : pkg.nodeModules,
-                    '<%= pkg.browser %>' : pkg.browserModules
+                    '<%= pkg.browser %>' : '<%= dist.browser %>',
+                    '<%= pkg.main %>'    : '<%= dist.node %>'
                 }
             }
         }
@@ -64,6 +83,7 @@ module.exports = function (grunt) {
 
     pastry.each([
         'clean',
+        'concat',
         'jasmine',
         'jshint',
         'uglify'
@@ -73,6 +93,7 @@ module.exports = function (grunt) {
 
     grunt.registerTask('default', [
         'jshint',
+        'concat',
         'uglify',
         'jasmine'
     ]);

@@ -1,5 +1,6 @@
 /* jshint strict: true, undef: true, unused: true */
 /* global define */
+
 define('fmt/date', [
     // 'pastry',
 ], function(
@@ -63,3 +64,4 @@ define('fmt/date', [
             .replace( '{ms}'  , ms             );
     };
 });
+

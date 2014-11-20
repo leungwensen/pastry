@@ -1,5 +1,6 @@
 /* jshint strict: true, undef: true, unused: true */
 /* global exports, module */
+
 (function (GLOBAL) {
     'use strict';
     /*
@@ -106,6 +107,22 @@
                     callback.call(thisObj, obj[key], key, obj);
                 }
             };
+
+        P.eachReverse = function (arr, callback, thisObj) {
+            /*
+             * @description : 逆序遍历
+             * @parameter*  : {Array   } arr      , 待循环数组
+             * @parameter*  : {Function} callback , 回调函数
+             * @parameter   : {Object  } thisObj  , 上下文变量
+             * @syntax      : pastry.eachReverse(arr Array, callback Function[, thisObj Object]);
+             */
+            if (arr) {
+                var i = arr.length - 1;
+                for (; i > -1; i -= 1) {
+                    callback.call(thisObj, arr[i], i, arr);
+                }
+            }
+        };
 
         P.every = AP.every ?
             /*
@@ -526,10 +543,10 @@
                 'log',
                 'warn'
             ], function(type) {
-                P[type.toUpperCase()] = (typeof console === U) ? noop : console[type];
+                P[type.toUpperCase()] = (typeof console === U) ? noop : P.bind(console[type], console);
             });
             P.ERROR = function(err) {
-                P.warn(P.toArray(arguments));
+                P.WARN(err);
                 throw new Error(err);
             };
         // }
@@ -618,494 +635,575 @@
     // }
 }(this));
 
-/* jshint strict: true, undef: true, unused: true */
+;/* jshint strict: true, undef: true, unused: true */
 // /* global xxx, yyy */
 
-var define;
-
-(function (GLOBAL) {
+(function(GLOBAL) {
     'use strict';
     /*
      * @author      : 绝云(wensen.lws@alibaba-inc.com)
-     * @date        : 2014-09-18
-     * @description : amd 模块 - define
-     * @reference   : https://github.com/jivesoftware/tamd.git
-     * @reference   : https://gist.github.com/388e70bccd3fdb8a6617
+     * @date        : 2014-11-10
+     * @description : event 模块，包括全局和局部的
      */
 
-    var pastry = GLOBAL.pastry;
+    var
+        pastry = GLOBAL.pastry,
 
-    function stubHook (next) {
-        next.apply(undef, pastry.toArray(arguments).slice(1));
-    }
-    function addDefinition (id, dependencies, factory) {
-        amd._post(function(id_, moduleValue) {
-                if (moduleValue && id_) {
-                    definitions[id_] = moduleValue;
-                    satisfy(id_);
-                }
-            }, id,
-            (pastry.isFunction(factory) ? factory.apply(undef, dependencies) : factory)
-        );
-    }
-    function requireSync (id, contextId, skipHook) {
-        if (id === 'require') {
-            return function(id) {
-                return requireSync(id, contextId);
-            };
-        }
-        var ret;
+        // defination of event function {
+            event = function(target) {
+                target = target || this;
 
-        if (skipHook) {
-            ret = definitions[id];
-        } else {
-            amd._req(function(id_) {
-                ret = definitions[id_];
-            }, id, contextId);
-        }
-        return ret;
-    }
-    function run (fn, dependencies) {
-        var ifn,
-            len = dependencies.length,
-            getDepFn = function (originFn) {
-                return function () {
-                    originFn();
-                    ifn();
+                var events = target._events = {}; // all events stores in the the collection: *._events
+
+                target.on = function(name, callback, context) {
+                    /*
+                     * @description: 绑定事件
+                     */
+                    var list = events[name] || (events[name] = []);
+                    list.push({
+                        callback : callback,
+                        context  : context
+                    });
+                    return target;
                 };
+                target.off = function(name, callback) {
+                    /*
+                     * @description: 解绑事件
+                     */
+                    if (!name) {
+                        events = {};
+                    }
+                    var list = events[name] || [],
+                        i = list.length;
+                    if (!callback) {
+                        list = [];
+                    } else {
+                        while (i > 0) {
+                            i --;
+                            if (list[i].callback === callback) {
+                                list.splice(i, 1);
+                            }
+                        }
+                    }
+                    return target;
+                };
+                target.emit = function() {
+                    /*
+                     * @description: 触发事件
+                     */
+                    var args = pastry.toArray(arguments),
+                        list = events[args.shift()] || [];
+                    pastry.each(list, function(event) {
+                        event.callback.apply(event.context, args);
+                    });
+                    return target;
+                };
+                target.trigger = target.emit; // alias
+                return target;
             };
+        // }
 
-        if (!len) {
-            fn();
-        } else if (1 === len) {
-            ifn = fn;
-        } else {
-            var count = len;
+    // add .event to pastry {
+        pastry.mixin({
+            event: event
+        });
+    // }
+    // add on(), off(), emit(), trigger() to pastry {
+        event(pastry);
+    // }
+}(this));
 
-            ifn = function() {
-                if (!--count) {
-                    fn();
-                }
-            };
+;/* jshint strict: true, undef: true, unused: true */
+// /* global document */
+
+var define;
+
+(function (GLOBAL, undef) {
+    'use strict';
+    /*
+     * @author      : wensen.lws
+     * @description : 模块加载
+     * @note        : 和 seajs、requirejs 的不同之一：define 的模块即时运行
+     */
+    if (define) { // 避免反复执行
+        return;
+    }
+
+    var pastry = GLOBAL.pastry,
+        event  = pastry.event,
+
+        Module = function (meta) {
+            /*
+             * @description: 模块构造函数
+             */
+            var mod = this;
+            mod.init(meta);
+            return mod;
+        },
+
+        data = Module._data = {},
+
+        moduleByUri   = data.moduleByUri   = {},
+        exportsByUri  = data.exportsByUri  = {},
+        executedByUri = data.executedByUri = {},
+        queueByUri    = data.queueByUri    = {},
+
+        require;
+
+    event(Module); // 加上事件相关函数: on(), off(), emit(), trigger()
+
+    Module.prototype = {
+        init: function (meta) {
+            /*
+             * @description: 初始化
+             */
+            var mod = this;
+            pastry.extend(mod, meta);
+            Module.emit('module-inited', mod);
+            moduleByUri[mod.uri] = mod;
+            moduleByUri[mod.id]  = mod;
+            queueByUri[mod.uri]  = mod;
+            return mod;
+        },
+        processDeps: function () {
+            var mod = this;
+            Module.emit('module-depsProcessed', mod);
+            return mod;
+        },
+        execute: function () {
+            var mod           = this,
+                depModExports = [];
+            if ('exports' in mod) {
+                return mod;
+            }
+
+            if (pastry.every(mod.deps, function (uri) {
+                return !!executedByUri[uri];
+            })) {
+                var modFactory = mod.factory,
+                    modUri     = mod.uri,
+                    modId      = mod.id;
+
+                pastry.each(mod.deps, function (uri) {
+                    depModExports.push(exportsByUri[uri]);
+                });
+                mod.exports = exportsByUri[modUri] = exportsByUri[modId] = pastry.isFunction(modFactory) ?
+                    modFactory.apply(undef, depModExports) : modFactory;
+                executedByUri[modUri] = true;
+                executedByUri[modId]  = true;
+                delete queueByUri[modUri];
+                Module.emit('module-executed', mod);
+            }
+            return mod;
         }
+    };
 
-        pastry.each(dependencies, function (dep) {
-            var depFn = required[dep];
-
-            if (depFn === true) {
-                ifn();
-            } else {
-                required[dep] = dep ? getDepFn(depFn) : ifn;
+    Module.on('module-executed', function () {
+        /*
+         * @description : 执行所有依赖于该模块的模块
+         * @note        : hacking so hard
+         */
+        pastry.each(queueByUri, function (mod2BeExecuted/*, uri */) {
+            if (mod2BeExecuted instanceof Module) {
+                mod2BeExecuted.execute();
             }
         });
-    }
-    function satisfy (dep) {
-        var go = required[dep];
+    });
 
-        required[dep] = true;
-        if (go && go !== true) {
-            go();
-        }
-    }
-
-    define = GLOBAL.define = function (/* [id], [dependencies], factory */) {
+    define = GLOBAL.define = Module.define = function (/* id, deps, factory */) {
         // 解释参数 {
-            var args         = pastry.toArray(arguments).slice(),
-                id           = pastry.isString(args[0]) ? args.shift() : undef,
-                dependencies = args.length > 1 ? args.shift() : [],
-                factory      = args[0];
+            var args    = pastry.toArray(arguments),
+                id      = pastry.isString(args[0]) ? args.shift() : undef,
+                deps    = args.length > 1 ? args.shift() : [],
+                factory = args[0],
+                meta = {
+                    id      : id,
+                    uri     : id,
+                    deps    : deps,
+                    factory : factory
+                },
+                mod;
         // }
-        // 定义 define 函数 {
-            amd._pre(function(id_, dependencies_, factory_) {
-                run(function() {
-                    addDefinition(
-                        id_,
-                        pastry.map(dependencies_, function(d) {
-                            return requireSync(d, id_, 1);
-                        }),
-                        factory_
-                    );
-                }, dependencies_);
-            }, id, dependencies, factory);
+        // 需要对元数据进行处理就绑定这个事件 {
+            Module.emit('module-metaGot', meta);
+        // }
+        // 新建实例、保存并且即时运行 {
+            mod = new Module(meta)
+                .processDeps()
+                .execute();
+        // }
+        // define事件 {
+            Module.emit('module-defined', mod);
         // }
     };
 
-    var undef,
-        definitions = {},
-        required    = {},
-        amd         = {
-            _pre  : stubHook,
-            _post : stubHook,
-            _req  : stubHook
-        },
-        require = define;
+    define.amd = {}; // 最小 AMD 实现
 
-    define.amd = {}; // 根据 amd 标准定义，要有这样一个属性
+    require = define; // 即时运行，require 和 define 等价
 
-    // 核心模块 {
-        define('pastry', pastry);
-        define('amd', amd);
+    // 核心模块定义 {
+        define('Module', function () {
+            return Module;
+        });
+        define('pastry', function () {
+            return pastry;
+        });
+        define('event', function () {
+            return event;
+        });
     // }
-
-    satisfy('require');
-
-    // 全局变量 {
+    // 输出 require 函数 {
         pastry.setGLOBAL('require' , require);
     // }
 }(this));
 
-/* jshint strict: true, undef: true, unused: true */
-/* global define */
-define('amd/hooks', [
-    'amd',
-    'pastry'
-], function(
-    amd,
-    pastry,
-    undef
-) {
-    'use strict';
-    /*
-     * @author      : 绝云(wensen.lws@alibaba-inc.com)
-     * @date        : 2014-10-07
-     * @description : amd 模块 - hooks
-     * @reference   : https://github.com/jivesoftware/amd.git
-     */
+;/* jshint strict: true, undef: true, unused: true */
+/* global define, document, location */
 
-    var allId  = '**',
-        queues = {};
-
-    function getQueue (eventType, id) {
-        var typeSpecific = queues[eventType] = queues[eventType] || {},
-            queue = typeSpecific[id] = typeSpecific[id] || [];
-
-        return queue;
-    }
-    function runCallbacks (eventType, args, callback) {
-        var callbacks = getQueue(eventType, allId).concat(getQueue(eventType, args[0]));
-
-        (function run(as) {
-            if (callbacks.length) {
-                callbacks.shift().apply(undef, as.concat(function() {
-                    run([].slice.call(arguments));
-                }));
-            } else {
-                callback.apply(undef, as);
-            }
-        }(args));
-    }
-    function on (eventType, id, callback) {
-        if (!callback) {
-            callback = id;
-            id = allId; // hook runs on every module
-        }
-        getQueue(eventType, id).push(callback);
-    }
-    function off (eventType, id, callback) {
-        if (pastry.isFunction(id)) {
-            callback = id;
-            id = allId; // hook runs on every module
-        }
-        var queue = getQueue(eventType, id || allId);
-
-        for (var i = 0; i < queue.length; i++) {
-            if (queue[i] === callback || !callback) {
-                queue.splice(i, 1); // Removes the matching callback from the array.
-                i -= 1; // Compensate for array length changing within the loop.
-            }
-        }
-    }
-
-    pastry.extend(amd, {
-        _pre: function(callback, id, dependencies, factory) {
-            runCallbacks('define', [
-                id,
-                dependencies,
-                factory
-            ], function(
-                id_,
-                deps_,
-                factory_
-            ) {
-                var finalDeps = [],
-                    count = deps_.length,
-                    len = count,
-                    getDep = function (n) {
-                        return function(dep) {
-                            finalDeps[n] = dep;
-                            if (!--count) {
-                                callback(id_, finalDeps, factory_);
-                            }
-                        };
-                    };
-
-                pastry.each(deps_, function (dep, i) {
-                    runCallbacks('require', [
-                        dep,
-                        id_
-                    ], getDep(i));
-                });
-                if (!len) {
-                    callback(id_, finalDeps, factory_);
-                }
-            });
-
-        },
-        _post: function(callback, id, moduleValue) {
-            if (id) {
-                runCallbacks('publish', [
-                    id,
-                    moduleValue
-                ], callback);
-            } else {
-                callback(id, moduleValue);
-            }
-        },
-        _req: function(callback, id, contextId) {
-            runCallbacks('require', [
-                id,
-                contextId
-            ], callback);
-        }
-    });
-
-    return {
-        on  : on,
-        off : off
-    };
-});
-
-/* jshint strict: true, undef: true, unused: true */
-/* global define */
-define('amd/normalize', [
+define('module/path', [
     'pastry',
-    'amd/hooks'
-], function(
+    'Module'
+], function (
     pastry,
-    hooks
+    Module
 ) {
     'use strict';
     /*
-     * @author      : 绝云(wensen.lws@alibaba-inc.com)
-     * @date        : 2014-10-07
-     * @description : amd 模块 - normalize
-     * @reference   : https://github.com/jivesoftware/amd.git
+     * @author      : wensen.lws
+     * @description : 模块路径问题
+     * @reference   : https://github.com/seajs/seajs/blob/master/src/util-path.js
+     * @note        : browser only
      */
+    var re = {
+            absolute       : /^\/\/.|:\//,
+            dirname        : /[^?#]*\//,
+            dot            : /\/\.\//g,
+            doubleDot      : /\/[^/]+\/\.\.\//,
+            ignoreLocation : /^(about|blob):/,
+            multiSlash     : /([^:/])\/+\//g,
+            path           : /^([^/:]+)(\/.+)$/,
+            rootDir        : /^.*?\/\/.*?\//
+        },
+        data         = Module._data,
+        doc          = document,
+        lc           = location,
+        href         = lc.href,
+        scripts      = doc.scripts,
+        loaderScript = doc.getElementById('moduleLoader') || scripts[scripts.length - 1],
+        loaderPath   = loaderScript.hasAttribute ? /* non-IE6/7 */ loaderScript.src : loaderScript.getAttribute('src', 4);
 
-    var relative = /^\.\.?\//;
+    function dirname(path) {
+        // dirname('a/b/c.js?t=123#xx/zz') ==> 'a/b/'
+        return path.match(re.dirname)[0];
+    }
+    function realpath(path) {
+        path = path.replace(re.dot, '/'); // /a/b/./c/./d ==> /a/b/c/d
+        // a//b/c ==> a/b/c
+        // a///b/////c ==> a/b/c
+        // DOUBLE_DOT_RE matches a/b/c//../d path correctly only if replace // with / first
+        path = path.replace(re.multiSlash, '$1/');
+        while (path.match(re.doubleDot)) {
+            // a/b/c/../../d  ==>  a/b/../d  ==>  a/d
+            path = path.replace(re.doubleDot, '/');
+        }
+        return path;
+    }
+    function normalize(path) {
+        // normalize('path/to/a') ==> 'path/to/a.js'
+        var last  = path.length - 1,
+            lastC = path.charCodeAt(last);
+        if (lastC === 35 /* '#' */) {
+            // If the uri ends with `#`, just return it without '#'
+            return path.substring(0, last);
+        }
+        return (path.substring(last - 2) === '.js' || path.indexOf('?') > 0 || lastC === 47 /* '/' */) ?
+            path : (path + '.js');
+    }
+    function parseAlias(id) {
+        var alias = data.alias;
+        return alias && pastry.isString(alias[id]) ? alias[id] : id;
+    }
+    function parsePaths(id) {
+        var m,
+            paths = data.paths;
+        if (paths && (m = id.match(re.path)) && pastry.isString(paths[m[1]])) {
+            id = paths[m[1]] + m[2];
+        }
+        return id;
+    }
+    function addBase(id, refUri) {
+        var ret,
+            first = id.charCodeAt(0);
 
-    function normalize(id, contextId) {
+        if (re.absolute.test(id)) { // Absolute
+            ret = id;
+        } else if (first === 46 /* '.' */) { // Relative
+            ret = (refUri ? dirname(refUri) : data.cwd) + id;
+        } else if (first === 47 /* '/' */) { // Root
+            var m = data.cwd.match(re.rootDir);
+            ret = m ? m[0] + id.substring(1) : id;
+        } else { // Top-level
+            ret = data.base + id;
+        }
+        if (ret.indexOf('//') === 0) { // Add default protocol when uri begins with '//'
+            ret = lc.protocol + ret;
+        }
+        return realpath(ret);
+    }
+    function id2Uri(id, refUri) {
         if (!id) {
-            return id;
+            return '';
         }
-        var parts = id.split('/'), contextParts, normalized = [];
+        id = parseAlias(id);
+        id = parsePaths(id);
+        id = parseAlias(id);
+        id = normalize(id);
+        id = parseAlias(id);
 
-        if (relative.test(id)) {
-            contextParts = contextId ? contextId.split('/').slice(0, -1) : [];
-            parts = contextParts.concat(parts);
-        }
-
-        pastry.each(parts, function (part) {
-            switch (part) {
-                case '.':
-                    break;
-                case '..':
-                    if (normalized.length < 1) {
-                        pastry.ERROR("Module id, "+ id +", with context, "+ contextId +", has too many '..' components.");
-                    }
-                    normalized.pop();
-                    break;
-                default:
-                    normalized.push(part);
-            }
-        });
-
-        return normalized.join('/');
+        var uri = addBase(id, refUri);
+        uri = parseAlias(uri);
+        return uri;
     }
 
-    hooks.on('define', function(id, dependencies, factory, next) {
-        next(id, pastry.map(dependencies, function(d) {
-            return normalize(d, id);
-        }), factory);
-    });
-    hooks.on('require', function(id, contextId, next) {
-        next(normalize(id, contextId), contextId);
-    });
-
-    return normalize;
-});
-
-/* jshint strict: true, undef: true, unused: true */
-/* global define */
-define('amd/plugins', [
-    'amd/hooks',
-    'amd/normalize'
-], function(
-    hooks,
-    normalize
-) {
-    'use strict';
-    /*
-     * @author      : 绝云(wensen.lws@alibaba-inc.com)
-     * @date        : 2014-10-07
-     * @description : amd 模块 - plugins
-     * @reference   : https://github.com/jivesoftware/amd.git
-     */
-
-    var started = {},
-        exp = /^(.*?)!(.*)/;
-
-    hooks.on('require', function(id, contextId, next) {
-        var matches = exp.exec(id),
-            plugin, resource;
-
-        if (!matches) {
-            next(id, contextId);
-        } else {
-            plugin   = normalize(matches[1], contextId);
-            resource = matches[2];
-
-            require([plugin], function(p) {
-                var normResource, normDep;
-
-                if (p.normalize) {
-                    normResource = p.normalize(resource, function(r) {
-                        return normalize(r, contextId);
-                    });
-                } else {
-                    normResource = normalize(resource, contextId);
-                }
-
-                normDep = plugin +'!'+ normResource;
-                if (!started[normDep]) {
-                    started[normDep] = true;
-                    p.load(normResource, require, function(value) {
-                        define(normDep, function() {
-                            return value;
-                        });
-                    });
-                }
-                next(normDep, contextId);
-            });
-        }
-    });
-});
-
-/* jshint strict: true, undef: true, unused: true */
-/* global define, document */
-define('amd/loader', [
-    'pastry',
-    'require',
-    'amd/hooks'
-], function(
-    pastry,
-    require,
-    hooks
-) {
-    'use strict';
-    /*
-     * @author      : 绝云(wensen.lws@alibaba-inc.com)
-     * @date        : 2014-10-07
-     * @description : amd 模块 - hooks
-     * @reference   : https://github.com/jivesoftware/amd.git
-     */
-
-    var mappings  = {},
-        callbacks = {},
-        loaded    = {},
-        requested = {};
-
-    function noop () {}
-    function maybeLoad (id) {
-        var urls, callback;
-
-        if (!require(id) && (urls = mappings[id])) {
-            delete mappings[id];
-            callback = callbacks[id];
-            clearValue(callbacks, callback);
-            loadInOrder(urls, callback);
-        } else {
-            requested[id] = true;
-        }
-    }
-    function loadInOrder (urls, callback) {
-        if (urls[0]) {
-            load(urls[0], function() {
-                loadInOrder(urls.slice(1), callback);
-            });
-        } else if (callback) {
-            callback();
-        }
-    }
-    function load (src, callback) {
-        var prevCallback = loaded[src];
-
-        if (true === prevCallback) {
-            if (pastry.isFunction(callback)) {
-                callback();
-            }
-        } else if (callback) {
-            loaded[src] = chain(prevCallback, callback);
-        }
-        if (prevCallback) {
-            return;
-        }
-        var firstScript = document.getElementsByTagName('script')[0],
-            head        = firstScript.parentNode,
-            script      = document.createElement('script');
-
-        script.src   = src;
-        script.async = true;
-        script.onreadystatechange = script.onload = function() {
-            if (!script.readyState || /loaded|complete/.test(script.readyState)) {
-                script.onload = script.onreadystatechange = noop;
-                head.removeChild(script);
-
-                (loaded[src] || noop)();
-                loaded[src] = true;
-            }
-        };
-        head.insertBefore(script, firstScript);
-    }
-    function clearValue (map, value) {
-        pastry.each(map, function (v, key) {
-            if (v === value) {
-                delete map[key];
-            }
-        });
-    }
-    function chain (f, g) {
-        return function() {
-            if (pastry.isFunction(f)) {
-                f();
-            }
-            g();
-        };
-    }
-    function map (ids, urls, callback) {
-        pastry.each(ids, function (id) {
-            mappings[id] = urls;
-            callbacks[id] = callback;
-            if (requested[id]) {
-                maybeLoad(id);
-            }
-        });
-    }
-
-    hooks.on('define', function(id, dependencies, factory, next) {
-        pastry.each(dependencies, function (dep) {
-            maybeLoad(dep);
-        });
-        next(id, dependencies, factory);
-    });
+    data.cwd  = (!href || re.ignoreLocation.test(href)) ? '' : dirname(href);
+    data.path = loaderPath;
+    data.dir  = data.base = dirname(loaderPath || data.cwd);
 
     return {
-        map: map
+        id2Uri: id2Uri
     };
 });
 
-/* jshint strict: true, undef: true, unused: true */
+;/* jshint strict: true, undef: true, unused: true */
+/* global define, document */
+
+define('module/request', [
+    'pastry',
+    'Module'
+], function (
+    pastry,
+    Module
+) {
+    'use strict';
+    /*
+     * @author      : wensen.lws
+     * @description : 异步请求脚本或者其它资源
+     * @note        : browser only
+     */
+    var
+        // data        = Module._data,
+        doc         = document,
+        head        = doc.head || doc.getElementsByTagName('head')[0] || doc.documentElement,
+        baseElement = head.getElementsByTagName('base')[0];
+
+    function addOnload(node, callback, url) {
+        var supportOnload = 'onload' in node;
+
+        function onload(error) {
+            // Ensure only run once and handle memory leak in IE
+            node.onload = node.onerror = node.onreadystatechange = null;
+
+            // Remove the script to reduce memory leak
+            // if (!data.debug) {
+            //     head.removeChild(node);
+            // }
+
+            // Dereference the node
+            node = null;
+            if (pastry.isFunction(callback)) {
+                callback(error);
+            }
+        }
+
+        if (supportOnload) {
+            node.onload = onload;
+            node.onerror = function() {
+                Module.emit('error', { uri: url, node: node });
+                onload(true);
+            };
+        } else {
+            node.onreadystatechange = function() {
+                if (/loaded|complete/.test(node.readyState)) {
+                    onload();
+                }
+            };
+        }
+    }
+    function request(url, callback, charset, crossorigin) {
+        var node = doc.createElement('script');
+
+        if (charset) {
+            var cs = pastry.isFunction(charset) ? charset(url) : charset;
+            if (cs) {
+                node.charset = cs;
+            }
+        }
+
+        // crossorigin default value is `false`.
+        var cors = pastry.isFunction(crossorigin) ? crossorigin(url) : crossorigin;
+        if (cors !== false) {
+            node.crossorigin = cors;
+        }
+
+        addOnload(node, callback, url);
+
+        node.async = true;
+        node.src = url;
+
+        // For some cache cases in IE 6-8, the script executes IMMEDIATELY after
+        // the end of the insert execution, so use `currentlyAddingScript` to
+        // hold current node, for deriving url in `define` call
+        Module.currentlyAddingScript = node;
+
+        if (baseElement) {
+            // ref: #185 & http://dev.jquery.com/ticket/2709
+            head.insertBefore(node, baseElement);
+        } else {
+            head.appendChild(node);
+        }
+        Module.currentlyAddingScript = null;
+    }
+
+    return request;
+});
+
+;/* jshint strict: true, undef: true, unused: true */
+/* global define, document, window */
+
+define('module/loader', [
+    'pastry',
+    'Module',
+    'module/path',
+    'module/request'
+], function (
+    pastry,
+    Module,
+    path,
+    request
+) {
+    'use strict';
+    /*
+     * @author      : wensen.lws
+     * @description : 异步加载模块
+     * @note        : browser only
+     */
+    var data          = Module._data,
+        moduleByUri   = data.moduleByUri,
+        executedByUri = data.executedByUri,
+        loadingByUri  = data.loadingByUri = {},
+        doc           = document,
+        win           = window,
+        id2Uri        = path.id2Uri,
+        interactiveScript;
+
+    Module.resolve = id2Uri;
+    Module.request = request;
+
+    function getCurrentScript() {
+        if (Module.currentlyAddingScript) {
+            return Module.currentlyAddingScript.src;
+        }
+        // 取得正在解析的script节点
+        if (doc.currentScript) { // firefox 4+
+            return doc.currentScript.src;
+        }
+        // 参考 https://github.com/samyk/jiagra/blob/master/jiagra.js
+        var stack;
+        try {
+            throw new Error();
+        } catch(e) { // safari的错误对象只有line, sourceId, sourceURL
+            stack = e.stack;
+            if (!stack && win.opera) {
+                // opera 9没有e.stack,但有e.Backtrace,但不能直接取得,需要对e对象转字符串进行抽取
+                stack = (String(e).match(/of linked script \S+/g) || []).join(' ');
+            }
+        }
+        if (stack) {
+            /*
+             * e.stack最后一行在所有支持的浏览器大致如下:
+             * chrome23: at http://113.93.50.63/data.js:4:1
+             * firefox17: @http://113.93.50.63/query.js:4
+             * opera12: @http://113.93.50.63/data.js:4
+             * IE10: at Global code (http://113.93.50.63/data.js:4:1)
+             */
+            stack = stack.split( /[@ ]/g).pop(); // 取得最后一行,最后一个空格或@之后的部分
+            stack = (stack[0] === '(') ? stack.slice(1, -1) : stack;
+            return stack.replace(/(:\d+)?:\d+$/i, ''); // 去掉行号与或许存在的出错字符起始位置
+        }
+        if (interactiveScript && interactiveScript.readyState === "interactive") {
+            return interactiveScript.src;
+        }
+        var nodes = doc.getElementsByTagName('script');
+        for (var i = 0, node; node = nodes[i++];) {
+            if (node.readyState === 'interactive') {
+                interactiveScript = node;
+                return node.src;
+            }
+        }
+    }
+
+    Module
+        .on('module-metaGot', function (meta) {
+            var src = getCurrentScript();
+            if (src) {
+                meta.uri = src;
+            } else {
+                meta.uri = data.cwd;
+            }
+            if (src === '' || (pastry.isString(src) && src.indexOf(data.cwd) > -1)) {
+                if (meta.id) { // script tag 中的具名模块
+                    // meta.id = './' + meta.id; // @FIXME 去掉这个处理
+                } else { // script tag 中的匿名模块
+                    meta.uri = data.cwd + ('#' + pastry.uuid());
+                }
+            }
+        })
+        .on('module-inited', function (mod) {
+            if (!(pastry.isString(mod.uri) && mod.uri.indexOf('/') > -1)) {
+                pastry.extend(mod, {
+                    uri: id2Uri(mod.id)
+                });
+            }
+        })
+        .on('module-depsProcessed', function (mod) {
+            pastry.each(mod.deps, function (id, index) {
+                var uri;
+                if (moduleByUri[id]) {
+                    uri = id;
+                } else {
+                    uri = id2Uri(id, mod.uri);
+                }
+                mod.deps[index] = uri;
+                if (!moduleByUri[uri] && !loadingByUri[uri] && !executedByUri[uri]) {
+                    request(uri);
+                    loadingByUri[uri] = true;
+                }
+            });
+        });
+});
+
+;/* jshint strict: true, undef: true, unused: true */
 /* global define */
+
+define('module/config', [
+    'Module'
+], function(
+    Module
+) {
+    'use strict';
+    /*
+     * @author      : 绝云 (wensen.lws@alibaba-inc.com)
+     * @description : configuration
+     * @TODO
+     */
+    Module.config = function () { };
+    // var  module;
+    // return  module;
+});
+
+;/* jshint strict: true, undef: true, unused: true */
+/* global define */
+
 define('fmt/date', [
     // 'pastry',
 ], function(
@@ -1150,7 +1248,7 @@ define('fmt/date', [
             mi = date.getMinutes(),
             s  = date.getSeconds(),
             ms = date.getMilliseconds();
-        pattern = pattern || '{YYYY}-{MM}-{DD} {hh}:{mm}:{ss}';
+        pattern = pattern || '{YYYY}-{MM}-{DD}T{hh}:{mm}:{ss}Z';
 
         return pattern
             .replace( '{YYYY}', y              )
@@ -1170,7 +1268,7 @@ define('fmt/date', [
     };
 });
 
-/* jshint strict: true, undef: true, unused: true */
+;/* jshint strict: true, undef: true, unused: true */
 /* global define */
 define('fmt/sprintf', [
     'pastry'
@@ -1301,8 +1399,7 @@ define('fmt/sprintf', [
     });
     return sprintf;
 });
-
-/* jshint strict: true, undef: true, unused: true */
+;/* jshint strict: true, undef: true, unused: true */
 /* global define */
 define('fmt/vsprintf', [
     'pastry',
@@ -1328,10 +1425,10 @@ define('fmt/vsprintf', [
     });
     return vsprintf;
 });
-
-/* jshint strict: true, undef: true, unused: true */
+;/* jshint strict: true, undef: true, unused: true */
 /* global define */
-define('shim/json', [
+
+define('json', [
     'pastry',
     'fmt/date'
 ], function(
@@ -1372,7 +1469,7 @@ define('shim/json', [
                 };
             });
             D2JSON = function () {
-                return isFinite(this.valueOf()) ? fmtDate(this, '{YYY}-{MM}-{DD}T{hh}:{mm}:{ss}Z') : null;
+                return isFinite(this.valueOf()) ? fmtDate(this) : null;
             };
         }
     // }
@@ -1543,3 +1640,361 @@ define('shim/json', [
     exportJSON(shim);
     return shim;
 });
+
+;/* jshint strict: true, undef: true, unused: true */
+/* global define, decodeURIComponent, encodeURIComponent */
+
+define('querystring', [
+    'pastry'
+], function(
+    pastry
+) {
+    'use strict';
+    /*
+     * @author      : 绝云(wensen.lws@alibaba-inc.com)
+     * @date        : 2014-11-19
+     * @description : querystring 模块
+     * @note        : browsers only
+     */
+
+    var escape = encodeURIComponent,
+
+        unescape = function (s) {
+            return decodeURIComponent(s.replace(/\+/g, ' '));
+        },
+
+        querystring = {
+            /*
+             * @description : override default encoding method
+             * @syntax      : querystring.escape(str)
+             * @param       : {String} str, unescaped string.
+             * @return      : {String} escaped string.
+             */
+            escape: escape,
+
+            /*
+             * @description : override default decoding method
+             * @syntax      : querystring.unescape(str)
+             * @param       : {String} str, escaped string.
+             * @return      : {String} unescaped string.
+             */
+            unescape: unescape,
+
+            parse: function (qs, sep, eq) {
+                /*
+                 * @description : accept query strings and return native javascript objects.
+                 * @syntax      : querystring.parse(str)
+                 * @param       : {String} str, query string to be parsed.
+                 * @return      : {Object} parsed object.
+                 */
+                sep = sep || "&";
+                eq  = eq  || "=";
+                var tuple,
+                    obj = {},
+                    pieces = qs.split(sep);
+
+                pastry.each(pieces, function (elem) {
+                    tuple = elem.split(eq);
+                    if (tuple.length > 0) {
+                        obj[unescape(tuple.shift())] = unescape(tuple.join(eq));
+                    }
+                });
+                return obj;
+            },
+            stringify: function (obj, c) {
+                /*
+                 * @description : converts an arbitrary value to a query string representation.
+                 * @syntax      : querystring.stringify(obj)
+                 * @param       : {object} obj, object to be stringified
+                 * @return      : {String} query string.
+                 */
+                var qs = [],
+                    s = c && c.arrayKey ? true : false;
+
+                pastry.each(obj, function (value, key) {
+                    if (pastry.isArray(value)) {
+                        pastry.each(value, function (elem) {
+                            qs.push(escape(s ? key + '[]' : key) + '=' + escape(elem));
+                        });
+                    }
+                    else {
+                        qs.push(escape(key) + '=' + escape(value));
+                    }
+                });
+                return qs.join('&');
+            }
+        };
+
+    return querystring;
+});
+
+;/* jshint strict: true, undef: true, unused: true */
+/* global define, location, navigator, ActiveXObject */
+
+define('bom/info', [
+    'pastry'
+], function(
+    pastry
+) {
+    'use strict';
+    /*
+     * @author      : 绝云 (wensen.lws@alibaba-inc.com)
+     * @description : 记录各种浏览器相关的版本号
+     */
+    var nav       = navigator || {},
+        userAgent = nav.userAgent,
+        platform  = nav.platform,
+        plugins   = nav.plugins;
+
+    function toInt (value, base) {
+        return parseInt(value, base || 10);
+    }
+    function setVerInt (versions, key, strVal) {
+        versions[key] = toInt(strVal);
+    }
+    function setVer (versions, str, reg) {
+        var matched = str.match(reg);
+        if (matched) {
+            setVerInt(versions, matched[0].match(/\w*/)[0], matched[1] || 0);
+        }
+    }
+    function detectPlatform (str) {
+        /*
+         * @description : detect platform
+         * @param       : {string} platformStr, platform defined string.
+         * @syntax      : detectPlatform(platformStr)
+         * @return      : {string} platform. (mac|windows|linux...)
+         */
+        if (!str) {
+            return;
+        }
+        var result = pastry.lc(str).match(/mac|win|linux|ipad|ipod|iphone|android/);
+        return pastry.isArray(result) ? result[0] : result;
+    }
+    function detectPlugin (arr) {
+        /*
+         * @description : detect plugins (now flash only)
+         * @param       : {array } plugins, plugin list
+         * @syntax      : detectPlugin(plugins)
+         * @return      : {object} { 'flash' : 0|xx }
+         */
+
+        return {
+            flash: (function () {
+                var flash,
+                    v      = 0,
+                    startV = 13;
+                if (arr && arr.length) {
+                    flash = arr['Shockwave Flash'];
+                    if (flash && flash.description) {
+                        v = flash.description.match(/\b(\d+)\.\d+\b/)[1] || v;
+                    }
+                } else {
+                    while (startV --) {
+                        try {
+                            new ActiveXObject('ShockwaveFlash.ShockwaveFlash.' + startV);
+                            v = startV;
+                            break;
+                        } catch(e) {}
+                    }
+                }
+                return toInt(v);
+            }())
+        };
+    }
+    function detectVersion (str) {
+        /*
+         * @description : detect versions
+         * @param       : {string} userAgent, window.navigator.userAgent
+         * @syntax      : PT.detectVer(userAgent)
+         * @return      : {object} { 'flash' : 0|xx }
+         */
+
+        if (!str) {
+            return;
+        }
+        str = pastry.lc(str);
+        var ieVer,
+            matched,
+            versions = {};
+
+        // browser versions {
+            pastry.each([
+                /msie ([\d.]+)/     ,
+                /firefox\/([\d.]+)/ ,
+                /chrome\/([\d.]+)/  ,
+                /crios\/([\d.]+)/   ,
+                /opera.([\d.]+)/    ,
+                /adobeair\/([\d.]+)/
+            ], function (reg) {
+                setVer(versions, str, reg);
+            });
+        // }
+        // chrome {
+            if (versions.crios) {
+                versions.chrome = versions.crios;
+            }
+        // }
+        // safari {
+            matched = str.match(/version\/([\d.]+).*safari/);
+            if (matched) {
+                setVerInt(versions, 'safari', matched[1] || 0);
+            }
+        // }
+        // safari mobile {
+            matched = str.match(/version\/([\d.]+).*mobile.*safari/);
+            if (matched) {
+                setVerInt(versions, 'mobilesafari', matched[1] || 0);
+            }
+        // }
+        // engine versions {
+            pastry.each([
+                /trident\/([\d.]+)/     ,
+                /gecko\/([\d.]+)/       ,
+                /applewebkit\/([\d.]+)/ ,
+                /presto\/([\d.]+)/
+            ], function (reg) {
+                setVer(versions, str, reg);
+            });
+            // IE {
+                ieVer = versions.msie;
+                if (ieVer === 6) {
+                    versions.trident = 4;
+                } else if (ieVer === 7 || ieVer === 8) {
+                    versions.trident = 5;
+                }
+            // }
+        // }
+        return versions;
+    }
+
+    return {
+        host      : location.host,
+        platform  : detectPlatform(platform) || detectPlatform(userAgent) || 'unknown',
+        plugins   : detectPlugin(plugins),
+        userAgent : userAgent,
+        versions  : detectVersion(userAgent)
+    };
+});
+
+;/* jshint strict: true, undef: true, unused: true */
+/* global define, XMLHttpRequest, ActiveXObject, location */
+
+define('io/ajax', [
+    'pastry',
+    'json',
+    'querystring',
+    'bom/info'
+], function(
+    pastry,
+    JSON,
+    querystring,
+    bomInfo
+) {
+    'use strict';
+    /*
+     * @author      : 绝云(wensen.lws@alibaba-inc.com)
+     * @date        : 2014-11-19
+     * @description : io 模块 - ajax
+     */
+
+    function getXHR () {
+        return pastry.getAny([
+            function () { return new XMLHttpRequest();                   },
+            function () { return new ActiveXObject('MSXML2.XMLHTTP');    },
+            function () { return new ActiveXObject('Microsoft.XMLHTTP'); }
+        ]);
+    }
+
+    var ajax = function (uri, option) {
+        /*
+         * @description : ajax.
+         * @syntax      : [pastry.]ajax(uri[, option])[.error(callback)][.success(callback)]..
+         * @param       : {String} uri, uri.
+         * @param       : {Object} option, option.
+         * @return      : {this  } return itself for chain operations.
+         */
+        option = option || {};
+        var xhr         = getXHR(),
+            method      = option.method ? pastry.uc(option.method)               : 'GET',
+            type        = option.type   ? pastry.lc(option.type)                 : 'xml',
+            data        = option.data   ? pastry.QueryStr.stringify(option.data) : null,
+            contentType = option.contentType,
+            isAsync     = option.isAsync;
+
+        // add handlers {
+            pastry.each([
+                'abort'     ,
+                'error'     ,
+                'load'      ,
+                'loadend'   ,
+                'loadstart' ,
+                'progress'  ,
+                'success'   ,
+                'timeout'
+            ], function (handler) {
+                /*
+                 * @description : event handlers.
+                 * @param       : {Function} callback, callback function.
+                 */
+                if (option[handler]) {
+                    xhr['on' + handler] = option[handler];
+                }
+            });
+        // }
+        // success / error callback {
+            xhr.isSuccess = function () {
+                /*
+                 * @description : is ajax request success
+                 * @syntax      : pastry.ajax.isSuccess()
+                 * @return      : {Boolean} is ajax request successfully porformed
+                 */
+                var status = xhr.status;
+                return (status >= 200 && status < 300)            ||
+                       (status === 304)                           ||
+                       (!status && location.protocol === 'file:') ||
+                       (!status && bomInfo.versions.safari);
+            };
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.isSuccess() && option.success) {
+                        var response = xhr.responseText;
+                        if (type === 'json') {
+                            response = pastry.tryAny([function () { return JSON.parse(response); }]) || response;
+                        }
+                        xhr.onsuccess(response);
+                    } else if (option.error) {
+                        xhr.onerror(xhr.statusText);
+                    }
+                }
+            };
+        // }
+        // progress ajax {
+            if (method === 'GET') {
+                if (data) {
+                    uri += (pastry.hasSubString(uri, '?') ? '&' : '?') + data;
+                }
+                xhr.open(method, uri, isAsync);
+                xhr.setRequestHeader(
+                        'Content-Type',
+                        contentType || 'text/plain;charset=UTF-8'
+                    );
+            } else if (method === 'POST'){
+                xhr.open(method, uri, isAsync);
+                xhr.setRequestHeader(
+                        'Content-Type',
+                        contentType || 'application/x-www-form-urlencoded;charset=UTF-8'
+                    );
+            } else {
+                xhr.open(method, uri, isAsync);
+            }
+            xhr.send(data);
+        // }
+    };
+
+    pastry.mixin({
+        ajax: ajax
+    });
+    return ajax;
+});
+

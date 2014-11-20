@@ -46,6 +46,7 @@ var define;
             pastry.extend(mod, meta);
             Module.emit('module-inited', mod);
             moduleByUri[mod.uri] = mod;
+            moduleByUri[mod.id]  = mod;
             queueByUri[mod.uri]  = mod;
             return mod;
         },
@@ -65,14 +66,16 @@ var define;
                 return !!executedByUri[uri];
             })) {
                 var modFactory = mod.factory,
-                    modUri     = mod.uri;
+                    modUri     = mod.uri,
+                    modId      = mod.id;
 
                 pastry.each(mod.deps, function (uri) {
                     depModExports.push(exportsByUri[uri]);
                 });
-                mod.exports = exportsByUri[modUri] = pastry.isFunction(modFactory) ?
+                mod.exports = exportsByUri[modUri] = exportsByUri[modId] = pastry.isFunction(modFactory) ?
                     modFactory.apply(undef, depModExports) : modFactory;
                 executedByUri[modUri] = true;
+                executedByUri[modId]  = true;
                 delete queueByUri[modUri];
                 Module.emit('module-executed', mod);
             }

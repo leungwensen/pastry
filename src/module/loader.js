@@ -82,9 +82,9 @@ define('module/loader', [
                 meta.uri = data.cwd;
             }
             if (src === '' || (pastry.isString(src) && src.indexOf(data.cwd) > -1)) {
-                if (meta.id) { // script 中的具名模块
-                    meta.id = './' + meta.id;
-                } else { // script 中的匿名模块
+                if (meta.id) { // script tag 中的具名模块
+                    // meta.id = './' + meta.id; // @FIXME 去掉这个处理
+                } else { // script tag 中的匿名模块
                     meta.uri = data.cwd + ('#' + pastry.uuid());
                 }
             }
