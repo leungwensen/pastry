@@ -1,5 +1,6 @@
 /* jshint strict: true, undef: true, unused: true */
 /* global define */
+
 define('fmt/sprintf', [
     'pastry'
 ], function(
@@ -11,6 +12,11 @@ define('fmt/sprintf', [
      * @date        : 2014-10-07
      * @description : fmt 模块 - sprintf
      */
+
+    function toInt (str, base) {
+        return parseInt(str, base || 10);
+    }
+
     var reg = /%(\+)?([0 ]|'(.))?(-)?([0-9]+)?(\.([0-9]+))?([%bcdfosxX])/g,
 
         sprintf = function(format) {
@@ -19,9 +25,9 @@ define('fmt/sprintf', [
             }
 
             var part,
-                parts = [],
+                parts      = [],
                 paramIndex = 1,
-                args = pastry.toArray(arguments);
+                args       = pastry.toArray(arguments);
 
             while (part = reg.exec(format)) {
                 if ((paramIndex >= args.length) && (part[8] !== '%')) {
@@ -44,7 +50,7 @@ define('fmt/sprintf', [
 
             var i, j, preSubStr, origLength,
                 newString = '',
-                start = 0;
+                start     = 0;
 
             for (i = 0; i < parts.length; i ++) {
                 newString += format.substring(start, parts[i].begin);
@@ -57,13 +63,13 @@ define('fmt/sprintf', [
                         preSubStr = '%';
                         break;
                     case 'b':
-                        preSubStr = Math.abs(parseInt(parts[i].data)).toString(2);
+                        preSubStr = Math.abs(toInt(parts[i].data)).toString(2);
                         break;
                     case 'c':
-                        preSubStr = String.fromCharCode(Math.abs(parseInt(parts[i].data)));
+                        preSubStr = String.fromCharCode(Math.abs(toInt(parts[i].data)));
                         break;
                     case 'd':
-                        preSubStr = String(Math.abs(parseInt(parts[i].data)));
+                        preSubStr = String(Math.abs(toInt(parts[i].data)));
                         break;
                     case 'f':
                         preSubStr = (parts[i].precision === false) ?
@@ -71,16 +77,16 @@ define('fmt/sprintf', [
                             (Math.abs(parseFloat(parts[i].data)).toFixed(parts[i].precision));
                         break;
                     case 'o':
-                        preSubStr = Math.abs(parseInt(parts[i].data)).toString(8);
+                        preSubStr = Math.abs(toInt(parts[i].data)).toString(8);
                         break;
                     case 's':
                         preSubStr = parts[i].data.substring(0, parts[i].precision ? parts[i].precision : parts[i].data.length);
                         break;
                     case 'x':
-                        preSubStr = Math.abs(parseInt(parts[i].data)).toString(16).toLowerCase();
+                        preSubStr = Math.abs(toInt(parts[i].data)).toString(16).toLowerCase();
                         break;
                     case 'X':
-                        preSubStr = Math.abs(parseInt(parts[i].data)).toString(16).toUpperCase();
+                        preSubStr = Math.abs(toInt(parts[i].data)).toString(16).toUpperCase();
                         break;
                     default:
                         pastry.ERROR('sprintf: Unknown type "' + parts[i].type + '" detected. This should never happen. Maybe the regex is wrong.');
@@ -115,12 +121,10 @@ define('fmt/sprintf', [
                         preSubStr = '+' + preSubStr;
                     }
                 }
-
                 newString += preSubStr;
             }
 
             newString += format.substring(start, format.length);
-
             return newString;
         };
 

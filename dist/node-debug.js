@@ -926,6 +926,7 @@ define('fmt/date', [
 
 /* jshint strict: true, undef: true, unused: true */
 /* global define */
+
 define('fmt/sprintf', [
     'pastry'
 ], function(
@@ -937,6 +938,11 @@ define('fmt/sprintf', [
      * @date        : 2014-10-07
      * @description : fmt 模块 - sprintf
      */
+
+    function toInt (str, base) {
+        return parseInt(str, base || 10);
+    }
+
     var reg = /%(\+)?([0 ]|'(.))?(-)?([0-9]+)?(\.([0-9]+))?([%bcdfosxX])/g,
 
         sprintf = function(format) {
@@ -945,9 +951,9 @@ define('fmt/sprintf', [
             }
 
             var part,
-                parts = [],
+                parts      = [],
                 paramIndex = 1,
-                args = pastry.toArray(arguments);
+                args       = pastry.toArray(arguments);
 
             while (part = reg.exec(format)) {
                 if ((paramIndex >= args.length) && (part[8] !== '%')) {
@@ -970,7 +976,7 @@ define('fmt/sprintf', [
 
             var i, j, preSubStr, origLength,
                 newString = '',
-                start = 0;
+                start     = 0;
 
             for (i = 0; i < parts.length; i ++) {
                 newString += format.substring(start, parts[i].begin);
@@ -983,13 +989,13 @@ define('fmt/sprintf', [
                         preSubStr = '%';
                         break;
                     case 'b':
-                        preSubStr = Math.abs(parseInt(parts[i].data)).toString(2);
+                        preSubStr = Math.abs(toInt(parts[i].data)).toString(2);
                         break;
                     case 'c':
-                        preSubStr = String.fromCharCode(Math.abs(parseInt(parts[i].data)));
+                        preSubStr = String.fromCharCode(Math.abs(toInt(parts[i].data)));
                         break;
                     case 'd':
-                        preSubStr = String(Math.abs(parseInt(parts[i].data)));
+                        preSubStr = String(Math.abs(toInt(parts[i].data)));
                         break;
                     case 'f':
                         preSubStr = (parts[i].precision === false) ?
@@ -997,16 +1003,16 @@ define('fmt/sprintf', [
                             (Math.abs(parseFloat(parts[i].data)).toFixed(parts[i].precision));
                         break;
                     case 'o':
-                        preSubStr = Math.abs(parseInt(parts[i].data)).toString(8);
+                        preSubStr = Math.abs(toInt(parts[i].data)).toString(8);
                         break;
                     case 's':
                         preSubStr = parts[i].data.substring(0, parts[i].precision ? parts[i].precision : parts[i].data.length);
                         break;
                     case 'x':
-                        preSubStr = Math.abs(parseInt(parts[i].data)).toString(16).toLowerCase();
+                        preSubStr = Math.abs(toInt(parts[i].data)).toString(16).toLowerCase();
                         break;
                     case 'X':
-                        preSubStr = Math.abs(parseInt(parts[i].data)).toString(16).toUpperCase();
+                        preSubStr = Math.abs(toInt(parts[i].data)).toString(16).toUpperCase();
                         break;
                     default:
                         pastry.ERROR('sprintf: Unknown type "' + parts[i].type + '" detected. This should never happen. Maybe the regex is wrong.');
@@ -1041,12 +1047,10 @@ define('fmt/sprintf', [
                         preSubStr = '+' + preSubStr;
                     }
                 }
-
                 newString += preSubStr;
             }
 
             newString += format.substring(start, format.length);
-
             return newString;
         };
 
@@ -1057,6 +1061,7 @@ define('fmt/sprintf', [
 });
 /* jshint strict: true, undef: true, unused: true */
 /* global define */
+
 define('fmt/vsprintf', [
     'pastry',
     'fmt/sprintf'
@@ -1070,7 +1075,6 @@ define('fmt/vsprintf', [
      * @date        : 2014-10-29
      * @description : fmt 模块 - vsprintf
      */
-
     var vsprintf = function(fmt, argv) {
         argv.unshift(fmt);
         return sprintf.apply(null, argv);
@@ -1081,6 +1085,7 @@ define('fmt/vsprintf', [
     });
     return vsprintf;
 });
+
 /* jshint strict: true, undef: true, unused: true */
 /* global define */
 
@@ -1098,7 +1103,6 @@ define('json', [
      * @description : shim 模块 - JSON
      * @reference   : https://github.com/douglascrockford/JSON-js
      */
-
     function exportJSON (obj) {
         pastry.mixin({
             JSON: obj
@@ -1131,7 +1135,7 @@ define('json', [
     // }
 
     var gap, indent, rep,
-        cx = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
+        cx        = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
         escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
 
         meta = {
@@ -1154,7 +1158,7 @@ define('json', [
 
         str = function (key, holder) {
             var v, partial,
-                mind = gap,
+                mind  = gap,
                 value = holder[key];
 
             if (value && pastry.isFunction(value.toJSON)) {
@@ -1224,9 +1228,9 @@ define('json', [
                  * @syntax      : JSON.stringify(value).
                  */
                 var i;
-                gap = '';
+                gap    = '';
                 indent = '';
-                rep = replacer;
+                rep    = replacer;
 
                 if (pastry.isNumber(space)) {
                     for (i = 0; i < space; i += 1) {

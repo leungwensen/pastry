@@ -13,7 +13,6 @@ define('querystring', [
      * @description : querystring 模块
      * @note        : browsers only
      */
-
     var escape = encodeURIComponent,
 
         unescape = function (s) {
@@ -47,7 +46,7 @@ define('querystring', [
                 sep = sep || "&";
                 eq  = eq  || "=";
                 var tuple,
-                    obj = {},
+                    obj    = {},
                     pieces = qs.split(sep);
 
                 pastry.each(pieces, function (elem) {
@@ -66,7 +65,7 @@ define('querystring', [
                  * @return      : {String} query string.
                  */
                 var qs = [],
-                    s = c && c.arrayKey ? true : false;
+                    s  = c && c.arrayKey ? true : false;
 
                 pastry.each(obj, function (value, key) {
                     if (pastry.isArray(value)) {
