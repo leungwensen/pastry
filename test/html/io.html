@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>module</title>
+</head>
+<body>
+    <script src="../../dist/browser-debug.js"></script>
+    <script>
+        require([
+            'io/ajax'
+        ], function (
+            ajax
+        ) {
+            ajax('../../src/io/ajax.js', {
+                success: function (text) {
+                    console.log(text);
+                    ajax('../src/io/ajax.js', {
+                        error: function (err) {
+                            console.log(err);
+                            ajax('../../package.json', {
+                                type: 'json',
+                                success: function (obj) {
+                                    console.log(obj);
+                                },
+                                error: function (obj) {
+                                    console.log(obj);
+                                },
+                            });
+                        },
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -635,7 +635,7 @@
     // }
 }(this));
 
-;/* jshint strict: true, undef: true, unused: true */
+/* jshint strict: true, undef: true, unused: true */
 // /* global xxx, yyy */
 
 (function(GLOBAL) {
@@ -713,7 +713,7 @@
     // }
 }(this));
 
-;/* jshint strict: true, undef: true, unused: true */
+/* jshint strict: true, undef: true, unused: true */
 // /* global document */
 
 var define;
@@ -857,7 +857,7 @@ var define;
     // }
 }(this));
 
-;/* jshint strict: true, undef: true, unused: true */
+/* jshint strict: true, undef: true, unused: true */
 /* global define */
 
 define('fmt/date', [
@@ -924,7 +924,7 @@ define('fmt/date', [
     };
 });
 
-;/* jshint strict: true, undef: true, unused: true */
+/* jshint strict: true, undef: true, unused: true */
 /* global define */
 define('fmt/sprintf', [
     'pastry'
@@ -1055,7 +1055,7 @@ define('fmt/sprintf', [
     });
     return sprintf;
 });
-;/* jshint strict: true, undef: true, unused: true */
+/* jshint strict: true, undef: true, unused: true */
 /* global define */
 define('fmt/vsprintf', [
     'pastry',
@@ -1081,7 +1081,7 @@ define('fmt/vsprintf', [
     });
     return vsprintf;
 });
-;/* jshint strict: true, undef: true, unused: true */
+/* jshint strict: true, undef: true, unused: true */
 /* global define */
 
 define('json', [

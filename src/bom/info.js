@@ -76,7 +76,7 @@ define('bom/info', [
         /*
          * @description : detect versions
          * @param       : {string} userAgent, window.navigator.userAgent
-         * @syntax      : PT.detectVer(userAgent)
+         * @syntax      : detectVerion(userAgent)
          * @return      : {object} { 'flash' : 0|xx }
          */
 

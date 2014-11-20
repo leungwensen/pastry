@@ -81,7 +81,7 @@ define('io/ajax', [
                     if (xhr.isSuccess() && option.success) {
                         var response = xhr.responseText;
                         if (type === 'json') {
-                            response = pastry.tryAny([function () { return JSON.parse(response); }]) || response;
+                            response = pastry.getAny([function () { return JSON.parse(response); }]) || response;
                         }
                         xhr.onsuccess(response);
                     } else if (option.error) {

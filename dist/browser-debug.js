@@ -635,7 +635,7 @@
     // }
 }(this));
 
-;/* jshint strict: true, undef: true, unused: true */
+/* jshint strict: true, undef: true, unused: true */
 // /* global xxx, yyy */
 
 (function(GLOBAL) {
@@ -713,7 +713,7 @@
     // }
 }(this));
 
-;/* jshint strict: true, undef: true, unused: true */
+/* jshint strict: true, undef: true, unused: true */
 // /* global document */
 
 var define;
@@ -857,7 +857,7 @@ var define;
     // }
 }(this));
 
-;/* jshint strict: true, undef: true, unused: true */
+/* jshint strict: true, undef: true, unused: true */
 /* global define, document, location */
 
 define('module/path', [
@@ -974,7 +974,7 @@ define('module/path', [
     };
 });
 
-;/* jshint strict: true, undef: true, unused: true */
+/* jshint strict: true, undef: true, unused: true */
 /* global define, document */
 
 define('module/request', [
@@ -989,10 +989,9 @@ define('module/request', [
      * @author      : wensen.lws
      * @description : 异步请求脚本或者其它资源
      * @note        : browser only
+     * @reference   : https://github.com/seajs/seajs/blob/master/src/util-request.js
      */
-    var
-        // data        = Module._data,
-        doc         = document,
+    var doc         = document,
         head        = doc.head || doc.getElementsByTagName('head')[0] || doc.documentElement,
         baseElement = head.getElementsByTagName('base')[0];
 
@@ -1000,16 +999,12 @@ define('module/request', [
         var supportOnload = 'onload' in node;
 
         function onload(error) {
-            // Ensure only run once and handle memory leak in IE
-            node.onload = node.onerror = node.onreadystatechange = null;
-
-            // Remove the script to reduce memory leak
-            // if (!data.debug) {
-            //     head.removeChild(node);
+            // Ensure only run once and handle memory leak in IE {
+                node.onload = node.onerror = node.onreadystatechange = null;
             // }
-
-            // Dereference the node
-            node = null;
+            // Dereference the node {
+                node = null;
+            // }
             if (pastry.isFunction(callback)) {
                 callback(error);
             }
@@ -1038,26 +1033,26 @@ define('module/request', [
                 node.charset = cs;
             }
         }
-
-        // crossorigin default value is `false`.
-        var cors = pastry.isFunction(crossorigin) ? crossorigin(url) : crossorigin;
-        if (cors !== false) {
-            node.crossorigin = cors;
-        }
-
+        // crossorigin default value is `false`. {
+            var cors = pastry.isFunction(crossorigin) ? crossorigin(url) : crossorigin;
+            if (cors !== false) {
+                node.crossorigin = cors;
+            }
+        // }
         addOnload(node, callback, url);
 
         node.async = true;
         node.src = url;
 
-        // For some cache cases in IE 6-8, the script executes IMMEDIATELY after
-        // the end of the insert execution, so use `currentlyAddingScript` to
-        // hold current node, for deriving url in `define` call
+        /*
+         * For some cache cases in IE 6-8, the script executes IMMEDIATELY after
+         * the end of the insert execution, so use `currentlyAddingScript` to
+         * hold current node, for deriving url in `define` call
+         */
         Module.currentlyAddingScript = node;
 
         if (baseElement) {
-            // ref: #185 & http://dev.jquery.com/ticket/2709
-            head.insertBefore(node, baseElement);
+            head.insertBefore(node, baseElement); // ref: #185 & http://dev.jquery.com/ticket/2709
         } else {
             head.appendChild(node);
         }
@@ -1067,7 +1062,7 @@ define('module/request', [
     return request;
 });
 
-;/* jshint strict: true, undef: true, unused: true */
+/* jshint strict: true, undef: true, unused: true */
 /* global define, document, window */
 
 define('module/loader', [
@@ -1182,7 +1177,7 @@ define('module/loader', [
         });
 });
 
-;/* jshint strict: true, undef: true, unused: true */
+/* jshint strict: true, undef: true, unused: true */
 /* global define */
 
 define('module/config', [
@@ -1201,7 +1196,7 @@ define('module/config', [
     // return  module;
 });
 
-;/* jshint strict: true, undef: true, unused: true */
+/* jshint strict: true, undef: true, unused: true */
 /* global define */
 
 define('fmt/date', [
@@ -1268,7 +1263,7 @@ define('fmt/date', [
     };
 });
 
-;/* jshint strict: true, undef: true, unused: true */
+/* jshint strict: true, undef: true, unused: true */
 /* global define */
 define('fmt/sprintf', [
     'pastry'
@@ -1399,7 +1394,7 @@ define('fmt/sprintf', [
     });
     return sprintf;
 });
-;/* jshint strict: true, undef: true, unused: true */
+/* jshint strict: true, undef: true, unused: true */
 /* global define */
 define('fmt/vsprintf', [
     'pastry',
@@ -1425,7 +1420,7 @@ define('fmt/vsprintf', [
     });
     return vsprintf;
 });
-;/* jshint strict: true, undef: true, unused: true */
+/* jshint strict: true, undef: true, unused: true */
 /* global define */
 
 define('json', [
@@ -1641,7 +1636,7 @@ define('json', [
     return shim;
 });
 
-;/* jshint strict: true, undef: true, unused: true */
+/* jshint strict: true, undef: true, unused: true */
 /* global define, decodeURIComponent, encodeURIComponent */
 
 define('querystring', [
@@ -1728,7 +1723,7 @@ define('querystring', [
     return querystring;
 });
 
-;/* jshint strict: true, undef: true, unused: true */
+/* jshint strict: true, undef: true, unused: true */
 /* global define, location, navigator, ActiveXObject */
 
 define('bom/info', [
@@ -1877,7 +1872,7 @@ define('bom/info', [
     };
 });
 
-;/* jshint strict: true, undef: true, unused: true */
+/* jshint strict: true, undef: true, unused: true */
 /* global define, XMLHttpRequest, ActiveXObject, location */
 
 define('io/ajax', [
@@ -1960,7 +1955,7 @@ define('io/ajax', [
                     if (xhr.isSuccess() && option.success) {
                         var response = xhr.responseText;
                         if (type === 'json') {
-                            response = pastry.tryAny([function () { return JSON.parse(response); }]) || response;
+                            response = pastry.getAny([function () { return JSON.parse(response); }]) || response;
                         }
                         xhr.onsuccess(response);
                     } else if (option.error) {
