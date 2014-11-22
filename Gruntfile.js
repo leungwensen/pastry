@@ -63,7 +63,7 @@ module.exports = function (grunt) {
         },
 
         jasmine: {
-            src: 'release/<%= pkg.version %>/pastry.node.min.js',
+            src: '<%= dist.node %>',
             options: {
                 specs: 'test/jasmine/**/*.spec.js'
             }
