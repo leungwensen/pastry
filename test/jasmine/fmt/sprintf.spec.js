@@ -1,5 +1,6 @@
 /* jshint strict: true, undef: true, unused: true */
 /* global describe, it, expect */
+
 require([
     'pastry',
     'fmt/sprintf'
@@ -59,3 +60,4 @@ require([
 
     });
 });
+
