@@ -29,7 +29,7 @@
         toStr = {}.toString,
         slice = AP.slice,
 
-        noop = function() { };
+        noop = function () { };
     // }
     // 版本号 {
         P.VERSION = '0.2.0';
@@ -52,13 +52,13 @@
                 }
                 if (up) {
                     for (i = fromIndex; i < arr.length; i++) {
-                        if (arr[i] === searchElement){
+                        if (arr[i] === searchElement) {
                             return i;
                         }
                     }
                 } else {
                     for (i = fromIndex; i >= 0; i--) {
-                        if (arr[i] === searchElement){
+                        if (arr[i] === searchElement) {
                             return i;
                         }
                     }
@@ -103,7 +103,7 @@
             function (obj, callback, thisObj) {
                 obj.forEach(callback, thisObj);
             } : function (obj, callback, thisObj) {
-                for (var key in obj){
+                for (var key in obj) {
                     callback.call(thisObj, obj[key], key, obj);
                 }
             };
@@ -175,9 +175,9 @@
              * @return      : {Array   } 结果数组
              * @syntax      : pastry.map(arr, callback[, thisObj])
              */
-            function(arr, callback, thisObj) {
+            function (arr, callback, thisObj) {
                 return arr.map(callback, thisObj);
-            } : function(arr, callback, thisObj) {
+            } : function (arr, callback, thisObj) {
                 var res = [];
                 P.each(arr, function (element, key) {
                     res.push(callback.call(thisObj, element, key, arr));
@@ -352,16 +352,16 @@
                 var type = typeof obj;
                 return type === 'object' && !!obj;
             };
-            P.isNaN = function(obj) {
+            P.isNaN = function (obj) {
                 return P.isNumber(obj) && obj !== +obj;
             };
-            P.isFinite = function(obj) {
+            P.isFinite = function (obj) {
                 return P.isNumber(obj) && isFinite(obj) && !isNaN(obj);
             };
-            P.isUndefined = function(obj) {
+            P.isUndefined = function (obj) {
                 return obj === undefined;
             };
-            P.isNull = function(obj) {
+            P.isNull = function (obj) {
                 return obj === null;
             };
         // }
@@ -376,7 +376,7 @@
                  * @syntax      : pastry.merge(dest Object[, src1 Object, src2 Object, ...]);
                  */
                 if (P.isObject(dest)) {
-                    P.each(P.toArray(arguments).slice(1), function(source) {
+                    P.each(P.toArray(arguments).slice(1), function (source) {
                         if (source) {
                             for (var prop in source) {
                                 if (P.isObject(source[prop])) {
@@ -398,7 +398,7 @@
                  * @syntax      : pastry.extend(dest Object[, src1 Object, src2 Object, ...]);
                  */
                 if (P.isObject(dest)) {
-                    P.each(P.toArray(arguments).slice(1), function(source) {
+                    P.each(P.toArray(arguments).slice(1), function (source) {
                         if (source) {
                             for (var prop in source) {
                                 dest[prop] = source[prop];
@@ -542,10 +542,10 @@
                 'info',
                 'log',
                 'warn'
-            ], function(type) {
+            ], function (type) {
                 P[type.toUpperCase()] = (typeof console === U) ? noop : P.bind(console[type], console);
             });
-            P.ERROR = function(err) {
+            P.ERROR = function (err) {
                 P.WARN(err);
                 throw new Error(err);
             };
@@ -567,7 +567,7 @@
                 }
                 return returnValue;
             };
-            P.uuid = function(prefix){
+            P.uuid = function (prefix) {
                 /*
                  * @description : 生成uuid
                  * @parameter   : {String} prefix, 前缀
@@ -575,7 +575,7 @@
                  */
                 prefix = prefix || '';
                 return prefix + 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
-                    .replace(/[xy]/g, function(c){
+                    .replace(/[xy]/g, function (c) {
                         var r = Math.random()*16|0,
                             v = (c === 'x') ? r : (r&0x3|0x8),
                             result = v.toString(16);
@@ -591,8 +591,8 @@
          * @parameter   : {Boolean} override, 是否覆盖
          * @syntax      : pastry.mixin(obj Object[, override Boolean]);
          */
-        P.mixin = function(obj, override) {
-            P.each(obj, function(value, key) {
+        P.mixin = function (obj, override) {
+            P.each(obj, function (value, key) {
                 if (P[key] && !override) {
                     P.ERROR('P.' + key + ' already exists');
                 } else {
@@ -638,7 +638,7 @@
 /* jshint strict: true, undef: true, unused: true */
 // /* global xxx, yyy */
 
-(function(GLOBAL) {
+(function (GLOBAL) {
     'use strict';
     /*
      * @author      : 绝云(wensen.lws@alibaba-inc.com)
@@ -650,12 +650,12 @@
         pastry = GLOBAL.pastry,
 
         // defination of event function {
-            event = function(target) {
+            event = function (target) {
                 target = target || this;
 
                 var events = target._events = {}; // all events stores in the the collection: *._events
 
-                target.on = function(name, callback, context) {
+                target.on = function (name, callback, context) {
                     /*
                      * @description: 绑定事件
                      */
@@ -666,7 +666,7 @@
                     });
                     return target;
                 };
-                target.off = function(name, callback) {
+                target.off = function (name, callback) {
                     /*
                      * @description: 解绑事件
                      */
@@ -687,13 +687,13 @@
                     }
                     return target;
                 };
-                target.emit = function() {
+                target.emit = function () {
                     /*
                      * @description: 触发事件
                      */
                     var args = pastry.toArray(arguments),
                         list = events[args.shift()] || [];
-                    pastry.each(list, function(event) {
+                    pastry.each(list, function (event) {
                         event.callback.apply(event.context, args);
                     });
                     return target;
@@ -1012,12 +1012,12 @@ define('module/request', [
 
         if (supportOnload) {
             node.onload = onload;
-            node.onerror = function() {
+            node.onerror = function () {
                 Module.emit('error', { uri: url, node: node });
                 onload(true);
             };
         } else {
-            node.onreadystatechange = function() {
+            node.onreadystatechange = function () {
                 if (/loaded|complete/.test(node.readyState)) {
                     onload();
                 }
@@ -1182,7 +1182,7 @@ define('module/loader', [
 
 define('module/config', [
     'Module'
-], function(
+], function (
     Module
 ) {
     'use strict';
@@ -1200,9 +1200,9 @@ define('module/config', [
 /* global define */
 
 define('fmt/date', [
-    // 'pastry',
-], function(
-    // pastry
+    'pastry'
+], function (
+    pastry
 ) {
     'use strict';
     /*
@@ -1211,19 +1211,18 @@ define('fmt/date', [
      * @description : fmt 模块 - date
      */
 
-    // 私有函数 {
-        function f (n) {
-            return n < 10 ? '0' + n : n;
-        }
-        function lms (ms) {
-            var str = ms + '',
-                len = str.length;
-            return len === 3 ? str : len === 2 ? '0' + str : '00' + str;
-        }
-    // }
+    function doubleDigit (n) {
+        return n < 10 ? '0' + n : n;
+    }
+    function lms (ms) {
+        var str = ms + '',
+            len = str.length;
+        return len === 3 ? str : len === 2 ? '0' + str : '00' + str;
+    }
 
     return function (date, pattern) {
-        /**
+        /*
+         * @reference   : https://github.com/dojo/dojo/blob/master/json.js#L105
          * @description : return stringified date according to given pattern.
          * @parameter*  : {date  } date, input Date object
          * @parameter   : {string} pattern, defines pattern for stringify.
@@ -1231,35 +1230,19 @@ define('fmt/date', [
          * @return      : {string} result string.
          * @syntax      : fmtDate(date, [pattern])
          * @example     :
-        //     '{YYYY}-{MM}-{DD}T{hh}:{mm}:{ss}.{lms}Z' => '2013-10-03T00:57::13.180Z'
-        //     '{YYYY}-{MM}-{DD} {hh}:{mm}:{ss}'        => '2013-10-03 00:57::13'
-        //     '{YY}-{M}-{D} {h}:{m}:{s}'               => '13-10-3 0:57::13'
+         //    '{FullYear}-{Month}-{Date}T{Hours}:{Minutes}:{Seconds}.{Milliseconds}Z' => '2013-10-03T00:57::13.180Z'
          */
+        if (pastry.isDate(date)) {
+            pattern = pattern || '{FullYear}-{Month}-{Date}T{Hours}:{Minutes}:{Seconds}Z';
 
-        var y  = date.getFullYear() + '',
-            mo = date.getMonth() + 1,
-            d  = date.getDate(),
-            h  = date.getHours(),
-            mi = date.getMinutes(),
-            s  = date.getSeconds(),
-            ms = date.getMilliseconds();
-        pattern = pattern || '{YYYY}-{MM}-{DD}T{hh}:{mm}:{ss}Z';
-
-        return pattern
-            .replace( '{YYYY}', y              )
-            .replace( '{MM}'  , f(mo)          )
-            .replace( '{DD}'  , f(d )          )
-            .replace( '{hh}'  , f(h )          )
-            .replace( '{mm}'  , f(mi)          )
-            .replace( '{ss}'  , f(s )          )
-            .replace( '{lms}' , lms(ms)        )
-            .replace( '{YY}'  , y.substring(2) )
-            .replace( '{M}'   , mo             )
-            .replace( '{D}'   , d              )
-            .replace( '{h}'   , h              )
-            .replace( '{m}'   , mi             )
-            .replace( '{s}'   , s              )
-            .replace( '{ms}'  , ms             );
+            return pattern.replace(/\{(\w+)\}/g, function (t, prop) {
+                var fullProp = 'get' + ((prop === 'Year') ? prop : ('UTC' + prop)),
+                    num = date[fullProp]() + ((prop === 'Month') ? 1 : 0);
+                return prop === 'Milliseconds' ? lms(num) : doubleDigit(num);
+            });
+        } else {
+            pastry.ERROR('not a Date instance');
+        }
     };
 });
 
@@ -1268,7 +1251,7 @@ define('fmt/date', [
 
 define('fmt/sprintf', [
     'pastry'
-], function(
+], function (
     pastry
 ) {
     'use strict';
@@ -1284,7 +1267,7 @@ define('fmt/sprintf', [
 
     var reg = /%(\+)?([0 ]|'(.))?(-)?([0-9]+)?(\.([0-9]+))?([%bcdfosxX])/g,
 
-        sprintf = function(format) {
+        sprintf = function (format) {
             if (!pastry.isString(format)) {
                 pastry.ERROR('sprintf: The first arguments need to be a valid format string.');
             }
@@ -1404,7 +1387,7 @@ define('fmt/sprintf', [
 define('fmt/vsprintf', [
     'pastry',
     'fmt/sprintf'
-], function(
+], function (
     pastry,
     sprintf
 ) {
@@ -1414,7 +1397,7 @@ define('fmt/vsprintf', [
      * @date        : 2014-10-29
      * @description : fmt 模块 - vsprintf
      */
-    var vsprintf = function(fmt, argv) {
+    var vsprintf = function (fmt, argv) {
         argv.unshift(fmt);
         return sprintf.apply(null, argv);
     };
@@ -1431,7 +1414,7 @@ define('fmt/vsprintf', [
 define('json', [
     'pastry',
     'fmt/date'
-], function(
+], function (
     pastry,
     fmtDate
 ) {
@@ -1440,24 +1423,31 @@ define('json', [
      * @author      : 绝云(wensen.lws@alibaba-inc.com)
      * @date        : 2014-10-07
      * @description : shim 模块 - JSON
-     * @reference   : https://github.com/douglascrockford/JSON-js
+     * @reference   : https://github.com/dojo/dojo/blob/master/json.js
      */
     function exportJSON (obj) {
+        /*
+         * export JSON object
+         */
         pastry.mixin({
             JSON: obj
         });
         pastry.setGLOBAL('JSON', obj);
     }
+    // saving codes {
+        function isFunction (obj) { return pastry.isFunction(obj); }
+        function isString   (obj) { return pastry.isString(obj);   }
+        function isNumber   (obj) { return pastry.isNumber(obj);   }
+    // }
 
     if (JSON && !!JSON.parse && !!JSON.stringify) {
         exportJSON(JSON);
         return JSON;
     }
-
     // 补全基础数据类型的 toJSON 方法 {
         var D2JSON = Date.prototype.toJSON;
 
-        if (!pastry.isFunction(D2JSON)) {
+        if (!isFunction(D2JSON)) {
             pastry.each([
                 String.prototype,
                 Number.prototype,
@@ -1473,166 +1463,101 @@ define('json', [
         }
     // }
 
-    var gap, indent, rep,
-        cx        = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
-        escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
-
-        meta = {
-            '\b': '\\b',
-            '\t': '\\t',
-            '\n': '\\n',
-            '\f': '\\f',
-            '\r': '\\r',
-            '"' : '\\"',
-            '\\': '\\\\'
+    var undef,
+        escapeString = function (/*String*/str) {
+            return ('"' + str.replace(/(["\\])/g, '\\$1') + '"')
+                .replace(/[\f]/g, '\\f')
+                .replace(/[\b]/g, '\\b')
+                .replace(/[\n]/g, '\\n')
+                .replace(/[\t]/g, '\\t')
+                .replace(/[\r]/g, '\\r');
         },
-
-        quote = function (string) {
-            escapable.lastIndex = 0;
-            return escapable.test(string) ? '"' + string.replace(escapable, function (a) {
-                var c = meta[a];
-                return pastry.isString(c) ? c : '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
-            }) + '"' : '"' + string + '"';
-        },
-
-        str = function (key, holder) {
-            var v, partial,
-                mind  = gap,
-                value = holder[key];
-
-            if (value && pastry.isFunction(value.toJSON)) {
-                value = value.toJSON(key);
-            }
-            if (pastry.isFunction(rep)) {
-                value = rep.call(holder, key, value);
-            }
-            switch (true) {
-                case pastry.isString(value):
-                    return quote(value);
-                case pastry.isNumber(value):
-                    return isFinite(value) ? value + '' : 'null';
-                case pastry.isObject(value):
-                    if (!value) {
+        shim = {
+            parse: function (str, strict) {
+                /*
+                 * @description: 从 JSON 字符串得到一个数据结构
+                 */
+                if (strict && !/^([\s\[\{]*(?:"(?:\\.|[^"])*"|-?\d[\d\.]*(?:[Ee][+-]?\d+)?|null|true|false|)[\s\]\}]*(?:,|:|$))+$/.test(str)) {
+                    pastry.ERROR('Invalid characters in JSON');
+                }
+                /* jshint -W061 */
+                return eval('(' + str + ')');
+            },
+            stringify: function (value, replacer, spacer) {
+                /*
+                 * @description: 把内置数据类型转为 JSON 字符串
+                 */
+                if (isString(replacer)) {
+                    spacer = replacer;
+                    replacer = null;
+                }
+                function stringify (it, indent, key) {
+                    if (replacer) {
+                        it = replacer(key, it);
+                    }
+                    var val;
+                    if (isNumber(it)) {
+                        return isFinite(it) ? it + '' : 'null';
+                    }
+                    if (pastry.isBoolean(it)) {
+                        return it + '';
+                    }
+                    if (it === null) {
                         return 'null';
                     }
-                    gap += indent;
-                    partial = [];
-                    if (pastry.isArray(value)) {
-                        pastry.each(value, function (item, index) {
-                            partial[index] = str(index, value) || 'null';
-                        });
-                        v = (partial.length === 0) ?
-                            '[]' :
-                            gap ?
-                                '[\n' + gap + partial.join(',\n' + gap) + '\n' + mind + ']' :
-                                '[' + partial.join(',') + ']';
-                        gap = mind;
-                        return v;
+                    if (isString(it)) {
+                        return escapeString(it);
                     }
-                    if (rep && pastry.isObject(rep)) {
-                        pastry.each(rep, function (element) {
-                            if (pastry.isString(element)) {
-                                v = str(element, value);
-                                if (v) {
-                                    partial.push(quote(element) + (gap ? ': ' : ':') + v);
-                                }
+                    if (isFunction(it) || !it) {
+                        return undef;
+                    }
+                    if (isFunction(it.toJSON)) {
+                        return stringify(it.toJSON(key), indent, key);
+                    }
+                    if (pastry.isDate(it)) {
+                        return fmtDate(it);
+                    }
+                    if (it.valueOf() !== it) {
+                        return stringify(it.valueOf(), indent, key);
+                    }
+                    var nextIndent= spacer ? (indent + spacer) : '',
+                        sep = spacer ? ' ' : '',
+                        newLine = spacer ? '\n' : '';
+
+                    if (pastry.isArray(it)) {
+                        var itl = it.length,
+                            res = [];
+                        for (key = 0; key < itl; key++) {
+                            var obj = it[key];
+                            val = stringify(obj, nextIndent, key);
+                            if (!isString(val)) {
+                                val = 'null';
                             }
-                        });
-                    } else {
-                        pastry.each(value, function (element, k) {
-                            v = str(k, value);
-                            if (v) {
-                                partial.push(quote(k) + (gap ? ': ' : ':') + v);
-                            }
-                        });
+                            res.push(newLine + nextIndent + val);
+                        }
+                        return '[' + res.join(',') + newLine + indent + ']';
                     }
-                    v = (partial.length === 0) ?
-                        '{}' :
-                        gap ?
-                            '{\n' + gap + partial.join(',\n' + gap) + '\n' + mind + '}' :
-                            '{' + partial.join(',') + '}';
-                    gap = mind;
-                    return v;
-                default :
-                    return value + '';
-            }
-        },
-
-        shim = {
-            stringify: function (value, replacer, space) {
-                /**
-                 * @description : stringify a JSON object.
-                 * @param       : {unknown} value, value to be stringified
-                 * @return      : {string } result string.
-                 * @syntax      : JSON.stringify(value).
-                 */
-                var i;
-                gap    = '';
-                indent = '';
-                rep    = replacer;
-
-                if (pastry.isNumber(space)) {
-                    for (i = 0; i < space; i += 1) {
-                        indent += ' ';
-                    }
-                } else if (pastry.isString(space)) {
-                    indent = space;
-                }
-                rep = replacer;
-                if (
-                    replacer &&
-                    !pastry.isFunction(replacer) && (
-                        !pastry.isObject(replacer) ||
-                        !pastry.isNumber(replacer.length)
-                    )
-                ) {
-                    pastry.ERROR('JSON.stringify');
-                }
-                return str('', {'': value});
-            },
-
-            parse: function (text, reviver) {
-                /**
-                 * @description : parse a string to JSON object
-                 * @param       : {string } string, string to parse
-                 * @return      : {unknown} result object.
-                 * @syntax      : JSON.parse(string).
-                 */
-                var j;
-
-                function walk(holder, key) {
-                    var v,
-                        value = holder[key];
-
-                    if (value && pastry.isObject(value)) {
-                        pastry.each(value, function (element, k) {
-                            v = walk(value, k);
-                            if (v) {
-                                value[k] = v;
+                    var output = [];
+                    for (key in it) {
+                        var keyStr;
+                        if (it.hasOwnProperty(key)) {
+                            if (isNumber(key)) {
+                                keyStr = '"' + key + '"';
+                            } else if (isString(key)) {
+                                keyStr = escapeString(key);
                             } else {
-                                delete value[k];
+                                continue;
                             }
-                        });
+                            val = stringify(it[key], nextIndent, key);
+                            if (!isString(val)) {
+                                continue;
+                            }
+                            output.push(newLine + nextIndent + keyStr + ':' + sep + val);
+                        }
                     }
-                    return reviver.call(holder, key, value);
+                    return '{' + output.join(',') + newLine + indent + '}';
                 }
-
-                text = text + '';
-                cx.lastIndex = 0;
-                if (cx.test(text)) {
-                    text = text.replace(cx, function (a) {
-                        return '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
-                    });
-                }
-                if (/^[\],:{}\s]*$/.test(
-                    text.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, '@')
-                        .replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']')
-                        .replace(/(?:^|:|,)(?:\s*\[)+/g, '')
-                )) {
-                    /* jshint -W061 */ j = eval('(' + text + ')');
-                    return pastry.isFunction(reviver) ? walk({'': j}, '') : j;
-                }
-                pastry.ERROR('JSON.parse');
+                return stringify(value, '', '');
             }
         };
 
@@ -1645,7 +1570,7 @@ define('json', [
 
 define('querystring', [
     'pastry'
-], function(
+], function (
     pastry
 ) {
     'use strict';
@@ -1731,7 +1656,7 @@ define('querystring', [
 
 define('bom/info', [
     'pastry'
-], function(
+], function (
     pastry
 ) {
     'use strict';
@@ -1883,7 +1808,7 @@ define('io/ajax', [
     'json',
     'querystring',
     'bom/info'
-], function(
+], function (
     pastry,
     JSON,
     querystring,
@@ -1977,7 +1902,7 @@ define('io/ajax', [
                         'Content-Type',
                         contentType || 'text/plain;charset=UTF-8'
                     );
-            } else if (method === 'POST'){
+            } else if (method === 'POST') {
                 xhr.open(method, uri, isAsync);
                 xhr.setRequestHeader(
                         'Content-Type',
