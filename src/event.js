@@ -1,7 +1,7 @@
 /* jshint strict: true, undef: true, unused: true */
 // /* global xxx, yyy */
 
-(function(GLOBAL) {
+(function (GLOBAL) {
     'use strict';
     /*
      * @author      : 绝云(wensen.lws@alibaba-inc.com)
@@ -13,12 +13,12 @@
         pastry = GLOBAL.pastry,
 
         // defination of event function {
-            event = function(target) {
+            event = function (target) {
                 target = target || this;
 
                 var events = target._events = {}; // all events stores in the the collection: *._events
 
-                target.on = function(name, callback, context) {
+                target.on = function (name, callback, context) {
                     /*
                      * @description: 绑定事件
                      */
@@ -29,7 +29,7 @@
                     });
                     return target;
                 };
-                target.off = function(name, callback) {
+                target.off = function (name, callback) {
                     /*
                      * @description: 解绑事件
                      */
@@ -50,13 +50,13 @@
                     }
                     return target;
                 };
-                target.emit = function() {
+                target.emit = function () {
                     /*
                      * @description: 触发事件
                      */
                     var args = pastry.toArray(arguments),
                         list = events[args.shift()] || [];
-                    pastry.each(list, function(event) {
+                    pastry.each(list, function (event) {
                         event.callback.apply(event.context, args);
                     });
                     return target;

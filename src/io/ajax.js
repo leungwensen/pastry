@@ -6,7 +6,7 @@ define('io/ajax', [
     'json',
     'querystring',
     'bom/info'
-], function(
+], function (
     pastry,
     JSON,
     querystring,
@@ -100,7 +100,7 @@ define('io/ajax', [
                         'Content-Type',
                         contentType || 'text/plain;charset=UTF-8'
                     );
-            } else if (method === 'POST'){
+            } else if (method === 'POST') {
                 xhr.open(method, uri, isAsync);
                 xhr.setRequestHeader(
                         'Content-Type',

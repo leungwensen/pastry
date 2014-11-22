@@ -36,12 +36,12 @@ define('module/request', [
 
         if (supportOnload) {
             node.onload = onload;
-            node.onerror = function() {
+            node.onerror = function () {
                 Module.emit('error', { uri: url, node: node });
                 onload(true);
             };
         } else {
-            node.onreadystatechange = function() {
+            node.onreadystatechange = function () {
                 if (/loaded|complete/.test(node.readyState)) {
                     onload();
                 }

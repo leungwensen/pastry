@@ -3,7 +3,7 @@
 
 define('fmt/sprintf', [
     'pastry'
-], function(
+], function (
     pastry
 ) {
     'use strict';
@@ -19,7 +19,7 @@ define('fmt/sprintf', [
 
     var reg = /%(\+)?([0 ]|'(.))?(-)?([0-9]+)?(\.([0-9]+))?([%bcdfosxX])/g,
 
-        sprintf = function(format) {
+        sprintf = function (format) {
             if (!pastry.isString(format)) {
                 pastry.ERROR('sprintf: The first arguments need to be a valid format string.');
             }

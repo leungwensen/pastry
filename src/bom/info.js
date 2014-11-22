@@ -3,7 +3,7 @@
 
 define('bom/info', [
     'pastry'
-], function(
+], function (
     pastry
 ) {
     'use strict';

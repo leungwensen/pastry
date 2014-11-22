@@ -4,7 +4,7 @@
 define('fmt/vsprintf', [
     'pastry',
     'fmt/sprintf'
-], function(
+], function (
     pastry,
     sprintf
 ) {
@@ -14,7 +14,7 @@ define('fmt/vsprintf', [
      * @date        : 2014-10-29
      * @description : fmt 模块 - vsprintf
      */
-    var vsprintf = function(fmt, argv) {
+    var vsprintf = function (fmt, argv) {
         argv.unshift(fmt);
         return sprintf.apply(null, argv);
     };

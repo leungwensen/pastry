@@ -3,7 +3,7 @@
 
 define('module/config', [
     'Module'
-], function(
+], function (
     Module
 ) {
     'use strict';

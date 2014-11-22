@@ -2,9 +2,9 @@
 /* global define */
 
 define('fmt/date', [
-    // 'pastry',
-], function(
-    // pastry
+    'pastry'
+], function (
+    pastry
 ) {
     'use strict';
     /*
@@ -13,19 +13,18 @@ define('fmt/date', [
      * @description : fmt 模块 - date
      */
 
-    // 私有函数 {
-        function f (n) {
-            return n < 10 ? '0' + n : n;
-        }
-        function lms (ms) {
-            var str = ms + '',
-                len = str.length;
-            return len === 3 ? str : len === 2 ? '0' + str : '00' + str;
-        }
-    // }
+    function doubleDigit (n) {
+        return n < 10 ? '0' + n : n;
+    }
+    function lms (ms) {
+        var str = ms + '',
+            len = str.length;
+        return len === 3 ? str : len === 2 ? '0' + str : '00' + str;
+    }
 
     return function (date, pattern) {
-        /**
+        /*
+         * @reference   : https://github.com/dojo/dojo/blob/master/json.js#L105
          * @description : return stringified date according to given pattern.
          * @parameter*  : {date  } date, input Date object
          * @parameter   : {string} pattern, defines pattern for stringify.
@@ -33,35 +32,19 @@ define('fmt/date', [
          * @return      : {string} result string.
          * @syntax      : fmtDate(date, [pattern])
          * @example     :
-        //     '{YYYY}-{MM}-{DD}T{hh}:{mm}:{ss}.{lms}Z' => '2013-10-03T00:57::13.180Z'
-        //     '{YYYY}-{MM}-{DD} {hh}:{mm}:{ss}'        => '2013-10-03 00:57::13'
-        //     '{YY}-{M}-{D} {h}:{m}:{s}'               => '13-10-3 0:57::13'
+         //    '{FullYear}-{Month}-{Date}T{Hours}:{Minutes}:{Seconds}.{Milliseconds}Z' => '2013-10-03T00:57::13.180Z'
          */
+        if (pastry.isDate(date)) {
+            pattern = pattern || '{FullYear}-{Month}-{Date}T{Hours}:{Minutes}:{Seconds}Z';
 
-        var y  = date.getFullYear() + '',
-            mo = date.getMonth() + 1,
-            d  = date.getDate(),
-            h  = date.getHours(),
-            mi = date.getMinutes(),
-            s  = date.getSeconds(),
-            ms = date.getMilliseconds();
-        pattern = pattern || '{YYYY}-{MM}-{DD}T{hh}:{mm}:{ss}Z';
-
-        return pattern
-            .replace( '{YYYY}', y              )
-            .replace( '{MM}'  , f(mo)          )
-            .replace( '{DD}'  , f(d )          )
-            .replace( '{hh}'  , f(h )          )
-            .replace( '{mm}'  , f(mi)          )
-            .replace( '{ss}'  , f(s )          )
-            .replace( '{lms}' , lms(ms)        )
-            .replace( '{YY}'  , y.substring(2) )
-            .replace( '{M}'   , mo             )
-            .replace( '{D}'   , d              )
-            .replace( '{h}'   , h              )
-            .replace( '{m}'   , mi             )
-            .replace( '{s}'   , s              )
-            .replace( '{ms}'  , ms             );
+            return pattern.replace(/\{(\w+)\}/g, function (t, prop) {
+                var fullProp = 'get' + ((prop === 'Year') ? prop : ('UTC' + prop)),
+                    num = date[fullProp]() + ((prop === 'Month') ? 1 : 0);
+                return prop === 'Milliseconds' ? lms(num) : doubleDigit(num);
+            });
+        } else {
+            pastry.ERROR('not a Date instance');
+        }
     };
 });
 

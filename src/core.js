@@ -29,7 +29,7 @@
         toStr = {}.toString,
         slice = AP.slice,
 
-        noop = function() { };
+        noop = function () { };
     // }
     // 版本号 {
         P.VERSION = '0.2.0';
@@ -52,13 +52,13 @@
                 }
                 if (up) {
                     for (i = fromIndex; i < arr.length; i++) {
-                        if (arr[i] === searchElement){
+                        if (arr[i] === searchElement) {
                             return i;
                         }
                     }
                 } else {
                     for (i = fromIndex; i >= 0; i--) {
-                        if (arr[i] === searchElement){
+                        if (arr[i] === searchElement) {
                             return i;
                         }
                     }
@@ -103,7 +103,7 @@
             function (obj, callback, thisObj) {
                 obj.forEach(callback, thisObj);
             } : function (obj, callback, thisObj) {
-                for (var key in obj){
+                for (var key in obj) {
                     callback.call(thisObj, obj[key], key, obj);
                 }
             };
@@ -175,9 +175,9 @@
              * @return      : {Array   } 结果数组
              * @syntax      : pastry.map(arr, callback[, thisObj])
              */
-            function(arr, callback, thisObj) {
+            function (arr, callback, thisObj) {
                 return arr.map(callback, thisObj);
-            } : function(arr, callback, thisObj) {
+            } : function (arr, callback, thisObj) {
                 var res = [];
                 P.each(arr, function (element, key) {
                     res.push(callback.call(thisObj, element, key, arr));
@@ -352,16 +352,16 @@
                 var type = typeof obj;
                 return type === 'object' && !!obj;
             };
-            P.isNaN = function(obj) {
+            P.isNaN = function (obj) {
                 return P.isNumber(obj) && obj !== +obj;
             };
-            P.isFinite = function(obj) {
+            P.isFinite = function (obj) {
                 return P.isNumber(obj) && isFinite(obj) && !isNaN(obj);
             };
-            P.isUndefined = function(obj) {
+            P.isUndefined = function (obj) {
                 return obj === undefined;
             };
-            P.isNull = function(obj) {
+            P.isNull = function (obj) {
                 return obj === null;
             };
         // }
@@ -376,7 +376,7 @@
                  * @syntax      : pastry.merge(dest Object[, src1 Object, src2 Object, ...]);
                  */
                 if (P.isObject(dest)) {
-                    P.each(P.toArray(arguments).slice(1), function(source) {
+                    P.each(P.toArray(arguments).slice(1), function (source) {
                         if (source) {
                             for (var prop in source) {
                                 if (P.isObject(source[prop])) {
@@ -398,7 +398,7 @@
                  * @syntax      : pastry.extend(dest Object[, src1 Object, src2 Object, ...]);
                  */
                 if (P.isObject(dest)) {
-                    P.each(P.toArray(arguments).slice(1), function(source) {
+                    P.each(P.toArray(arguments).slice(1), function (source) {
                         if (source) {
                             for (var prop in source) {
                                 dest[prop] = source[prop];
@@ -542,10 +542,10 @@
                 'info',
                 'log',
                 'warn'
-            ], function(type) {
+            ], function (type) {
                 P[type.toUpperCase()] = (typeof console === U) ? noop : P.bind(console[type], console);
             });
-            P.ERROR = function(err) {
+            P.ERROR = function (err) {
                 P.WARN(err);
                 throw new Error(err);
             };
@@ -567,7 +567,7 @@
                 }
                 return returnValue;
             };
-            P.uuid = function(prefix){
+            P.uuid = function (prefix) {
                 /*
                  * @description : 生成uuid
                  * @parameter   : {String} prefix, 前缀
@@ -575,7 +575,7 @@
                  */
                 prefix = prefix || '';
                 return prefix + 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
-                    .replace(/[xy]/g, function(c){
+                    .replace(/[xy]/g, function (c) {
                         var r = Math.random()*16|0,
                             v = (c === 'x') ? r : (r&0x3|0x8),
                             result = v.toString(16);
@@ -591,8 +591,8 @@
          * @parameter   : {Boolean} override, 是否覆盖
          * @syntax      : pastry.mixin(obj Object[, override Boolean]);
          */
-        P.mixin = function(obj, override) {
-            P.each(obj, function(value, key) {
+        P.mixin = function (obj, override) {
+            P.each(obj, function (value, key) {
                 if (P[key] && !override) {
                     P.ERROR('P.' + key + ' already exists');
                 } else {

@@ -3,7 +3,7 @@
 
 define('querystring', [
     'pastry'
-], function(
+], function (
     pastry
 ) {
     'use strict';
