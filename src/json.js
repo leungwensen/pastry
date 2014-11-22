@@ -4,7 +4,7 @@
 define('json', [
     'pastry',
     'fmt/date'
-], function(
+], function (
     pastry,
     fmtDate
 ) {
@@ -13,24 +13,31 @@ define('json', [
      * @author      : 绝云(wensen.lws@alibaba-inc.com)
      * @date        : 2014-10-07
      * @description : shim 模块 - JSON
-     * @reference   : https://github.com/douglascrockford/JSON-js
+     * @reference   : https://github.com/dojo/dojo/blob/master/json.js
      */
     function exportJSON (obj) {
+        /*
+         * export JSON object
+         */
         pastry.mixin({
             JSON: obj
         });
         pastry.setGLOBAL('JSON', obj);
     }
+    // saving codes {
+        function isFunction (obj) { return pastry.isFunction(obj); }
+        function isString   (obj) { return pastry.isString(obj);   }
+        function isNumber   (obj) { return pastry.isNumber(obj);   }
+    // }
 
     if (JSON && !!JSON.parse && !!JSON.stringify) {
         exportJSON(JSON);
         return JSON;
     }
-
     // 补全基础数据类型的 toJSON 方法 {
         var D2JSON = Date.prototype.toJSON;
 
-        if (!pastry.isFunction(D2JSON)) {
+        if (!isFunction(D2JSON)) {
             pastry.each([
                 String.prototype,
                 Number.prototype,
@@ -46,166 +53,101 @@ define('json', [
         }
     // }
 
-    var gap, indent, rep,
-        cx        = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
-        escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
-
-        meta = {
-            '\b': '\\b',
-            '\t': '\\t',
-            '\n': '\\n',
-            '\f': '\\f',
-            '\r': '\\r',
-            '"' : '\\"',
-            '\\': '\\\\'
+    var undef,
+        escapeString = function (/*String*/str) {
+            return ('"' + str.replace(/(["\\])/g, '\\$1') + '"')
+                .replace(/[\f]/g, '\\f')
+                .replace(/[\b]/g, '\\b')
+                .replace(/[\n]/g, '\\n')
+                .replace(/[\t]/g, '\\t')
+                .replace(/[\r]/g, '\\r');
         },
-
-        quote = function (string) {
-            escapable.lastIndex = 0;
-            return escapable.test(string) ? '"' + string.replace(escapable, function (a) {
-                var c = meta[a];
-                return pastry.isString(c) ? c : '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
-            }) + '"' : '"' + string + '"';
-        },
-
-        str = function (key, holder) {
-            var v, partial,
-                mind  = gap,
-                value = holder[key];
-
-            if (value && pastry.isFunction(value.toJSON)) {
-                value = value.toJSON(key);
-            }
-            if (pastry.isFunction(rep)) {
-                value = rep.call(holder, key, value);
-            }
-            switch (true) {
-                case pastry.isString(value):
-                    return quote(value);
-                case pastry.isNumber(value):
-                    return isFinite(value) ? value + '' : 'null';
-                case pastry.isObject(value):
-                    if (!value) {
+        shim = {
+            parse: function (str, strict) {
+                /*
+                 * @description: 从 JSON 字符串得到一个数据结构
+                 */
+                if (strict && !/^([\s\[\{]*(?:"(?:\\.|[^"])*"|-?\d[\d\.]*(?:[Ee][+-]?\d+)?|null|true|false|)[\s\]\}]*(?:,|:|$))+$/.test(str)) {
+                    pastry.ERROR('Invalid characters in JSON');
+                }
+                /* jshint -W061 */
+                return eval('(' + str + ')');
+            },
+            stringify: function (value, replacer, spacer) {
+                /*
+                 * @description: 把内置数据类型转为 JSON 字符串
+                 */
+                if (isString(replacer)) {
+                    spacer = replacer;
+                    replacer = null;
+                }
+                function stringify (it, indent, key) {
+                    if (replacer) {
+                        it = replacer(key, it);
+                    }
+                    var val;
+                    if (isNumber(it)) {
+                        return isFinite(it) ? it + '' : 'null';
+                    }
+                    if (pastry.isBoolean(it)) {
+                        return it + '';
+                    }
+                    if (it === null) {
                         return 'null';
                     }
-                    gap += indent;
-                    partial = [];
-                    if (pastry.isArray(value)) {
-                        pastry.each(value, function (item, index) {
-                            partial[index] = str(index, value) || 'null';
-                        });
-                        v = (partial.length === 0) ?
-                            '[]' :
-                            gap ?
-                                '[\n' + gap + partial.join(',\n' + gap) + '\n' + mind + ']' :
-                                '[' + partial.join(',') + ']';
-                        gap = mind;
-                        return v;
+                    if (isString(it)) {
+                        return escapeString(it);
                     }
-                    if (rep && pastry.isObject(rep)) {
-                        pastry.each(rep, function (element) {
-                            if (pastry.isString(element)) {
-                                v = str(element, value);
-                                if (v) {
-                                    partial.push(quote(element) + (gap ? ': ' : ':') + v);
-                                }
+                    if (isFunction(it) || !it) {
+                        return undef;
+                    }
+                    if (isFunction(it.toJSON)) {
+                        return stringify(it.toJSON(key), indent, key);
+                    }
+                    if (pastry.isDate(it)) {
+                        return fmtDate(it);
+                    }
+                    if (it.valueOf() !== it) {
+                        return stringify(it.valueOf(), indent, key);
+                    }
+                    var nextIndent= spacer ? (indent + spacer) : '',
+                        sep = spacer ? ' ' : '',
+                        newLine = spacer ? '\n' : '';
+
+                    if (pastry.isArray(it)) {
+                        var itl = it.length,
+                            res = [];
+                        for (key = 0; key < itl; key++) {
+                            var obj = it[key];
+                            val = stringify(obj, nextIndent, key);
+                            if (!isString(val)) {
+                                val = 'null';
                             }
-                        });
-                    } else {
-                        pastry.each(value, function (element, k) {
-                            v = str(k, value);
-                            if (v) {
-                                partial.push(quote(k) + (gap ? ': ' : ':') + v);
-                            }
-                        });
+                            res.push(newLine + nextIndent + val);
+                        }
+                        return '[' + res.join(',') + newLine + indent + ']';
                     }
-                    v = (partial.length === 0) ?
-                        '{}' :
-                        gap ?
-                            '{\n' + gap + partial.join(',\n' + gap) + '\n' + mind + '}' :
-                            '{' + partial.join(',') + '}';
-                    gap = mind;
-                    return v;
-                default :
-                    return value + '';
-            }
-        },
-
-        shim = {
-            stringify: function (value, replacer, space) {
-                /**
-                 * @description : stringify a JSON object.
-                 * @param       : {unknown} value, value to be stringified
-                 * @return      : {string } result string.
-                 * @syntax      : JSON.stringify(value).
-                 */
-                var i;
-                gap    = '';
-                indent = '';
-                rep    = replacer;
-
-                if (pastry.isNumber(space)) {
-                    for (i = 0; i < space; i += 1) {
-                        indent += ' ';
-                    }
-                } else if (pastry.isString(space)) {
-                    indent = space;
-                }
-                rep = replacer;
-                if (
-                    replacer &&
-                    !pastry.isFunction(replacer) && (
-                        !pastry.isObject(replacer) ||
-                        !pastry.isNumber(replacer.length)
-                    )
-                ) {
-                    pastry.ERROR('JSON.stringify');
-                }
-                return str('', {'': value});
-            },
-
-            parse: function (text, reviver) {
-                /**
-                 * @description : parse a string to JSON object
-                 * @param       : {string } string, string to parse
-                 * @return      : {unknown} result object.
-                 * @syntax      : JSON.parse(string).
-                 */
-                var j;
-
-                function walk(holder, key) {
-                    var v,
-                        value = holder[key];
-
-                    if (value && pastry.isObject(value)) {
-                        pastry.each(value, function (element, k) {
-                            v = walk(value, k);
-                            if (v) {
-                                value[k] = v;
+                    var output = [];
+                    for (key in it) {
+                        var keyStr;
+                        if (it.hasOwnProperty(key)) {
+                            if (isNumber(key)) {
+                                keyStr = '"' + key + '"';
+                            } else if (isString(key)) {
+                                keyStr = escapeString(key);
                             } else {
-                                delete value[k];
+                                continue;
                             }
-                        });
+                            val = stringify(it[key], nextIndent, key);
+                            if (!isString(val)) {
+                                continue;
+                            }
+                            output.push(newLine + nextIndent + keyStr + ':' + sep + val);
+                        }
                     }
-                    return reviver.call(holder, key, value);
+                    return '{' + output.join(',') + newLine + indent + '}';
                 }
-
-                text = text + '';
-                cx.lastIndex = 0;
-                if (cx.test(text)) {
-                    text = text.replace(cx, function (a) {
-                        return '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
-                    });
-                }
-                if (/^[\],:{}\s]*$/.test(
-                    text.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, '@')
-                        .replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']')
-                        .replace(/(?:^|:|,)(?:\s*\[)+/g, '')
-                )) {
-                    /* jshint -W061 */ j = eval('(' + text + ')');
-                    return pastry.isFunction(reviver) ? walk({'': j}, '') : j;
-                }
-                pastry.ERROR('JSON.parse');
+                return stringify(value, '', '');
             }
         };
 
