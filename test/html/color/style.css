@@ -1,0 +1,11 @@
+
+table {
+    margin: 0 auto;
+}
+th {
+    text-align: left;
+}
+td {
+    min-width: 80px;
+}
+

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>color</title>
+    <link rel="stylesheet" href="./color/style.css">
+</head>
+<body>
+    <table id="colorTable">
+        <tr>
+            <th>name</th>
+            <th>color</th>
+        </tr>
+    </table>
+    <script src="../../dist/browser-debug.js"></script>
+    <script>
+        require([
+            'pastry',
+            'dom/query',
+            'color/cssByName'
+        ], function (
+            pastry,
+            query,
+            cssByName
+        ) {
+            var doc = document,
+                $table = query('#colorTable')[0];
+
+            function createColorTr (name, color) {
+                    $tr      = doc.createElement('tr'),
+                    $tdName  = doc.createElement('td'),
+                    $tdColor = doc.createElement('td');
+                $tdName.innerHTML = name;
+                $tdColor.style['background-color'] = color;
+                $tr.appendChild($tdName);
+                $tr.appendChild($tdColor);
+                return $tr;
+            };
+
+            pastry.each(cssByName, function (css, name) {
+                $table.appendChild(createColorTr(name, css));
+            });
+        });
+    </script>
+</body>
+</html>
