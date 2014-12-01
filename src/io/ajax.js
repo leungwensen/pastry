@@ -17,6 +17,7 @@ define('io/ajax', [
      * @author      : 绝云(wensen.lws@alibaba-inc.com)
      * @date        : 2014-11-19
      * @description : io 模块 - ajax
+     * @note        : browser only
      */
 
     function getXHR () {

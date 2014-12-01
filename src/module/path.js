@@ -15,16 +15,17 @@ define('module/path', [
      * @reference   : https://github.com/seajs/seajs/blob/master/src/util-path.js
      * @note        : browser only
      */
-    var re = {
-            absolute       : /^\/\/.|:\//,
-            dirname        : /[^?#]*\//,
-            dot            : /\/\.\//g,
-            doubleDot      : /\/[^/]+\/\.\.\//,
-            ignoreLocation : /^(about|blob):/,
-            multiSlash     : /([^:/])\/+\//g,
-            path           : /^([^/:]+)(\/.+)$/,
-            rootDir        : /^.*?\/\/.*?\//
-        },
+    var
+        // 正则 {
+            re_absolute       = /^\/\/.|:\//,
+            re_dirname        = /[^?#]*\//,
+            re_dot            = /\/\.\//g,
+            re_doubleDot      = /\/[^/]+\/\.\.\//,
+            re_ignoreLocation = /^(about|blob):/,
+            re_multiSlash     = /([^:/])\/+\//g,
+            re_path           = /^([^/:]+)(\/.+)$/,
+            re_rootDir        = /^.*?\/\/.*?\//,
+        // }
         data         = Module._data,
         doc          = document,
         lc           = location,
@@ -35,17 +36,17 @@ define('module/path', [
 
     function dirname(path) {
         // dirname('a/b/c.js?t=123#xx/zz') ==> 'a/b/'
-        return path.match(re.dirname)[0];
+        return path.match(re_dirname)[0];
     }
     function realpath(path) {
-        path = path.replace(re.dot, '/'); // /a/b/./c/./d ==> /a/b/c/d
+        path = path.replace(re_dot, '/'); // /a/b/./c/./d ==> /a/b/c/d
         // a//b/c ==> a/b/c
         // a///b/////c ==> a/b/c
         // DOUBLE_DOT_RE matches a/b/c//../d path correctly only if replace // with / first
-        path = path.replace(re.multiSlash, '$1/');
-        while (path.match(re.doubleDot)) {
+        path = path.replace(re_multiSlash, '$1/');
+        while (path.match(re_doubleDot)) {
             // a/b/c/../../d  ==>  a/b/../d  ==>  a/d
-            path = path.replace(re.doubleDot, '/');
+            path = path.replace(re_doubleDot, '/');
         }
         return path;
     }
@@ -67,7 +68,7 @@ define('module/path', [
     function parsePaths(id) {
         var m,
             paths = data.paths;
-        if (paths && (m = id.match(re.path)) && pastry.isString(paths[m[1]])) {
+        if (paths && (m = id.match(re_path)) && pastry.isString(paths[m[1]])) {
             id = paths[m[1]] + m[2];
         }
         return id;
@@ -76,12 +77,12 @@ define('module/path', [
         var ret,
             first = id.charCodeAt(0);
 
-        if (re.absolute.test(id)) { // Absolute
+        if (re_absolute.test(id)) { // Absolute
             ret = id;
         } else if (first === 46 /* '.' */) { // Relative
             ret = (refUri ? dirname(refUri) : data.cwd) + id;
         } else if (first === 47 /* '/' */) { // Root
-            var m = data.cwd.match(re.rootDir);
+            var m = data.cwd.match(re_rootDir);
             ret = m ? m[0] + id.substring(1) : id;
         } else { // Top-level
             ret = data.base + id;
@@ -106,7 +107,7 @@ define('module/path', [
         return uri;
     }
 
-    data.cwd  = (!href || re.ignoreLocation.test(href)) ? '' : dirname(href);
+    data.cwd  = (!href || re_ignoreLocation.test(href)) ? '' : dirname(href);
     data.path = loaderPath;
     data.dir  = data.base = dirname(loaderPath || data.cwd);
 

@@ -10,6 +10,7 @@ define('bom/info', [
     /*
      * @author      : 绝云 (wensen.lws@alibaba-inc.com)
      * @description : 记录各种浏览器相关的版本号
+     * @note        : browser only
      */
     var nav       = navigator || {},
         userAgent = nav.userAgent,

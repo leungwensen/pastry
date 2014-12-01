@@ -43,8 +43,8 @@ define('querystring', [
                  * @param       : {String} str, query string to be parsed.
                  * @return      : {Object} parsed object.
                  */
-                sep = sep || "&";
-                eq  = eq  || "=";
+                sep = sep || '&';
+                eq  = eq  || '=';
                 var tuple,
                     obj    = {},
                     pieces = qs.split(sep);
