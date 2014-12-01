@@ -366,8 +366,24 @@
             };
         // }
         // 数组、对象相关 {
+            P.isArrayLike = function (obj) {
+                return (typeof obj === 'object' && isFinite(obj.length));
+            };
             P.toArray = function (obj) {
-                return slice.call(obj);
+                return P.isArrayLike(obj) ? slice.call(obj) : [];
+            };
+            P.flatten = function (array) {
+                /*
+                 * @description: 扁平化二维数组
+                 */
+                for (var r = [], i = 0, l = array.length; i < l; ++i) {
+                    if (P.isArrayLike(array[i])) {
+                        r = r.concat(array[i]);
+                    } else {
+                        r[r.length] = array[i];
+                    }
+                }
+                return r;
             };
             P.merge = function (dest) {
                 /*
@@ -874,16 +890,17 @@ define('module/path', [
      * @reference   : https://github.com/seajs/seajs/blob/master/src/util-path.js
      * @note        : browser only
      */
-    var re = {
-            absolute       : /^\/\/.|:\//,
-            dirname        : /[^?#]*\//,
-            dot            : /\/\.\//g,
-            doubleDot      : /\/[^/]+\/\.\.\//,
-            ignoreLocation : /^(about|blob):/,
-            multiSlash     : /([^:/])\/+\//g,
-            path           : /^([^/:]+)(\/.+)$/,
-            rootDir        : /^.*?\/\/.*?\//
-        },
+    var
+        // 正则 {
+            re_absolute       = /^\/\/.|:\//,
+            re_dirname        = /[^?#]*\//,
+            re_dot            = /\/\.\//g,
+            re_doubleDot      = /\/[^/]+\/\.\.\//,
+            re_ignoreLocation = /^(about|blob):/,
+            re_multiSlash     = /([^:/])\/+\//g,
+            re_path           = /^([^/:]+)(\/.+)$/,
+            re_rootDir        = /^.*?\/\/.*?\//,
+        // }
         data         = Module._data,
         doc          = document,
         lc           = location,
@@ -894,17 +911,17 @@ define('module/path', [
 
     function dirname(path) {
         // dirname('a/b/c.js?t=123#xx/zz') ==> 'a/b/'
-        return path.match(re.dirname)[0];
+        return path.match(re_dirname)[0];
     }
     function realpath(path) {
-        path = path.replace(re.dot, '/'); // /a/b/./c/./d ==> /a/b/c/d
+        path = path.replace(re_dot, '/'); // /a/b/./c/./d ==> /a/b/c/d
         // a//b/c ==> a/b/c
         // a///b/////c ==> a/b/c
         // DOUBLE_DOT_RE matches a/b/c//../d path correctly only if replace // with / first
-        path = path.replace(re.multiSlash, '$1/');
-        while (path.match(re.doubleDot)) {
+        path = path.replace(re_multiSlash, '$1/');
+        while (path.match(re_doubleDot)) {
             // a/b/c/../../d  ==>  a/b/../d  ==>  a/d
-            path = path.replace(re.doubleDot, '/');
+            path = path.replace(re_doubleDot, '/');
         }
         return path;
     }
@@ -926,7 +943,7 @@ define('module/path', [
     function parsePaths(id) {
         var m,
             paths = data.paths;
-        if (paths && (m = id.match(re.path)) && pastry.isString(paths[m[1]])) {
+        if (paths && (m = id.match(re_path)) && pastry.isString(paths[m[1]])) {
             id = paths[m[1]] + m[2];
         }
         return id;
@@ -935,12 +952,12 @@ define('module/path', [
         var ret,
             first = id.charCodeAt(0);
 
-        if (re.absolute.test(id)) { // Absolute
+        if (re_absolute.test(id)) { // Absolute
             ret = id;
         } else if (first === 46 /* '.' */) { // Relative
             ret = (refUri ? dirname(refUri) : data.cwd) + id;
         } else if (first === 47 /* '/' */) { // Root
-            var m = data.cwd.match(re.rootDir);
+            var m = data.cwd.match(re_rootDir);
             ret = m ? m[0] + id.substring(1) : id;
         } else { // Top-level
             ret = data.base + id;
@@ -965,7 +982,7 @@ define('module/path', [
         return uri;
     }
 
-    data.cwd  = (!href || re.ignoreLocation.test(href)) ? '' : dirname(href);
+    data.cwd  = (!href || re_ignoreLocation.test(href)) ? '' : dirname(href);
     data.path = loaderPath;
     data.dir  = data.base = dirname(loaderPath || data.cwd);
 
@@ -1194,6 +1211,261 @@ define('module/config', [
     Module.config = function () { };
     // var  module;
     // return  module;
+});
+
+/* jshint strict: true, undef: true, unused: true */
+/* global define */
+
+define('color/hexByName', [
+], function(
+) {
+    'use strict';
+    /*
+     * @author      : 绝云（wensen.lws）
+     * @description : 颜色hex值列表
+     */
+
+    var hexByName = {
+        aliceblue            : "f0f8ff",
+        antiquewhite         : "faebd7",
+        aqua                 : "00ffff",
+        aquamarine           : "7fffd4",
+        azure                : "f0ffff",
+        beige                : "f5f5dc",
+        bisque               : "ffe4c4",
+        black                : "000000",
+        blanchedalmond       : "ffebcd",
+        blue                 : "0000ff",
+        blueviolet           : "8a2be2",
+        brown                : "a52a2a",
+        burlywood            : "deb887",
+        burntsienna          : "ea7e5d",
+        cadetblue            : "5f9ea0",
+        chartreuse           : "7fff00",
+        chocolate            : "d2691e",
+        coral                : "ff7f50",
+        cornflowerblue       : "6495ed",
+        cornsilk             : "fff8dc",
+        crimson              : "dc143c",
+        cyan                 : "00ffff",
+        darkblue             : "00008b",
+        darkcyan             : "008b8b",
+        darkgoldenrod        : "b8860b",
+        darkgray             : "a9a9a9",
+        darkgreen            : "006400",
+        darkgrey             : "a9a9a9",
+        darkkhaki            : "bdb76b",
+        darkmagenta          : "8b008b",
+        darkolivegreen       : "556b2f",
+        darkorange           : "ff8c00",
+        darkorchid           : "9932cc",
+        darkred              : "8b0000",
+        darksalmon           : "e9967a",
+        darkseagreen         : "8fbc8f",
+        darkslateblue        : "483d8b",
+        darkslategray        : "2f4f4f",
+        darkslategrey        : "2f4f4f",
+        darkturquoise        : "00ced1",
+        darkviolet           : "9400d3",
+        deeppink             : "ff1493",
+        deepskyblue          : "00bfff",
+        dimgray              : "696969",
+        dimgrey              : "696969",
+        dodgerblue           : "1e90ff",
+        firebrick            : "b22222",
+        floralwhite          : "fffaf0",
+        forestgreen          : "228b22",
+        fuchsia              : "ff00ff",
+        gainsboro            : "dcdcdc",
+        ghostwhite           : "f8f8ff",
+        gold                 : "ffd700",
+        goldenrod            : "daa520",
+        gray                 : "808080",
+        green                : "008000",
+        greenyellow          : "adff2f",
+        grey                 : "808080",
+        honeydew             : "f0fff0",
+        hotpink              : "ff69b4",
+        indianred            : "cd5c5c",
+        indigo               : "4b0082",
+        ivory                : "fffff0",
+        khaki                : "f0e68c",
+        lavender             : "e6e6fa",
+        lavenderblush        : "fff0f5",
+        lawngreen            : "7cfc00",
+        lemonchiffon         : "fffacd",
+        lightblue            : "add8e6",
+        lightcoral           : "f08080",
+        lightcyan            : "e0ffff",
+        lightgoldenrodyellow : "fafad2",
+        lightgray            : "d3d3d3",
+        lightgreen           : "90ee90",
+        lightgrey            : "d3d3d3",
+        lightpink            : "ffb6c1",
+        lightsalmon          : "ffa07a",
+        lightseagreen        : "20b2aa",
+        lightskyblue         : "87cefa",
+        lightslategray       : "778899",
+        lightslategrey       : "778899",
+        lightsteelblue       : "b0c4de",
+        lightyellow          : "ffffe0",
+        lime                 : "00ff00",
+        limegreen            : "32cd32",
+        linen                : "faf0e6",
+        magenta              : "ff00ff",
+        maroon               : "800000",
+        mediumaquamarine     : "66cdaa",
+        mediumblue           : "0000cd",
+        mediumorchid         : "ba55d3",
+        mediumpurple         : "9370db",
+        mediumseagreen       : "3cb371",
+        mediumslateblue      : "7b68ee",
+        mediumspringgreen    : "00fa9a",
+        mediumturquoise      : "48d1cc",
+        mediumvioletred      : "c71585",
+        midnightblue         : "191970",
+        mintcream            : "f5fffa",
+        mistyrose            : "ffe4e1",
+        moccasin             : "ffe4b5",
+        navajowhite          : "ffdead",
+        navy                 : "000080",
+        oldlace              : "fdf5e6",
+        olive                : "808000",
+        olivedrab            : "6b8e23",
+        orange               : "ffa500",
+        orangered            : "ff4500",
+        orchid               : "da70d6",
+        palegoldenrod        : "eee8aa",
+        palegreen            : "98fb98",
+        paleturquoise        : "afeeee",
+        palevioletred        : "db7093",
+        papayawhip           : "ffefd5",
+        peachpuff            : "ffdab9",
+        peru                 : "cd853f",
+        pink                 : "ffc0cb",
+        plum                 : "dda0dd",
+        powderblue           : "b0e0e6",
+        purple               : "800080",
+        rebeccapurple        : "663399",
+        red                  : "ff0000",
+        rosybrown            : "bc8f8f",
+        royalblue            : "4169e1",
+        saddlebrown          : "8b4513",
+        salmon               : "fa8072",
+        sandybrown           : "f4a460",
+        seagreen             : "2e8b57",
+        seashell             : "fff5ee",
+        sienna               : "a0522d",
+        silver               : "c0c0c0",
+        skyblue              : "87ceeb",
+        slateblue            : "6a5acd",
+        slategray            : "708090",
+        slategrey            : "708090",
+        snow                 : "fffafa",
+        springgreen          : "00ff7f",
+        steelblue            : "4682b4",
+        tan                  : "d2b48c",
+        teal                 : "008080",
+        thistle              : "d8bfd8",
+        tomato               : "ff6347",
+        turquoise            : "40e0d0",
+        violet               : "ee82ee",
+        wheat                : "f5deb3",
+        white                : "ffffff",
+        whitesmoke           : "f5f5f5",
+        yellow               : "ffff00",
+        yellowgreen          : "9acd32"
+    };
+
+    return hexByName;
+});
+
+/* jshint strict: true, undef: true, unused: true */
+/* global define */
+
+define('color/cssByName', [
+    'pastry',
+    'color/hexByName'
+], function(
+    pastry,
+    hexByName
+) {
+    'use strict';
+    /*
+     * @author      :  author
+     * @description :  description
+     */
+    var preffix = '#',
+        colorByName = {};
+
+    pastry.each(hexByName, function (hex, name) {
+        colorByName[name] = preffix + hex;
+    });
+    return colorByName;
+});
+
+/* jshint strict: true, undef: true, unused: true */
+/* global define */
+
+define('color/utils', [
+    // 'pastry'
+], function (
+    // pastry
+) {
+    'use strict';
+    /*
+     * @author      : 绝云
+     * @date        : 2014-11-07
+     * @description : color 相关
+     */
+    var colorPrefix = '#',
+        maxColorHex = parseInt('ffffff', 16);
+
+    function cssColorByHex (hex) {
+       return colorPrefix + completeColorHex(hex);
+    }
+    function completeColorHex (hex) {
+        if (hex.length === 6) {
+            return hex;
+        }
+        while(hex.length < 6) {
+            hex = '0' + hex;
+        }
+        return hex;
+    }
+    function hexByCssColor (color) {
+        return parseInt(color.replace(colorPrefix, ''), 16);
+    }
+    function oppositeColor (color) {
+        var hex = hexByCssColor(color);
+
+        return cssColorByHex((maxColorHex - hex).toString(16));
+    }
+    function hex2RGB (hex) {
+        hex = completeColorHex(hex.toString(16));
+        return {
+            R: parseInt(hex.substr(0, 2), 16),
+            G: parseInt(hex.substr(2, 2), 16),
+            B: parseInt(hex.substr(4, 2), 16)
+        };
+    }
+    function greyColor (color) {
+        var hex = hexByCssColor(color),
+            rgb = hex2RGB(hex),
+            average = Math.floor((rgb.R + rgb.G + rgb.B) / 3);
+
+        return cssColorByHex(
+            average.toString(16) +
+            average.toString(16) +
+            average.toString(16)
+        );
+    }
+    return {
+        cssColorByHex : cssColorByHex,
+        greyColor     : greyColor,
+        hexByCssColor : hexByCssColor,
+        oppositeColor : oppositeColor
+    };
 });
 
 /* jshint strict: true, undef: true, unused: true */
@@ -1610,8 +1882,8 @@ define('querystring', [
                  * @param       : {String} str, query string to be parsed.
                  * @return      : {Object} parsed object.
                  */
-                sep = sep || "&";
-                eq  = eq  || "=";
+                sep = sep || '&';
+                eq  = eq  || '=';
                 var tuple,
                     obj    = {},
                     pieces = qs.split(sep);
@@ -1663,6 +1935,7 @@ define('bom/info', [
     /*
      * @author      : 绝云 (wensen.lws@alibaba-inc.com)
      * @description : 记录各种浏览器相关的版本号
+     * @note        : browser only
      */
     var nav       = navigator || {},
         userAgent = nav.userAgent,
@@ -1801,6 +2074,122 @@ define('bom/info', [
 });
 
 /* jshint strict: true, undef: true, unused: true */
+/* global define, document, window */
+
+define('dom/utils', [
+    // 'pastry'
+], function(
+    // pastry
+) {
+    'use strict';
+    /*
+     * @author      : 绝云（wensen.lws）
+     * @description : utils for dom operations
+     * @note        : browser only
+     */
+    var doc  = document,
+        html = doc.documentElement;
+
+    return {
+        isNode: function (element) {
+            var t;
+            return element &&
+                typeof element === 'object' &&
+                (t = element.nodeType) && (t === 1 || t === 9);
+        },
+        contains: 'compareDocumentPosition' in html ?
+            function (element, container) {
+                return (container.compareDocumentPosition(element) & 16) === 16;
+            } :
+            function (element, container) {
+                container = (container === doc || container === window) ?
+                    html : container;
+                return container !== element &&
+                    container.contains(element);
+            }
+    };
+});
+
+/* jshint strict: true, undef: true, unused: true */
+/* global define, document, window */
+
+define('dom/query', [
+    'pastry',
+    'dom/utils'
+], function(
+    pastry,
+    domUtils
+) {
+    'use strict';
+    /*
+     * @author      : 绝云（wensen.lws）
+     * @description : selector engine
+     * @note        : browser only
+     */
+    var
+        // 正则 {
+            re_quick = /^(?:#([\w-]+)|(\w+)|\.([\w-]+))$/, // 应用快速选择器
+        // }
+        // 全局变量 {
+            doc  = document,
+            win  = window,
+        // }
+        // utils {
+            toArray   = pastry.toArray,
+            arrayLike = pastry.isArrayLike,
+            isNode    = domUtils.isNode,
+            contains  = domUtils.contains;
+        // }
+
+    function normalizeRoot (root) {
+        if (!root) {
+            return doc;
+        }
+        if (typeof root === 'string') {
+            return query(root)[0];
+        }
+        if (!root['nodeType'] && arrayLike(root)) {
+            return root[0];
+        }
+        return root;
+    }
+    function query (selector, optRoot) {
+        var root = normalizeRoot(optRoot);
+
+        if (!root || !selector) {
+            return [];
+        }
+        if (selector === win || isNode(selector)) {
+            return (!optRoot || (selector !== win && isNode(root) && contains(selector, root))) ?
+                [selector] : [];
+        }
+        if (selector && arrayLike(selector)) {
+            return pastry.flatten(selector);
+        }
+
+        if (pastry.isString(selector)) {
+            var match = re_quick.exec(selector);
+
+            if (match) {
+                if (match[1]) {
+                    return [root.getElementById(match[1])];
+                } else if (match[2] ) {
+                    return toArray(root.getElementsByTagName(match[2]));
+                } else if (match[3]) {
+                    return toArray(root.getElementsByClassName(match[3]));
+                }
+            }
+        }
+        if (selector && (selector.document || (selector.nodeType && selector.nodeType === 9))) {
+            return !optRoot ? [selector] : [];
+        }
+        return toArray((root).querySelectorAll(selector));
+    }
+
+    return query;
+});
+
+/* jshint strict: true, undef: true, unused: true */
 /* global define, XMLHttpRequest, ActiveXObject, location */
 
 define('io/ajax', [
@@ -1819,6 +2208,7 @@ define('io/ajax', [
      * @author      : 绝云(wensen.lws@alibaba-inc.com)
      * @date        : 2014-11-19
      * @description : io 模块 - ajax
+     * @note        : browser only
      */
 
     function getXHR () {
