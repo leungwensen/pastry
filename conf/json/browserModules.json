@@ -1,0 +1,21 @@
+[
+    "src/core.js",
+    "src/event.js",
+    "src/module/define.js",
+    "src/module/path.js",
+    "src/module/request.js",
+    "src/module/loader.js",
+    "src/module/config.js",
+    "src/color/hexByName.js",
+    "src/color/cssByName.js",
+    "src/color/utils.js",
+    "src/fmt/date.js",
+    "src/fmt/sprintf.js",
+    "src/fmt/vsprintf.js",
+    "src/json.js",
+    "src/querystring.js",
+    "src/bom/info.js",
+    "src/dom/utils.js",
+    "src/dom/query.js",
+    "src/io/ajax.js"
+]

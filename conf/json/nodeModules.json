@@ -1,0 +1,9 @@
+[
+    "src/core.js",
+    "src/event.js",
+    "src/module/define.js",
+    "src/fmt/date.js",
+    "src/fmt/sprintf.js",
+    "src/fmt/vsprintf.js",
+    "src/json.js"
+]
