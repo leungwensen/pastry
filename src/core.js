@@ -366,8 +366,24 @@
             };
         // }
         // 数组、对象相关 {
+            P.isArrayLike = function (obj) {
+                return (typeof obj === 'object' && isFinite(obj.length));
+            };
             P.toArray = function (obj) {
-                return slice.call(obj);
+                return P.isArrayLike(obj) ? slice.call(obj) : [];
+            };
+            P.flatten = function (array) {
+                /*
+                 * @description: 扁平化二维数组
+                 */
+                for (var r = [], i = 0, l = array.length; i < l; ++i) {
+                    if (P.isArrayLike(array[i])) {
+                        r = r.concat(array[i]);
+                    } else {
+                        r[r.length] = array[i];
+                    }
+                }
+                return r;
             };
             P.merge = function (dest) {
                 /*
