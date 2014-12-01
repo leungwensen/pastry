@@ -4,7 +4,11 @@ var pastry = require('pastry');
 
 module.exports = function (grunt) {
     'use strict';
-    var pkg = grunt.file.readJSON('package.json');
+    var pkg  = grunt.file.readJSON('package.json'),
+        conf = {
+            browserModules : grunt.file.readJSON('conf/json/browserModules.json'),
+            nodeModules    : grunt.file.readJSON('conf/json/nodeModules.json')
+        };
 
     grunt.initConfig({
         pkg: pkg,
@@ -29,11 +33,11 @@ module.exports = function (grunt) {
                 separator: '',
             },
             browserDebug: {
-                src  : pkg.browserModules,
+                src  : conf.browserModules,
                 dest : '<%= dist.browser %>'
             },
             nodeDebug: {
-                src  : pkg.nodeModules,
+                src  : conf.nodeModules,
                 dest : '<%= dist.node %>'
             },
         },
