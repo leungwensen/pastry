@@ -740,8 +740,9 @@ var define;
      * @author      : wensen.lws
      * @description : 模块加载
      * @note        : 和 seajs、requirejs 的不同之一：define 的模块即时运行
+     * @TODO        : id 重复定义报错
      */
-    if (define) { // 避免反复执行
+    if (define) { // 避免反复执行以及和其它模块加载器冲突
         return;
     }
 
@@ -757,12 +758,14 @@ var define;
             return mod;
         },
 
-        data = Module._data = {},
+        // 缓存数据 {
+            data = Module._data = {},
 
-        moduleByUri   = data.moduleByUri   = {},
-        exportsByUri  = data.exportsByUri  = {},
-        executedByUri = data.executedByUri = {},
-        queueByUri    = data.queueByUri    = {},
+            moduleByUri   = data.moduleByUri   = {},
+            exportsByUri  = data.exportsByUri  = {},
+            executedByUri = data.executedByUri = {},
+            queueByUri    = data.queueByUri    = {}, // 模块执行队列
+        // }
 
         require;
 

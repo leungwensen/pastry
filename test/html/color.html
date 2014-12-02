@@ -24,7 +24,7 @@
             cssByName
         ) {
             var doc = document,
-                $table = query('#colorTable')[0];
+                $table = query.one('#colorTable');
 
             function createColorTr (name, color) {
                     $tr      = doc.createElement('tr'),

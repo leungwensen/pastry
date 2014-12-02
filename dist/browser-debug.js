@@ -740,8 +740,9 @@ var define;
      * @author      : wensen.lws
      * @description : 模块加载
      * @note        : 和 seajs、requirejs 的不同之一：define 的模块即时运行
+     * @TODO        : id 重复定义报错
      */
-    if (define) { // 避免反复执行
+    if (define) { // 避免反复执行以及和其它模块加载器冲突
         return;
     }
 
@@ -757,12 +758,14 @@ var define;
             return mod;
         },
 
-        data = Module._data = {},
+        // 缓存数据 {
+            data = Module._data = {},
 
-        moduleByUri   = data.moduleByUri   = {},
-        exportsByUri  = data.exportsByUri  = {},
-        executedByUri = data.executedByUri = {},
-        queueByUri    = data.queueByUri    = {},
+            moduleByUri   = data.moduleByUri   = {},
+            exportsByUri  = data.exportsByUri  = {},
+            executedByUri = data.executedByUri = {},
+            queueByUri    = data.queueByUri    = {}, // 模块执行队列
+        // }
 
         require;
 
@@ -2123,29 +2126,28 @@ define('dom/query', [
     'use strict';
     /*
      * @author      : 绝云（wensen.lws）
-     * @description : selector engine
+     * @description : selector
      * @note        : browser only
      */
     var
-        // 正则 {
-            re_quick = /^(?:#([\w-]+)|(\w+)|\.([\w-]+))$/, // 应用快速选择器
-        // }
-        // 全局变量 {
-            doc  = document,
-            win  = window,
-        // }
         // utils {
             toArray   = pastry.toArray,
             arrayLike = pastry.isArrayLike,
+            isString  = pastry.isString,
             isNode    = domUtils.isNode,
-            contains  = domUtils.contains;
+            contains  = domUtils.contains,
         // }
+        doc      = document,
+        win      = window,
+        idPrefix = '#',
+        re_quick = /^(?:#([\w-]+)|(\w+)|\.([\w-]+))$/, // 应用快速选择器
+        result   = {};
 
     function normalizeRoot (root) {
         if (!root) {
             return doc;
         }
-        if (typeof root === 'string') {
+        if (isString(root)) {
             return query(root)[0];
         }
         if (!root['nodeType'] && arrayLike(root)) {
@@ -2154,23 +2156,25 @@ define('dom/query', [
         return root;
     }
     function query (selector, optRoot) {
-        var root = normalizeRoot(optRoot);
+        /*
+         * description: 选择器
+         */
+        var root = normalizeRoot(optRoot),
+            match;
 
         if (!root || !selector) {
             return [];
         }
         if (selector === win || isNode(selector)) {
-            return (!optRoot || (selector !== win && isNode(root) && contains(selector, root))) ?
+            return !optRoot || (selector !== win && isNode(root) && contains(selector, root)) ?
                 [selector] : [];
         }
         if (selector && arrayLike(selector)) {
             return pastry.flatten(selector);
         }
 
-        if (pastry.isString(selector)) {
-            var match = re_quick.exec(selector);
-
-            if (match) {
+        // 简单查询使用快速查询方法 {
+            if (isString(selector) && (match = re_quick.exec(selector))) {
                 if (match[1]) {
                     return [root.getElementById(match[1])];
                 } else if (match[2] ) {
@@ -2179,14 +2183,28 @@ define('dom/query', [
                     return toArray(root.getElementsByClassName(match[3]));
                 }
             }
-        }
+        // }
         if (selector && (selector.document || (selector.nodeType && selector.nodeType === 9))) {
             return !optRoot ? [selector] : [];
         }
         return toArray((root).querySelectorAll(selector));
     }
+    function queryOne (selector, optRoot) {
+        return query(selector, optRoot)[0];
+    }
 
-    return query;
+    // 封装 api {
+        return pastry.extend(result, {
+            all  : query,
+            one  : queryOne,
+            byId : function (selector, optRoot) {
+                if (isString(selector) && selector.charAt(0) !== idPrefix) {
+                    return queryOne(idPrefix + selector, optRoot);
+                }
+                return queryOne(selector, optRoot);
+            }
+        });
+    // }
 });
 
 /* jshint strict: true, undef: true, unused: true */
