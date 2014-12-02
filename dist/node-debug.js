@@ -26,10 +26,17 @@
         OP = O[PS],
         SP = S[PS],
 
+        isObject,
+        isFunction,
+
         toStr = {}.toString,
         slice = AP.slice,
 
-        noop = function () { };
+        noop = function () { },
+
+        isType = function (type, obj) {
+            return toStr.call(obj) === '[object ' + type + ']';
+        };
     // }
     // 版本号 {
         P.VERSION = '0.2.0';
@@ -337,18 +344,18 @@
                 'Boolean',
                 'Date',
                 'Error',
-                'Function',
                 'Number',
                 'RegExp',
                 'String'
             ], function (type) {
                 P['is' + type] = function (obj) {
-                    return toStr.call(obj) === '[object ' + type + ']';
+                    return isType(type, obj);
                 };
             });
-            P.isArray = A.isArray ? A.isArray : P.isArray;
-
-            P.isObject = function (obj) {
+            P.isFunction = isFunction = function (obj) {
+                return isType('Function', obj);
+            };
+            P.isObject = isObject = function (obj) {
                 var type = typeof obj;
                 return type === 'object' && !!obj;
             };
@@ -364,6 +371,9 @@
             P.isNull = function (obj) {
                 return obj === null;
             };
+            if (A.isArray) {
+                P.isArray = A.isArray;
+            }
         // }
         // 数组、对象相关 {
             P.isArrayLike = function (obj) {
@@ -391,11 +401,11 @@
                  * @parameter*  : {Object} dest, 目标对象
                  * @syntax      : pastry.merge(dest Object[, src1 Object, src2 Object, ...]);
                  */
-                if (P.isObject(dest)) {
+                if (isObject(dest) || isFunction(dest)) {
                     P.each(P.toArray(arguments).slice(1), function (source) {
                         if (source) {
                             for (var prop in source) {
-                                if (P.isObject(source[prop])) {
+                                if (isObject(source[prop])) {
                                     dest[prop] = dest[prop] || {};
                                     P.merge(dest[prop], source[prop]);
                                 } else {
@@ -413,7 +423,7 @@
                  * @parameter*  : {Object} dest, 目标对象
                  * @syntax      : pastry.extend(dest Object[, src1 Object, src2 Object, ...]);
                  */
-                if (P.isObject(dest)) {
+                if (isObject(dest) || isFunction(dest)) {
                     P.each(P.toArray(arguments).slice(1), function (source) {
                         if (source) {
                             for (var prop in source) {
@@ -451,7 +461,7 @@
                     return O.keys(obj);
                 } : function (obj) {
                     var result = [];
-                    if (P.isFunction(obj)) {
+                    if (isFunction(obj)) {
                         P.each(obj, function (value, key) {
                             if (key !== P) {
                                 result.push(key);
@@ -534,7 +544,7 @@
                 function (func, oThis) {
                     return func.bind(oThis, P.toArray(arguments).slice(2));
                 } : function (func, oThis) {
-                    if (P.isFunction(oThis) && P.isFunction(func)) {
+                    if (isFunction(oThis) && isFunction(func)) {
                         var aArgs  = P.toArray(arguments).slice(2),
                             FNOP   = function () {},
                             fBound = function () {
