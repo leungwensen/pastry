@@ -5,5 +5,7 @@
     "src/fmt/date.js",
     "src/fmt/sprintf.js",
     "src/fmt/vsprintf.js",
+    "src/color/named.js",
+    "src/Color.js",
     "src/json.js"
 ]
