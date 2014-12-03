@@ -10,6 +10,9 @@
         <tr>
             <th>name</th>
             <th>color</th>
+            <th>greyColor</th>
+            <th>css</th>
+            <th>hsla</th>
         </tr>
     </table>
     <script src="../../dist/browser-debug.js"></script>
@@ -17,28 +20,59 @@
         require([
             'pastry',
             'dom/query',
-            'color/cssByName'
+            'Color'
         ], function (
             pastry,
             query,
-            cssByName
+            Color
         ) {
             var doc = document,
                 $table = query.one('#colorTable');
 
             function createColorTr (name, color) {
-                    $tr      = doc.createElement('tr'),
-                    $tdName  = doc.createElement('td'),
-                    $tdColor = doc.createElement('td');
-                $tdName.innerHTML = name;
-                $tdColor.style['background-color'] = color;
-                $tr.appendChild($tdName);
-                $tr.appendChild($tdColor);
+                var $tr       = doc.createElement('tr'),
+                    color     = new Color(color),
+                    greyColor = color.toGrey(),
+                    $tds      = {},
+                    fontColor = greyColor.r > 125 ? 'black' : 'white';
+
+                pastry.each([
+                    'name',
+                    'color',
+                    'greyColor',
+                    'css',
+                    'hsla'
+                ], function (str) {
+                    $tds[str] = doc.createElement('td');
+                });
+
+                $tds.name.innerHTML      = name;
+                $tds.color.innerHTML     = color.toHex();
+                $tds.hsla.innerHTML      = color.toHsla();
+                $tds.css.innerHTML       = color.toCss(true);
+                $tds.greyColor.innerHTML = greyColor.toHex();
+
+                $tds.color.style['background-color']     = color;
+                $tds.greyColor.style['background-color'] = greyColor;
+                $tds.color.style['color']     = fontColor;
+                $tds.greyColor.style['color'] = fontColor;
+
+                pastry.each([
+                    'name',
+                    'color',
+                    'greyColor',
+                    'css',
+                    'hsla'
+                ], function (str) {
+                    $tr.appendChild($tds[str]);
+                });
+                color.destroy();
+                greyColor.destroy();
                 return $tr;
             };
 
-            pastry.each(cssByName, function (css, name) {
-                $table.appendChild(createColorTr(name, css));
+            pastry.each(Color.named, function (rgb, name) {
+                $table.appendChild(createColorTr(name, rgb));
             });
         });
     </script>
