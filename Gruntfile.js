@@ -6,8 +6,8 @@ module.exports = function (grunt) {
     'use strict';
     var pkg  = grunt.file.readJSON('package.json'),
         conf = {
-            browserModules : grunt.file.readJSON('conf/json/browserModules.json'),
-            nodeModules    : grunt.file.readJSON('conf/json/nodeModules.json')
+            browserModules : grunt.file.readJSON('data/json/browserModules.json'),
+            nodeModules    : grunt.file.readJSON('data/json/nodeModules.json')
         };
 
     grunt.initConfig({
