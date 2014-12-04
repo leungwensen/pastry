@@ -729,13 +729,11 @@
             };
         // }
 
-    // add .event to pastry {
-        pastry.mixin({
-            event: event
-        });
-    // }
     // add on(), off(), emit(), trigger() to pastry {
         event(pastry);
+    // }
+    // add .event to pastry {
+        pastry.event = event;
     // }
 }(this));
 
@@ -1066,10 +1064,7 @@ define('fmt/sprintf', [
             return newString;
         };
 
-    pastry.mixin({
-        sprintf: sprintf
-    });
-    return sprintf;
+    return pastry.sprintf = sprintf;
 });
 /* jshint strict: true, undef: true, unused: true */
 /* global define */
@@ -1092,10 +1087,163 @@ define('fmt/vsprintf', [
         return sprintf.apply(null, argv);
     };
 
-    pastry.mixin({
-        vsprintf: vsprintf
-    });
-    return vsprintf;
+    return pastry.vsprintf = vsprintf;
+});
+
+/* jshint strict: true, undef: true, unused: true */
+/* global define */
+
+define('json', [
+    'pastry',
+    'fmt/date'
+], function (
+    pastry,
+    fmtDate
+) {
+    'use strict';
+    /*
+     * @author      : 绝云(wensen.lws@alibaba-inc.com)
+     * @date        : 2014-10-07
+     * @description : shim 模块 - JSON
+     * @reference   : https://github.com/dojo/dojo/blob/master/json.js
+     */
+    function exportJSON (obj) {
+        /*
+         * export JSON object
+         */
+        pastry.JSON = obj;
+        pastry.setGLOBAL('JSON', obj);
+    }
+
+    if (JSON && !!JSON.parse && !!JSON.stringify) {
+        exportJSON(JSON);
+        return JSON;
+    }
+
+    var D2JSON = Date.prototype.toJSON,
+        // saving codes {
+            isFunction = pastry.isFunction,
+            isString   = pastry.isString,
+            isNumber   = pastry.isNumber;
+        // }
+
+    // 补全基础数据类型的 toJSON 方法 {
+        if (!isFunction(D2JSON)) {
+            pastry.each([
+                String.prototype,
+                Number.prototype,
+                Boolean.prototype
+            ], function (p) {
+                p.toJSON = function () {
+                    return this.valueOf();
+                };
+            });
+            D2JSON = function () {
+                return isFinite(this.valueOf()) ? fmtDate(this) : null;
+            };
+        }
+    // }
+
+    var undef,
+        escapeString = function (/*String*/str) {
+            return ('"' + str.replace(/(["\\])/g, '\\$1') + '"')
+                .replace(/[\f]/g, '\\f')
+                .replace(/[\b]/g, '\\b')
+                .replace(/[\n]/g, '\\n')
+                .replace(/[\t]/g, '\\t')
+                .replace(/[\r]/g, '\\r');
+        },
+        shim = {
+            parse: function (str, strict) {
+                /*
+                 * @description: 从 JSON 字符串得到一个数据结构
+                 */
+                if (strict && !/^([\s\[\{]*(?:"(?:\\.|[^"])*"|-?\d[\d\.]*(?:[Ee][+-]?\d+)?|null|true|false|)[\s\]\}]*(?:,|:|$))+$/.test(str)) {
+                    pastry.ERROR('Invalid characters in JSON');
+                }
+                /* jshint -W061 */
+                return eval('(' + str + ')');
+            },
+            stringify: function (value, replacer, spacer) {
+                /*
+                 * @description: 把内置数据类型转为 JSON 字符串
+                 */
+                if (isString(replacer)) {
+                    spacer = replacer;
+                    replacer = null;
+                }
+                function stringify (it, indent, key) {
+                    if (replacer) {
+                        it = replacer(key, it);
+                    }
+                    var val;
+                    if (isNumber(it)) {
+                        return isFinite(it) ? it + '' : 'null';
+                    }
+                    if (pastry.isBoolean(it)) {
+                        return it + '';
+                    }
+                    if (it === null) {
+                        return 'null';
+                    }
+                    if (isString(it)) {
+                        return escapeString(it);
+                    }
+                    if (isFunction(it) || !it) {
+                        return undef;
+                    }
+                    if (isFunction(it.toJSON)) {
+                        return stringify(it.toJSON(key), indent, key);
+                    }
+                    if (pastry.isDate(it)) {
+                        return fmtDate(it);
+                    }
+                    if (it.valueOf() !== it) {
+                        return stringify(it.valueOf(), indent, key);
+                    }
+                    var nextIndent= spacer ? (indent + spacer) : '',
+                        sep = spacer ? ' ' : '',
+                        newLine = spacer ? '\n' : '';
+
+                    if (pastry.isArray(it)) {
+                        var itl = it.length,
+                            res = [];
+                        for (key = 0; key < itl; key++) {
+                            var obj = it[key];
+                            val = stringify(obj, nextIndent, key);
+                            if (!isString(val)) {
+                                val = 'null';
+                            }
+                            res.push(newLine + nextIndent + val);
+                        }
+                        return '[' + res.join(',') + newLine + indent + ']';
+                    }
+                    var output = [];
+                    for (key in it) {
+                        var keyStr;
+                        if (it.hasOwnProperty(key)) {
+                            if (isNumber(key)) {
+                                keyStr = '"' + key + '"';
+                            } else if (isString(key)) {
+                                keyStr = escapeString(key);
+                            } else {
+                                continue;
+                            }
+                            val = stringify(it[key], nextIndent, key);
+                            if (!isString(val)) {
+                                continue;
+                            }
+                            output.push(newLine + nextIndent + keyStr + ':' + sep + val);
+                        }
+                    }
+                    return '{' + output.join(',') + newLine + indent + '}';
+                }
+                return stringify(value, '', '');
+            }
+        };
+
+    exportJSON(shim);
+    return shim;
 });
 
 /* jshint strict: true, undef: true, unused: true */
@@ -1268,7 +1416,7 @@ define('color/named', [
 /* jshint strict: true, undef: true, unused: true */
 /* global define */
 
-define('Color', [
+define('class/Color', [
     'pastry',
     'color/named'
 ], function(
@@ -1496,165 +1644,5 @@ define('Color', [
         }
     });
 
-    pastry.mixin({
-        Color: Color
-    });
-    return Color;
+    return pastry.Color = Color;
 });
-/* jshint strict: true, undef: true, unused: true */
-/* global define */
-
-define('json', [
-    'pastry',
-    'fmt/date'
-], function (
-    pastry,
-    fmtDate
-) {
-    'use strict';
-    /*
-     * @author      : 绝云(wensen.lws@alibaba-inc.com)
-     * @date        : 2014-10-07
-     * @description : shim 模块 - JSON
-     * @reference   : https://github.com/dojo/dojo/blob/master/json.js
-     */
-    function exportJSON (obj) {
-        /*
-         * export JSON object
-         */
-        pastry.mixin({
-            JSON: obj
-        });
-        pastry.setGLOBAL('JSON', obj);
-    }
-    // saving codes {
-        function isFunction (obj) { return pastry.isFunction(obj); }
-        function isString   (obj) { return pastry.isString(obj);   }
-        function isNumber   (obj) { return pastry.isNumber(obj);   }
-    // }
-
-    if (JSON && !!JSON.parse && !!JSON.stringify) {
-        exportJSON(JSON);
-        return JSON;
-    }
-    // 补全基础数据类型的 toJSON 方法 {
-        var D2JSON = Date.prototype.toJSON;
-
-        if (!isFunction(D2JSON)) {
-            pastry.each([
-                String.prototype,
-                Number.prototype,
-                Boolean.prototype
-            ], function (p) {
-                p.toJSON = function () {
-                    return this.valueOf();
-                };
-            });
-            D2JSON = function () {
-                return isFinite(this.valueOf()) ? fmtDate(this) : null;
-            };
-        }
-    // }
-
-    var undef,
-        escapeString = function (/*String*/str) {
-            return ('"' + str.replace(/(["\\])/g, '\\$1') + '"')
-                .replace(/[\f]/g, '\\f')
-                .replace(/[\b]/g, '\\b')
-                .replace(/[\n]/g, '\\n')
-                .replace(/[\t]/g, '\\t')
-                .replace(/[\r]/g, '\\r');
-        },
-        shim = {
-            parse: function (str, strict) {
-                /*
-                 * @description: 从 JSON 字符串得到一个数据结构
-                 */
-                if (strict && !/^([\s\[\{]*(?:"(?:\\.|[^"])*"|-?\d[\d\.]*(?:[Ee][+-]?\d+)?|null|true|false|)[\s\]\}]*(?:,|:|$))+$/.test(str)) {
-                    pastry.ERROR('Invalid characters in JSON');
-                }
-                /* jshint -W061 */
-                return eval('(' + str + ')');
-            },
-            stringify: function (value, replacer, spacer) {
-                /*
-                 * @description: 把内置数据类型转为 JSON 字符串
-                 */
-                if (isString(replacer)) {
-                    spacer = replacer;
-                    replacer = null;
-                }
-                function stringify (it, indent, key) {
-                    if (replacer) {
-                        it = replacer(key, it);
-                    }
-                    var val;
-                    if (isNumber(it)) {
-                        return isFinite(it) ? it + '' : 'null';
-                    }
-                    if (pastry.isBoolean(it)) {
-                        return it + '';
-                    }
-                    if (it === null) {
-                        return 'null';
-                    }
-                    if (isString(it)) {
-                        return escapeString(it);
-                    }
-                    if (isFunction(it) || !it) {
-                        return undef;
-                    }
-                    if (isFunction(it.toJSON)) {
-                        return stringify(it.toJSON(key), indent, key);
-                    }
-                    if (pastry.isDate(it)) {
-                        return fmtDate(it);
-                    }
-                    if (it.valueOf() !== it) {
-                        return stringify(it.valueOf(), indent, key);
-                    }
-                    var nextIndent= spacer ? (indent + spacer) : '',
-                        sep = spacer ? ' ' : '',
-                        newLine = spacer ? '\n' : '';
-
-                    if (pastry.isArray(it)) {
-                        var itl = it.length,
-                            res = [];
-                        for (key = 0; key < itl; key++) {
-                            var obj = it[key];
-                            val = stringify(obj, nextIndent, key);
-                            if (!isString(val)) {
-                                val = 'null';
-                            }
-                            res.push(newLine + nextIndent + val);
-                        }
-                        return '[' + res.join(',') + newLine + indent + ']';
-                    }
-                    var output = [];
-                    for (key in it) {
-                        var keyStr;
-                        if (it.hasOwnProperty(key)) {
-                            if (isNumber(key)) {
-                                keyStr = '"' + key + '"';
-                            } else if (isString(key)) {
-                                keyStr = escapeString(key);
-                            } else {
-                                continue;
-                            }
-                            val = stringify(it[key], nextIndent, key);
-                            if (!isString(val)) {
-                                continue;
-                            }
-                            output.push(newLine + nextIndent + keyStr + ':' + sep + val);
-                        }
-                    }
-                    return '{' + output.join(',') + newLine + indent + '}';
-                }
-                return stringify(value, '', '');
-            }
-        };
-
-    exportJSON(shim);
-    return shim;
-});
-

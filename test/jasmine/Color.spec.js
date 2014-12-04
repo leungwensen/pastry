@@ -3,7 +3,7 @@
 
 require([
     'pastry',
-    'Color'
+    'class/Color'
 ], function (
     pastry,
     Color

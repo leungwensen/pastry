@@ -19,24 +19,23 @@ define('json', [
         /*
          * export JSON object
          */
-        pastry.mixin({
-            JSON: obj
-        });
+        pastry.JSON = obj;
         pastry.setGLOBAL('JSON', obj);
     }
-    // saving codes {
-        function isFunction (obj) { return pastry.isFunction(obj); }
-        function isString   (obj) { return pastry.isString(obj);   }
-        function isNumber   (obj) { return pastry.isNumber(obj);   }
-    // }
 
     if (JSON && !!JSON.parse && !!JSON.stringify) {
         exportJSON(JSON);
         return JSON;
     }
-    // 补全基础数据类型的 toJSON 方法 {
-        var D2JSON = Date.prototype.toJSON;
 
+    var D2JSON = Date.prototype.toJSON,
+        // saving codes {
+            isFunction = pastry.isFunction,
+            isString   = pastry.isString,
+            isNumber   = pastry.isNumber;
+        // }
+
+    // 补全基础数据类型的 toJSON 方法 {
         if (!isFunction(D2JSON)) {
             pastry.each([
                 String.prototype,

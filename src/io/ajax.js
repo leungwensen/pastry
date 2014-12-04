@@ -114,9 +114,6 @@ define('io/ajax', [
         // }
     };
 
-    pastry.mixin({
-        ajax: ajax
-    });
-    return ajax;
+    return pastry.ajax = ajax;
 });
 

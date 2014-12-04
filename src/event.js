@@ -66,13 +66,11 @@
             };
         // }
 
-    // add .event to pastry {
-        pastry.mixin({
-            event: event
-        });
-    // }
     // add on(), off(), emit(), trigger() to pastry {
         event(pastry);
+    // }
+    // add .event to pastry {
+        pastry.event = event;
     // }
 }(this));
 

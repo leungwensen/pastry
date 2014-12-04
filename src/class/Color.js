@@ -1,7 +1,7 @@
 /* jshint strict: true, undef: true, unused: true */
 /* global define */
 
-define('Color', [
+define('class/Color', [
     'pastry',
     'color/named'
 ], function(
@@ -229,8 +229,5 @@ define('Color', [
         }
     });
 
-    pastry.mixin({
-        Color: Color
-    });
-    return Color;
+    return pastry.Color = Color;
 });

@@ -19,9 +19,6 @@ define('fmt/vsprintf', [
         return sprintf.apply(null, argv);
     };
 
-    pastry.mixin({
-        vsprintf: vsprintf
-    });
-    return vsprintf;
+    return pastry.vsprintf = vsprintf;
 });
 
