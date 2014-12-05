@@ -33,7 +33,7 @@
         "grunt-contrib-cssmin"  : "*" ,
         "grunt-contrib-jasmine" : "*" ,
         "grunt-contrib-jshint"  : "*" ,
-        "grunt-contrib-sass"    : "*" ,
+        "grunt-contrib-less"    : "*" ,
         "grunt-contrib-uglify"  : "*" ,
         "grunt-contrib-watch"   : "*" ,
         "grunt-html-validation" : "*" ,

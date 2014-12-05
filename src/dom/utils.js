@@ -2,9 +2,9 @@
 /* global define, document, window */
 
 define('dom/utils', [
-    // 'pastry'
+    'pastry'
 ], function(
-    // pastry
+    pastry
 ) {
     'use strict';
     /*
@@ -15,7 +15,7 @@ define('dom/utils', [
     var doc  = document,
         html = doc.documentElement;
 
-    return {
+    return pastry.domUtils = {
         isNode: function (element) {
             var t;
             return element &&

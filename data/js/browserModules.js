@@ -25,6 +25,10 @@ module.exports = [
     // json shim {
         "src/json.js",
     // }
+    // Class & declare {
+        "src/Class.js",
+        "src/declare.js",
+    // }
     // color utils {
         "src/color/named.js",
         "src/class/Color.js",
@@ -39,9 +43,23 @@ module.exports = [
         "src/dom/utils.js",
         "src/dom/query.js",
         "src/dom/ready.js",
+        // TODO {
+            // "src/dom/attr.js",
+            // "src/dom/style.js",
+            // "src/dom/construct.js",
+            // "src/dom/data.js",
+            // "src/dom/on.js",
+            // "src/dom/class.js",
+        // }
     // }
     // ajax, etc. {
         "src/io/ajax.js",
+    // }
+    // UI {
+        // popup {
+        // }
+        // dialog {
+        // }
     // }
 ];
 

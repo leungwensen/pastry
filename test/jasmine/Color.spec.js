@@ -13,6 +13,7 @@ require([
     describe('Color', function () {
         it('Color initProps', function () {
             var color = new Color();
+console.log(color);
             expect(color.r).toBe(255);
             expect(color.g).toBe(255);
             expect(color.b).toBe(255);

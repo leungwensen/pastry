@@ -1,0 +1,48 @@
+
+.grid {
+    clear   : both;
+    padding : 0px;
+    margin  : 0px;
+}
+.grid:before, .grid:after {
+    content : "";
+    display : table;
+}
+.grid:after {
+    clear : both;
+}
+.span1   { width : 100%   ; }
+.span1-2 { width : 49.2%  ; }
+.span1-3 { width : 32.2%  ; }
+.span1-4 { width : 23.8%  ; }
+.span2-3 { width : 66.1%  ; }
+.span3-4 { width : 74.6%  ; }
+.span1-5 { width : 18.72% ; }
+.span1-6 { width : 15.33% ; }
+.span1-7 { width : 12.91% ; }
+.span1-8 { width : 11.1%  ; }
+.span2-5 { width : 39.04% ; }
+.span2-7 { width : 27.42% ; }
+.span3-5 { width : 59.36% ; }
+.span3-7 { width : 41.92% ; }
+.span3-8 { width : 36.5%  ; }
+.span4-5 { width : 79.68% ; }
+.span4-7 { width : 56.45% ; }
+.span5-6 { width : 83.06% ; }
+.span5-7 { width : 70.97% ; }
+.span5-8 { width : 61.9%  ; }
+.span6-7 { width : 85.48% ; }
+.span7-8 { width : 87.3%  ; }
+.col {
+    display : block;
+    float   : left;
+    margin  : 1% 0 1% 1.6%;
+}
+.col:first-child { margin-left: 0; }
+@media only screen and (max-width: 480px) {
+    .col {
+        margin : 1% 0 1% 0%;
+        width  : 100%;
+    }
+}
+

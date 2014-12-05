@@ -3,9 +3,11 @@
 
 define('class/Color', [
     'pastry',
+    'declare',
     'color/named'
 ], function(
     pastry,
+    declare,
     namedColor
 ) {
     'use strict';
@@ -32,7 +34,9 @@ define('class/Color', [
             if (color) {
                 instance.init(color);
             }
-        };
+        },
+
+        classMaker;
 
     pastry.extend(Color, {
         named: namedColor,
@@ -158,7 +162,8 @@ define('class/Color', [
         return [h, s, l, a];
     }
 
-    pastry.extend((Color.prototype = {}), initProps, {
+    classMaker = pastry.extend(initProps, {
+        constructor: Color,
         init: function (color) {
             var instance = this;
             if (pastry.isString(color)) {
@@ -218,16 +223,8 @@ define('class/Color', [
             var instance = this,
                 g = round((instance.r + instance.g + instance.b) / 3);
             return Color.makeGrey(g, instance.a);
-        },
-        destroy: function () {
-            var instance = this;
-            for (var p in instance) {
-                if (instance.hasOwnProperty(p)) {
-                    delete instance[p];
-                }
-            }
         }
     });
 
-    return pastry.Color = Color;
+    return pastry.Color = declare('Color', classMaker);
 });

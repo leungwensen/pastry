@@ -10,6 +10,11 @@
      */
 
     GLOBAL = GLOBAL || {};
+
+    if (GLOBAL.pastry) { // 避免重复运行
+        return;
+    }
+
     var
     // 命名空间 {
         P = {},
@@ -1589,6 +1594,110 @@ define('json', [
 /* jshint strict: true, undef: true, unused: true */
 /* global define */
 
+define('Class', [
+    'pastry'
+], function(
+    pastry
+) {
+    'use strict';
+    /*
+     * @author      : 绝云
+     * @description : Class utils
+     */
+
+    var
+        str_className   = '__className',
+        str_constructor = '__constructor',
+        Class = function () { };
+
+    Class[str_className] = 'Class';
+    Class.instanceof = function (instance, superClass) {
+        return instance instanceof superClass || (
+            instance[str_constructor] &&
+            instance[str_constructor][str_className] === superClass[str_className]
+        );
+    };
+
+    Class.prototype = {
+        init: function (info) {
+            var instance = this;
+            pastry.extend(instance, info);
+            return instance;
+        },
+        destroy: function () {
+            var instance = this;
+            for (var p in instance) {
+                if (instance.hasOwnProperty(p)) {
+                    delete instance[p];
+                }
+            }
+            // instance.prototype = instance['__proto__'] = null;
+            // instance = null;
+        }
+    };
+
+    return pastry.Class = Class;
+});
+
+/* jshint strict: true, undef: true, unused: true */
+/* global define */
+
+define('declare', [
+    'pastry',
+    'Class'
+], function(
+    pastry,
+    Class
+) {
+    'use strict';
+    /*
+     * @author      : 绝云（wensen.lws）
+     * @description : Class utils
+     */
+    var undef,
+
+        str_class        = '__class',
+        NS               = str_class + '__',
+        str_className    = str_class + 'Name',
+        str_prototype    = 'prototype',
+        str_superClasses = '__superClasses',
+        str_constructor  = '__constructor',
+
+        declare = function (/*className, superClasses, props*/) {
+            var args          = pastry.toArray(arguments),
+                className     = pastry.isString(args[0]) ? args.shift() : undef,
+                superClasses  = args.length > 1 ? args.shift() : [],
+                props         = args[0],
+                constructor   = props && props.constructor ? props.constructor : function (info) {
+                    return this.init(info);
+                };
+
+            constructor[str_prototype]    = {};
+            constructor[str_superClasses] = superClasses;
+
+            if (superClasses.length === 0) {
+                constructor[str_prototype] = Class[str_prototype];
+                constructor[str_superClasses] = [Class];
+            } else {
+                pastry.each(superClasses, function (superClass) {
+                    pastry.extend(constructor[str_prototype], superClass[str_prototype]);
+                });
+            }
+
+            constructor[str_className] = className || pastry.uuid(NS);
+
+            pastry.extend(constructor[str_prototype], props);
+            constructor[str_prototype][str_class] = constructor[str_prototype][str_constructor] = constructor;
+
+            return constructor;
+        };
+
+    return pastry.declare = declare;
+});
+
+/* jshint strict: true, undef: true, unused: true */
+/* global define */
+
 define('color/named', [
 ], function(
 ) {
@@ -1758,9 +1867,11 @@ define('color/named', [
 
 define('class/Color', [
     'pastry',
+    'declare',
     'color/named'
 ], function(
     pastry,
+    declare,
     namedColor
 ) {
     'use strict';
@@ -1787,7 +1898,9 @@ define('class/Color', [
             if (color) {
                 instance.init(color);
             }
-        };
+        },
+
+        classMaker;
 
     pastry.extend(Color, {
         named: namedColor,
@@ -1913,7 +2026,8 @@ define('class/Color', [
         return [h, s, l, a];
     }
 
-    pastry.extend((Color.prototype = {}), initProps, {
+    classMaker = pastry.extend(initProps, {
+        constructor: Color,
         init: function (color) {
             var instance = this;
             if (pastry.isString(color)) {
@@ -1973,18 +2087,10 @@ define('class/Color', [
             var instance = this,
                 g = round((instance.r + instance.g + instance.b) / 3);
             return Color.makeGrey(g, instance.a);
-        },
-        destroy: function () {
-            var instance = this;
-            for (var p in instance) {
-                if (instance.hasOwnProperty(p)) {
-                    delete instance[p];
-                }
-            }
         }
     });
 
-    return pastry.Color = Color;
+    return pastry.Color = declare('Color', classMaker);
 });
 /* jshint strict: true, undef: true, unused: true */
 /* global define, decodeURIComponent, encodeURIComponent */
@@ -2226,9 +2332,9 @@ define('bom/info', [
 /* global define, document, window */
 
 define('dom/utils', [
-    // 'pastry'
+    'pastry'
 ], function(
-    // pastry
+    pastry
 ) {
     'use strict';
     /*
@@ -2239,7 +2345,7 @@ define('dom/utils', [
     var doc  = document,
         html = doc.documentElement;
 
-    return {
+    return pastry.domUtils = {
         isNode: function (element) {
             var t;
             return element &&
@@ -2340,7 +2446,7 @@ define('dom/query', [
     }
 
     // 封装 api {
-        return pastry.extend(result, {
+        return pastry.domQuery = pastry.extend(result, {
             all  : query,
             one  : queryOne,
             byId : function (selector, optRoot) {
@@ -2365,6 +2471,7 @@ define('dom/ready', [
     /*
      * @author      : 绝云（wensen.lws）
      * @description : domready
+     * @reference   : https://github.com/ded/domready/tree/v0.3.0
      */
     var
         fn,
@@ -2379,7 +2486,7 @@ define('dom/ready', [
         onreadystatechange = 'onreadystatechange',
         readyState         = 'readyState',
         loadedRgx = hack ? /^loaded|^c/ : /^loaded|c/,
-        loaded = loadedRgx.test(doc[readyState]);
+        loaded    = loadedRgx.test(doc[readyState]);
 
     function flush(f) {
         loaded = 1;
@@ -2423,6 +2530,7 @@ define('dom/ready', [
         }
     } : checkLoaded;
 });
+
 /* jshint strict: true, undef: true, unused: true */
 /* global define, XMLHttpRequest, ActiveXObject, location */
 

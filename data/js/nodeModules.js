@@ -21,6 +21,10 @@ module.exports = [
     // json shim {
         "src/json.js",
     // }
+    // Class & declare {
+        "src/Class.js",
+        "src/declare.js",
+    // }
     // color utils {
         "src/color/named.js",
         "src/class/Color.js",

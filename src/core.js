@@ -10,6 +10,11 @@
      */
 
     GLOBAL = GLOBAL || {};
+
+    if (GLOBAL.pastry) { // 避免重复运行
+        return;
+    }
+
     var
     // 命名空间 {
         P = {},

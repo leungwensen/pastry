@@ -1,5 +1,6 @@
 /* jshint strict: true, undef: true, unused: true */
 /* global module */
+
 var pastry = require('pastry');
 
 module.exports = function (grunt) {
@@ -15,7 +16,8 @@ module.exports = function (grunt) {
 
         dist: {
             browser : 'dist/browser-debug.js',
-            node    : 'dist/node-debug.js'
+            node    : 'dist/node-debug.js',
+            css     : 'dist/debug.css'
         },
 
         path: {
@@ -40,6 +42,14 @@ module.exports = function (grunt) {
                 src  : conf.nodeModules,
                 dest : '<%= dist.node %>'
             },
+        },
+
+        cssmin: {
+            release: {
+                files: {
+                    'release/<%= pkg.version %>/pastry.min.css': '<%= dist.css %>'
+                }
+            }
         },
 
         jshint: {
@@ -73,6 +83,14 @@ module.exports = function (grunt) {
             }
         },
 
+        less: {
+            development: {
+                files: {
+                    '<%= dist.css %>' : 'src/less/main.less'
+                }
+            }
+        },
+
         uglify: {
             options: {
             },
@@ -88,8 +106,10 @@ module.exports = function (grunt) {
     pastry.each([
         'clean',
         'concat',
+        'cssmin',
         'jasmine',
         'jshint',
+        'less',
         'uglify'
     ], function (task) {
         grunt.loadNpmTasks('grunt-contrib-' + task);
@@ -98,8 +118,17 @@ module.exports = function (grunt) {
     grunt.registerTask('default', [
         'jshint',
         'concat',
+        'jasmine',
+        'less'
+    ]);
+    grunt.registerTask('release', [
+        'jshint',
+        'concat',
+        'jasmine',
         'uglify',
-        'jasmine'
+        'less',
+        'cssmin'
+
     ]);
     grunt.registerTask('travis', [
         'jshint',

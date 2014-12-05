@@ -79,7 +79,7 @@ define('dom/query', [
     }
 
     // 封装 api {
-        return pastry.extend(result, {
+        return pastry.domQuery = pastry.extend(result, {
             all  : query,
             one  : queryOne,
             byId : function (selector, optRoot) {

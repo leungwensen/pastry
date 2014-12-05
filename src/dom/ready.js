@@ -69,3 +69,4 @@ define('dom/ready', [
         }
     } : checkLoaded;
 });
+
