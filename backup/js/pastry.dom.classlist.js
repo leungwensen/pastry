@@ -12,6 +12,7 @@
 
     var classStr     = 'class',
         classListStr = 'classList',
+        className    = 'className',
         validateClass = function (token) {
             return (token === '' || /\s/.test(token)) ? false : true;
         },

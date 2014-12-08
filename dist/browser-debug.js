@@ -2181,7 +2181,7 @@ define('querystring', [
 /* jshint strict: true, undef: true, unused: true */
 /* global define, location, navigator, ActiveXObject */
 
-define('bom/info', [
+define('bom/utils', [
     'pastry'
 ], function (
     pastry
@@ -2195,7 +2195,9 @@ define('bom/info', [
     var nav       = navigator || {},
         userAgent = nav.userAgent,
         platform  = nav.platform,
-        plugins   = nav.plugins;
+        plugins   = nav.plugins,
+        versions  = {},
+        detectedPlugins;
 
     function toInt (value, base) {
         return parseInt(value, base || 10);
@@ -2267,9 +2269,9 @@ define('bom/info', [
         str = pastry.lc(str);
         var ieVer,
             matched,
-            versions = {};
+            result = {};
 
-        // browser versions {
+        // browser result {
             pastry.each([
                 /msie ([\d.]+)/     ,
                 /firefox\/([\d.]+)/ ,
@@ -2278,53 +2280,60 @@ define('bom/info', [
                 /opera.([\d.]+)/    ,
                 /adobeair\/([\d.]+)/
             ], function (reg) {
-                setVer(versions, str, reg);
+                setVer(result, str, reg);
             });
         // }
         // chrome {
-            if (versions.crios) {
-                versions.chrome = versions.crios;
+            if (result.crios) {
+                result.chrome = result.crios;
             }
         // }
         // safari {
             matched = str.match(/version\/([\d.]+).*safari/);
             if (matched) {
-                setVerInt(versions, 'safari', matched[1] || 0);
+                setVerInt(result, 'safari', matched[1] || 0);
             }
         // }
         // safari mobile {
             matched = str.match(/version\/([\d.]+).*mobile.*safari/);
             if (matched) {
-                setVerInt(versions, 'mobilesafari', matched[1] || 0);
+                setVerInt(result, 'mobilesafari', matched[1] || 0);
             }
         // }
-        // engine versions {
+        // engine result {
             pastry.each([
                 /trident\/([\d.]+)/     ,
                 /gecko\/([\d.]+)/       ,
                 /applewebkit\/([\d.]+)/ ,
+                /webkit\/([\d.]+)/      , // 单独存储 webkit 字段
                 /presto\/([\d.]+)/
             ], function (reg) {
-                setVer(versions, str, reg);
+                setVer(result, str, reg);
             });
             // IE {
-                ieVer = versions.msie;
+                ieVer = result.msie;
                 if (ieVer === 6) {
-                    versions.trident = 4;
+                    result.trident = 4;
                 } else if (ieVer === 7 || ieVer === 8) {
-                    versions.trident = 5;
+                    result.trident = 5;
                 }
             // }
         // }
-        return versions;
+        return result;
     }
+
+    detectedPlugins = detectPlugin(plugins);
+
+    pastry.extend(versions, detectVersion(userAgent), detectedPlugins);
 
     return {
         host      : location.host,
         platform  : detectPlatform(platform) || detectPlatform(userAgent) || 'unknown',
-        plugins   : detectPlugin(plugins),
+        plugins   : detectedPlugins,
         userAgent : userAgent,
-        versions  : detectVersion(userAgent)
+        versions  : versions,
+        isWebkit  : !!versions.webkit,
+        isIE      : !!versions.msie,
     };
 });
 
@@ -2342,16 +2351,11 @@ define('dom/utils', [
      * @description : utils for dom operations
      * @note        : browser only
      */
-    var doc  = document,
-        html = doc.documentElement;
+    var doc     = document,
+        html    = doc.documentElement,
+        testDiv = doc.createElement('div');
 
     return pastry.domUtils = {
-        isNode: function (element) {
-            var t;
-            return element &&
-                typeof element === 'object' &&
-                (t = element.nodeType) && (t === 1 || t === 9);
-        },
         contains: 'compareDocumentPosition' in html ?
             function (element, container) {
                 return (container.compareDocumentPosition(element) & 16) === 16;
@@ -2361,7 +2365,16 @@ define('dom/utils', [
                     html : container;
                 return container !== element &&
                     container.contains(element);
-            }
+            },
+        isNode: function (element) {
+            var t;
+            return element &&
+                typeof element === 'object' &&
+                (t = element.nodeType) && (t === 1 || t === 9);
+        },
+        isQuirks       : pastry.lc(doc.compatMode) === 'backcompat' || doc.documentMode === 5, // 怪异模式
+        hasTextContent : 'textContent' in testDiv,
+        hasClassList   : 'classList'   in testDiv,
     };
 });
 
@@ -2391,7 +2404,6 @@ define('dom/query', [
         // }
         doc      = document,
         win      = window,
-        idPrefix = '#',
         re_quick = /^(?:#([\w-]+)|(\w+)|\.([\w-]+))$/, // 匹配快速选择器
         result   = {};
 
@@ -2449,12 +2461,6 @@ define('dom/query', [
         return pastry.domQuery = pastry.extend(result, {
             all  : query,
             one  : queryOne,
-            byId : function (selector, optRoot) {
-                if (isString(selector) && selector.charAt(0) !== idPrefix) {
-                    return queryOne(idPrefix + selector, optRoot);
-                }
-                return queryOne(selector, optRoot);
-            }
         });
     // }
 });
@@ -2532,18 +2538,741 @@ define('dom/ready', [
 });
 
 /* jshint strict: true, undef: true, unused: true */
+/* global define, document, window */
+
+define('dom/construct', [
+    'pastry',
+    'bom/utils',
+    // 'dom/attr',
+    'dom/query'
+], function(
+    pastry,
+    bomUtils,
+    // domAttr,
+    domQuery
+) {
+    'use strict';
+    /*
+     * @author      : 绝云（wensen.lws）
+     * @description : dom constructure related
+     * @reference   : https://github.com/dojo/dojo/blob/master/dom-construct.js
+     */
+    var domConstruct,
+        win      = window,
+        doc      = document || win.document,
+        queryOne = domQuery.one,
+        tagWrap = {
+            option   : ['select'],
+            tbody    : ['table'],
+            thead    : ['table'],
+            tfoot    : ['table'],
+            tr       : ['table', 'tbody'],
+            td       : ['table', 'tbody', 'tr'],
+            th       : ['table', 'thead', 'tr'],
+            legend   : ['fieldset'],
+            caption  : ['table'],
+            colgroup : ['table'],
+            col      : ['table', 'colgroup'],
+            li       : ['ul']
+        },
+        RE_tag    = /<\s*([\w\:]+)/,
+        masterDiv = doc.createElement('div');
+
+    function insertBefore (node, ref) {
+        var parent = ref.parentNode;
+        if (parent) {
+            parent.insertBefore(node, ref);
+        }
+    }
+    function insertAfter (node, ref) {
+        var parent = ref.parentNode;
+        if (parent) {
+            if (parent.lastChild === ref) {
+                parent.appendChild(node);
+            } else {
+                parent.insertBefore(node, ref.nextSibling);
+            }
+        }
+    }
+
+    domConstruct = {
+            toDom: function (frag, doc) {
+                doc = doc;
+                frag += '';
+
+                var match  = frag.match(RE_tag),
+                    tag    = match ? match[1].toLowerCase() : "",
+                    wrap, i, fc, df;
+
+                if (match && tagWrap[tag]) {
+                    wrap = tagWrap[tag];
+                    masterDiv.innerHTML = wrap.pre + frag + wrap.post;
+                    for(i = wrap.length; i; --i){
+                        masterDiv = masterDiv.firstChild;
+                    }
+                } else {
+                    masterDiv.innerHTML = frag;
+                }
+
+                if (masterDiv.childNodes.length === 1) {
+                    return masterDiv.removeChild(masterDiv.firstChild);
+                }
+
+                df = doc.createDocumentFragment();
+                while ((fc = masterDiv.firstChild)) {
+                    df.appendChild(fc);
+                }
+                return df;
+            },
+            place: function (node, refNode, position) {
+                refNode = queryOne(refNode);
+                if (pastry.isString(node)) {
+                    node = /^\s*</.test(node) ? domConstruct.toDom(node, refNode.ownerDocument) : queryOne(node);
+                }
+                if (pastry.isNumber(position)) {
+                    var childNodes = refNode.childNodes;
+                    if (!childNodes.length || childNodes.length <= position) {
+                        refNode.appendChild(node);
+                    } else {
+                        insertBefore(node, childNodes[position < 0 ? 0 : position]);
+                    }
+                } else {
+                    switch (position) {
+                        case 'before':
+                            insertBefore(node, refNode);
+                            break;
+                        case 'after':
+                            insertAfter(node, refNode);
+                            break;
+                        case 'replace':
+                            refNode.parentNode.replaceChild(node, refNode);
+                            break;
+                        case 'only':
+                            domConstruct.empty(refNode);
+                            refNode.appendChild(node);
+                            break;
+                        case 'first':
+                            if (refNode.firstChild) {
+                                insertBefore(node, refNode.firstChild);
+                            }
+                            break;
+                        default:
+                            refNode.appendChild(node);
+                    }
+                }
+            },
+            create: function (/*DOMNode|String*/ tag, /*DOMNode|String?*/ refNode, /*String?*/ pos) {
+                /*
+                 * @reference: 和 dojo/dom-construct 的差别在于，为了去耦合，去除了 attr 相关的处理
+                 */
+                if (refNode) {
+                    refNode = queryOne(refNode);
+                    doc = refNode.ownerDocument;
+                }
+                if (pastry.isString(tag)) {
+                    tag = doc.createElement(tag);
+                }
+                if (refNode) {
+                    domConstruct.place(tag, refNode, pos);
+                }
+                return tag;
+            },
+            empty: function (node) {
+                node = queryOne(node);
+                if ('innerHTML' in node) {
+                    try {
+                        node.innerHTML = '';
+                        return;
+                    } catch(e) {
+                    }
+                }
+                for (var c; c = node.lastChild;) {
+                    node.removeChild(c);
+                }
+            },
+            destroy: function (node) {
+                node = queryOne(node);
+                if (!node) {
+                    return;
+                }
+                var parent = node.parentNode;
+                if (node.firstChild) {
+                    domConstruct.empty(node);
+                }
+                if (parent) {
+                    if (bomUtils.isIE && parent.canHaveChildren && 'removeNode' in node) {
+                        node.removeNode(false);
+                    } else {
+                        parent.removeChild(node);
+                    }
+                }
+            }
+        };
+
+    return pastry.domConstruct = domConstruct;
+});
+
+/* jshint strict: true, undef: true, unused: true */
+/* global define */
+
+define('dom/style', [
+    'pastry',
+    'bom/utils',
+    'dom/utils',
+    'dom/query'
+], function(
+    pastry,
+    bomUtils,
+    domUtils,
+    domQuery
+) {
+    'use strict';
+    /*
+     * @author      : 绝云（wensen.lws）
+     * @description : dom style
+     */
+
+    var getComputedStyle,
+        toPixel,
+        domStyle,
+        getOpacity,
+        setOpacity,
+        queryOne    = domQuery.one,
+        bomVersions = bomUtils.versions,
+        ieVersion   = bomVersions.msie || 0,
+        isQuirks    = domUtils.isQuirks,
+        astr        = 'DXImageTransform.Microsoft.Alpha',
+        RE_pixel    = /margin|padding|width|height|max|min|offset/, // |border
+        pixelNamesCache = {
+            left : true,
+            top  : true
+        },
+        floatAlias = {
+            cssFloat   : 1,
+            styleFloat : 1,
+            'float'    : 1
+        };
+
+    function af (n, f) {
+        try{
+            return n.filters.item(astr);
+        }catch(e){
+            return f ? {} : null;
+        }
+    }
+    function toStyleValue (node, type, value) {
+        type = pastry.lc(type);
+        if (ieVersion || bomVersions.trident) {
+            if (value === 'auto') {
+                if (type === 'height') {
+                    return node.offsetHeight;
+                }
+                if (type === 'width') {
+                    return node.offsetWidth;
+                }
+            }
+            if (type === 'fontweight') {
+                switch(value){
+                    case 700: return 'bold';
+                    // case 400:
+                    default: return 'normal';
+                }
+            }
+        }
+        if (!(type in pixelNamesCache)) {
+            pixelNamesCache[type] = RE_pixel.test(type);
+        }
+        return pixelNamesCache[type] ? toPixel(node, value) : value;
+    }
+
+    if (ieVersion && (ieVersion < 9 || (ieVersion < 10 && isQuirks))) {
+        getOpacity =  function (node) {
+            try {
+                return af(node).Opacity / 100; // Number
+            } catch(e) {
+                return 1; // Number
+            }
+        };
+        setOpacity = function(/*DomNode*/ node, /*Number*/ opacity){
+            if (opacity === '') {
+                opacity = 1;
+            }
+            var ov = opacity * 100,
+                fullyOpaque = opacity === 1;
+
+            // on IE7 Alpha(Filter opacity=100) makes text look fuzzy so disable it altogether (bug #2661),
+            // but still update the opacity value so we can get a correct reading if it is read later:
+            // af(node, 1).Enabled = !fullyOpaque;
+            if (fullyOpaque) {
+                node.style.zoom = '';
+                if(af(node)){
+                    node.style.filter = node.style.filter.replace(
+                        new RegExp('\\s*progid:' + astr + '\\([^\\)]+?\\)', 'i'), '');
+                }
+            } else {
+                node.style.zoom = 1;
+                if (af(node)) {
+                    af(node, 1).Opacity = ov;
+                } else {
+                    node.style.filter += ' progid:' + astr + '(Opacity=' + ov + ')';
+                }
+                af(node, 1).Enabled = true;
+            }
+
+            if(node.tagName.toLowerCase() === 'tr'){
+                for(var td = node.firstChild; td; td = td.nextSibling){
+                    if(td.tagName.toLowerCase() === 'td'){
+                        setOpacity(td, opacity);
+                    }
+                }
+            }
+            return opacity;
+        };
+    } else {
+        getOpacity = function(node){
+            return getComputedStyle(node).opacity;
+        };
+        setOpacity = function(node, opacity){
+            return node.style.opacity = opacity;
+        };
+    }
+
+
+    // getComputedStyle {
+        if (bomUtils.isWebkit) {
+            getComputedStyle = function (node) {
+                var style;
+                if (node.nodeType === 1) {
+                    var dv = node.ownerDocument.defaultView;
+                    style = dv.getComputedStyle(node, null);
+                    if (!style && node.style) {
+                        node.style.display = '';
+                        style = dv.getComputedStyle(node, null);
+                    }
+                }
+                return style || {};
+            };
+        } else if (ieVersion && ieVersion < 9 || isQuirks) {
+            getComputedStyle = function (node) {
+                return node.nodeType === 1 && node.currentStyle ? node.currentStyle : {};
+            };
+        } else {
+            getComputedStyle = function (node) {
+                return node.nodeType === 1 ?
+                    node.ownerDocument.defaultView.getComputedStyle(node, null) : {};
+            };
+        }
+    // }
+    // toPixel {
+        if (ieVersion) {
+            toPixel = function(element, avalue){
+                if(!avalue){
+                    return 0;
+                }
+                // on IE7, medium is usually 4 pixels
+                if(avalue === 'medium'){
+                    return 4;
+                }
+                // style values can be floats, client code may
+                // want to round this value for integer pixels.
+                if(avalue.slice && avalue.slice(-2) === 'px'){
+                    return parseFloat(avalue);
+                }
+                var s = element.style,
+                    rs = element.runtimeStyle,
+                    cs = element.currentStyle,
+                    sLeft = s.left,
+                    rsLeft = rs.left;
+                rs.left = cs.left;
+                try{
+                    // 'avalue' may be incompatible with style.left, which can cause IE to throw
+                    // this has been observed for border widths using 'thin', 'medium', 'thick' constants
+                    // those particular constants could be trapped by a lookup
+                    // but perhaps there are more
+                    s.left = avalue;
+                    avalue = s.pixelLeft;
+                }catch(e){
+                    avalue = 0;
+                }
+                s.left = sLeft;
+                rs.left = rsLeft;
+                return avalue;
+            };
+        } else {
+            toPixel = function(element, value){
+                return parseFloat(value) || 0;
+            };
+        }
+    // }
+
+    return pastry.domStyle = domStyle = {
+        getComputedStyle : getComputedStyle,
+        toPixel          : toPixel,
+
+        get: function (node, name) {
+            var n  = queryOne(node),
+                l  = arguments.length,
+                op = (name === 'opacity'),
+                style;
+            if (l === 2 && op) {
+                return getOpacity(n);
+            }
+            name  = floatAlias[name] ? 'cssFloat' in n.style ? 'cssFloat' : 'styleFloat' : name;
+            style = domStyle.getComputedStyle(n);
+            return (l === 1) ? style : toStyleValue(n, name, style[name] || n.style[name]);
+        },
+        set: function (node, name, value) {
+            var n  = queryOne(node),
+                l  = arguments.length,
+                op = (name === 'opacity');
+
+            name = floatAlias[name] ? 'cssFloat' in n.style ? 'cssFloat' : 'styleFloat' : name;
+            if (l === 3) {
+                return op ? setOpacity(n, value) : n.style[name] = value;
+            }
+            for (var x in name) {
+                domStyle.set(node, x, name[x]);
+            }
+            return domStyle.getComputedStyle(n);
+        }
+    };
+});
+
+/* jshint strict: true, undef: true, unused: true */
+/* global define */
+
+define('dom/attr', [
+    'pastry',
+    'bom/utils',
+    'dom/utils',
+    'dom/query',
+    'dom/construct',
+    'dom/style'
+], function(
+    pastry,
+    bomUtils,
+    domUtils,
+    domQuery,
+    domConstruct,
+    domStyle
+) {
+    'use strict';
+    /*
+     * @author      : 绝云（wensen.lws）
+     * @description : 获取／设置 dom 元素的属性
+     */
+    var bomVersions    = bomUtils.versions,
+        ieVersion      = bomVersions.msie || 0,
+        lcStr          = pastry.lc,
+        isBoolean      = pastry.isBoolean,
+        isFunction     = pastry.isFunction,
+        isString       = pastry.isString,
+        hasTextContent = domUtils.hasTextContent,
+        queryOne       = domQuery.one,
+        propNames = {
+            'class'     : 'className',
+            'for'       : 'htmlFor',
+            tabindex    : 'tabIndex',
+            readonly    : 'readOnly',
+            colspan     : 'colSpan',
+            frameborder : 'frameBorder',
+            rowspan     : 'rowSpan',
+            textcontent : 'textContent',
+            valuetype   : 'valueType'
+        },
+        forcePropNames = {
+            innerHTML   : 1,
+            textContent : 1,
+            className   : 1,
+            htmlFor     : !!ieVersion,
+            value       : 1
+        },
+        attrNames = {
+            classname : 'class',
+            htmlfor   : 'for',
+            tabindex  : 'tabIndex',
+            readonly  : 'readOnly'
+        },
+        domAttr;
+
+    function hasAttr (node, name) {
+        var attr = node.getAttributeNode && node.getAttributeNode(name);
+        return !!attr && attr.specified;
+    }
+    function getText (node) {
+        var text = '',
+            ch   = node.childNodes;
+        for(var i = 0, n; n = ch[i]; i++){
+            //Skip comments.
+            if(n.nodeType !== 8){
+                if(n.nodeType === 1){
+                    text += getText(n);
+                }else{
+                    text += n.nodeValue;
+                }
+            }
+        }
+        return text;
+    }
+    function getProp (node, name) {
+        var lc       = name.toLowerCase(),
+            propName = exports.names[lc] || name;
+        if (propName === 'textContent' && !hasTextContent) {
+            return getText(node);
+        }
+        return node[propName];  // Anything
+    }
+    function setProp (node, name, value) {
+        var l = arguments.length;
+        if(l === 2 && !isString(name)){ // inline'd type check
+            // the object form of setter: the 2nd argument is a dictionary
+            for(var x in name){
+                setProp(node, x, name[x]);
+            }
+            return node; // DomNode
+        }
+        var lc = lcStr(name),
+            propName = propNames[lc] || name;
+        if (propName === 'style' && !isString(value)) { // inline'd type check
+            // special case: setting a style
+            domStyle.set(node, value);
+            return node; // DomNode
+        }
+        if (propName === 'innerHTML') {
+            if(ieVersion && lcStr(node.tagName) in {
+                col      : 1,
+                colgroup : 1,
+                table    : 1,
+                tbody    : 1,
+                tfoot    : 1,
+                thead    : 1,
+                tr       : 1,
+                title    : 1
+            }){
+                domConstruct.empty(node);
+                node.appendChild(domConstruct.toDom(value, node.ownerDocument));
+            } else {
+                node[propName] = value;
+            }
+            return node; // DomNode
+        }
+        if (propName === 'textContent' && !hasTextContent) {
+            domConstruct.empty(node);
+            node.appendChild(node.ownerDocument.createTextNode(value));
+            return node;
+        }
+        node[propName] = value;
+        return node;
+    }
+
+    return pastry.domAttr = domAttr = {
+        has: function (node, name) {
+            var lc = lcStr(name);
+            return forcePropNames[propNames[lc] || name] || hasAttr(queryOne(node), attrNames[lc] || name);
+        },
+        get: function (node, name) {
+            node = queryOne(node);
+            var lc        = lcStr(name),
+                propName  = propNames[lc] || name,
+                forceProp = forcePropNames[propName],
+                value     = node[propName],
+                attrName; // should we access this attribute via a property or via getAttribute()?
+
+            if (forceProp && !pastry.isUndefined(value)) {
+                // node's property
+                return value;   // Anything
+            }
+
+            if (propName === 'textContent') {
+                return getProp(node, propName);
+            }
+
+            if (propName !== 'href' && (isBoolean(value) || isFunction(value))) {
+                // node's property
+                return value;   // Anything
+            }
+            // node's attribute
+            // we need _hasAttr() here to guard against IE returning a default value
+            attrName = attrNames[lc] || name;
+            return hasAttr(node, attrName) ? node.getAttribute(attrName) : null; // Anything
+        },
+        set: function (node, name, value) {
+            node = queryOne(node);
+            if(arguments.length === 2){ // inline'd type check
+                // the object form of setter: the 2nd argument is a dictionary
+                for(var x in name){
+                    domAttr.set(node, x, name[x]);
+                }
+                return node; // DomNode
+            }
+            var lc        = name.toLowerCase(),
+                propName  = propNames[lc] || name,
+                forceProp = forcePropNames[propName];
+            if (propName === 'style' && isString(value)) { // inline'd type check
+                // special case: setting a style
+                domStyle.set(node, value);
+                return node; // DomNode
+            }
+            if (forceProp || isBoolean(value) || isFunction(value)) {
+                return setProp(node, name, value);
+            }
+            // node's attribute
+            node.setAttribute(attrNames[lc] || name, value);
+            return node; // DomNode
+        },
+        remove: function (node, name) {
+            queryOne(node).removeAttribute(attrNames[lcStr(name)] || name);
+        },
+        getNodeProp: function (node, name) {
+            node = queryOne(node);
+            var lc       = lcStr(name),
+                propName = propNames[lc] || name,
+                attrName;
+            if ((propName in node) && propName !== "href") {
+                // node's property
+                return node[propName];  // Anything
+            }
+            // node's attribute
+            attrName = attrNames[lc] || name;
+            return hasAttr(node, attrName) ? node.getAttribute(attrName) : null; // Anything
+        }
+    };
+});
+
+/* jshint strict: true, undef: true, unused: true */
+/* global define */
+
+define('dom/class', [
+    'pastry',
+    'dom/utils',
+    'dom/query'
+], function(
+    pastry,
+    domUtils,
+    domQuery
+) {
+    'use strict';
+    /*
+     * @author      : 绝云（wensen.lws）
+     * @description : dom classList related
+     * @note        : if ClassList is supported, use ClassList
+     */
+    var RE_spaces    = /\s+/,
+        className    = 'className',
+        spaceStr     = ' ',
+        hasClassList = domUtils.hasClassList,
+        tmpArray     = [''],
+        domClass;
+
+    function str2array (str) {
+        if (pastry.isString(str)) {
+            if (str && !RE_spaces.test(str)) {
+                tmpArray[0] = str;
+                return tmpArray;
+            }
+            var arr = str.split(RE_spaces);
+            if (arr.length && !arr[0]) {
+                arr.shift();
+            }
+            if (arr.length && !arr[arr.length - 1]) {
+                arr.pop();
+            }
+            return arr;
+        }
+        if (!str) {
+            return [];
+        }
+        return pastry.filter(str, function (x) {
+            return x;
+        });
+    }
+    function fillSpace (str) {
+        return spaceStr + str + spaceStr;
+    }
+
+    return pastry.domClass = domClass = {
+        contains: function (node, classStr) {
+            node     = domQuery.one(node);
+            classStr = pastry.trim(classStr);
+            if (hasClassList) {
+                return node.classList.contains(classStr);
+            }
+            return fillSpace(node[className]).indexOf(fillSpace(classStr)) >= 0;
+        },
+        add: function (node, classStr) {
+            node     = domQuery.one(node);
+            classStr = str2array(classStr);
+            if (hasClassList) {
+                pastry.each(classStr, function (c) {
+                    node.classList.add(c);
+                });
+            } else {
+                var oldClassName = node[className],
+                    oldLen, newLen;
+                oldClassName = oldClassName ? fillSpace(oldClassName) : spaceStr;
+                oldLen = oldClassName.length;
+                pastry.each(classStr, function (c) {
+                    if (c && oldClassName.indexOf(fillSpace(c)) < 0) {
+                        oldClassName += c + spaceStr;
+                    }
+                });
+                newLen = oldClassName.length;
+                if (oldLen < newLen) {
+                    node[className] = oldClassName.substr(1, newLen - 2);
+                }
+            }
+        },
+        remove: function (node, classStr) {
+            node     = domQuery.one(node);
+            classStr = str2array(classStr);
+            if (hasClassList) {
+                pastry.each(classStr, function (c) {
+                    node.classList.remove(c);
+                });
+            } else {
+                var cls = fillSpace(node[className]);
+                pastry.each(classStr, function (c) {
+                    cls = cls.replace(fillSpace(c), spaceStr);
+                });
+                cls = pastry.trim(cls);
+                if (node[className] !== cls) {
+                    node[className] = cls;
+                }
+            }
+        },
+        clear: function (node) {
+            node = domQuery.one(node);
+            node[className] = '';
+        },
+        toggle: function (node, classStr) {
+            node     = domQuery.one(node);
+            classStr = str2array(classStr);
+            if (hasClassList) {
+                pastry.each(classStr, function (c) {
+                    node.classList.toggle(c);
+                });
+            } else {
+                pastry.each(classStr, function (c) {
+                    domClass[domClass.contains(node, c) ? 'remove' : 'add'](node, c);
+                });
+            }
+        }
+    };
+});
+
+/* jshint strict: true, undef: true, unused: true */
 /* global define, XMLHttpRequest, ActiveXObject, location */
 
 define('io/ajax', [
     'pastry',
     'json',
     'querystring',
-    'bom/info'
+    'bom/utils'
 ], function (
     pastry,
     JSON,
     querystring,
-    bomInfo
+    bomUtils
 ) {
     'use strict';
     /*
@@ -2571,9 +3300,9 @@ define('io/ajax', [
          */
         option = option || {};
         var xhr         = getXHR(),
-            method      = option.method ? pastry.uc(option.method)               : 'GET',
-            type        = option.type   ? pastry.lc(option.type)                 : 'xml',
-            data        = option.data   ? pastry.QueryStr.stringify(option.data) : null,
+            method      = option.method ? pastry.uc(option.method)           : 'GET',
+            type        = option.type   ? pastry.lc(option.type)             : 'xml',
+            data        = option.data   ? querystring.stringify(option.data) : null,
             contentType = option.contentType,
             isAsync     = option.isAsync;
 
@@ -2608,7 +3337,7 @@ define('io/ajax', [
                 return (status >= 200 && status < 300)            ||
                        (status === 304)                           ||
                        (!status && location.protocol === 'file:') ||
-                       (!status && bomInfo.versions.safari);
+                       (!status && bomUtils.versions.safari);
             };
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) {

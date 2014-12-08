@@ -37,19 +37,19 @@ module.exports = [
         "src/querystring.js",
     // }
     // bom wrapping {
-        "src/bom/info.js",
+        "src/bom/utils.js",
     // }
     // dom wrapping {
         "src/dom/utils.js",
         "src/dom/query.js",
         "src/dom/ready.js",
+        "src/dom/construct.js",
+        "src/dom/style.js",
+        "src/dom/attr.js",
+        "src/dom/class.js",
         // TODO {
-            // "src/dom/attr.js",
-            // "src/dom/style.js",
-            // "src/dom/construct.js",
             // "src/dom/data.js",
             // "src/dom/on.js",
-            // "src/dom/class.js",
         // }
     // }
     // ajax, etc. {
