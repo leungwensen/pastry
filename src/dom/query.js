@@ -24,7 +24,6 @@ define('dom/query', [
         // }
         doc      = document,
         win      = window,
-        idPrefix = '#',
         re_quick = /^(?:#([\w-]+)|(\w+)|\.([\w-]+))$/, // 匹配快速选择器
         result   = {};
 
@@ -82,12 +81,6 @@ define('dom/query', [
         return pastry.domQuery = pastry.extend(result, {
             all  : query,
             one  : queryOne,
-            byId : function (selector, optRoot) {
-                if (isString(selector) && selector.charAt(0) !== idPrefix) {
-                    return queryOne(idPrefix + selector, optRoot);
-                }
-                return queryOne(selector, optRoot);
-            }
         });
     // }
 });
