@@ -1,7 +1,7 @@
 /* jshint strict: true, undef: true, unused: true */
 /* global define, location, navigator, ActiveXObject */
 
-define('bom/info', [
+define('bom/utils', [
     'pastry'
 ], function (
     pastry
@@ -15,7 +15,9 @@ define('bom/info', [
     var nav       = navigator || {},
         userAgent = nav.userAgent,
         platform  = nav.platform,
-        plugins   = nav.plugins;
+        plugins   = nav.plugins,
+        versions  = {},
+        detectedPlugins;
 
     function toInt (value, base) {
         return parseInt(value, base || 10);
@@ -87,9 +89,9 @@ define('bom/info', [
         str = pastry.lc(str);
         var ieVer,
             matched,
-            versions = {};
+            result = {};
 
-        // browser versions {
+        // browser result {
             pastry.each([
                 /msie ([\d.]+)/     ,
                 /firefox\/([\d.]+)/ ,
@@ -98,53 +100,60 @@ define('bom/info', [
                 /opera.([\d.]+)/    ,
                 /adobeair\/([\d.]+)/
             ], function (reg) {
-                setVer(versions, str, reg);
+                setVer(result, str, reg);
             });
         // }
         // chrome {
-            if (versions.crios) {
-                versions.chrome = versions.crios;
+            if (result.crios) {
+                result.chrome = result.crios;
             }
         // }
         // safari {
             matched = str.match(/version\/([\d.]+).*safari/);
             if (matched) {
-                setVerInt(versions, 'safari', matched[1] || 0);
+                setVerInt(result, 'safari', matched[1] || 0);
             }
         // }
         // safari mobile {
             matched = str.match(/version\/([\d.]+).*mobile.*safari/);
             if (matched) {
-                setVerInt(versions, 'mobilesafari', matched[1] || 0);
+                setVerInt(result, 'mobilesafari', matched[1] || 0);
             }
         // }
-        // engine versions {
+        // engine result {
             pastry.each([
                 /trident\/([\d.]+)/     ,
                 /gecko\/([\d.]+)/       ,
                 /applewebkit\/([\d.]+)/ ,
+                /webkit\/([\d.]+)/      , // 单独存储 webkit 字段
                 /presto\/([\d.]+)/
             ], function (reg) {
-                setVer(versions, str, reg);
+                setVer(result, str, reg);
             });
             // IE {
-                ieVer = versions.msie;
+                ieVer = result.msie;
                 if (ieVer === 6) {
-                    versions.trident = 4;
+                    result.trident = 4;
                 } else if (ieVer === 7 || ieVer === 8) {
-                    versions.trident = 5;
+                    result.trident = 5;
                 }
             // }
         // }
-        return versions;
+        return result;
     }
+
+    detectedPlugins = detectPlugin(plugins);
+
+    pastry.extend(versions, detectVersion(userAgent), detectedPlugins);
 
     return {
         host      : location.host,
         platform  : detectPlatform(platform) || detectPlatform(userAgent) || 'unknown',
-        plugins   : detectPlugin(plugins),
+        plugins   : detectedPlugins,
         userAgent : userAgent,
-        versions  : detectVersion(userAgent)
+        versions  : versions,
+        isWebkit  : !!versions.webkit,
+        isIE      : !!versions.msie,
     };
 });
 
