@@ -12,16 +12,11 @@ define('dom/utils', [
      * @description : utils for dom operations
      * @note        : browser only
      */
-    var doc  = document,
-        html = doc.documentElement;
+    var doc     = document,
+        html    = doc.documentElement,
+        testDiv = doc.createElement('div');
 
     return pastry.domUtils = {
-        isNode: function (element) {
-            var t;
-            return element &&
-                typeof element === 'object' &&
-                (t = element.nodeType) && (t === 1 || t === 9);
-        },
         contains: 'compareDocumentPosition' in html ?
             function (element, container) {
                 return (container.compareDocumentPosition(element) & 16) === 16;
@@ -31,7 +26,16 @@ define('dom/utils', [
                     html : container;
                 return container !== element &&
                     container.contains(element);
-            }
+            },
+        isNode: function (element) {
+            var t;
+            return element &&
+                typeof element === 'object' &&
+                (t = element.nodeType) && (t === 1 || t === 9);
+        },
+        isQuirks       : pastry.lc(doc.compatMode) === 'backcompat' || doc.documentMode === 5, // 怪异模式
+        hasTextContent : 'textContent' in testDiv,
+        hasClassList   : 'classList'   in testDiv,
     };
 });
 
