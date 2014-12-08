@@ -5,12 +5,12 @@ define('io/ajax', [
     'pastry',
     'json',
     'querystring',
-    'bom/info'
+    'bom/utils'
 ], function (
     pastry,
     JSON,
     querystring,
-    bomInfo
+    bomUtils
 ) {
     'use strict';
     /*
@@ -38,9 +38,9 @@ define('io/ajax', [
          */
         option = option || {};
         var xhr         = getXHR(),
-            method      = option.method ? pastry.uc(option.method)               : 'GET',
-            type        = option.type   ? pastry.lc(option.type)                 : 'xml',
-            data        = option.data   ? pastry.QueryStr.stringify(option.data) : null,
+            method      = option.method ? pastry.uc(option.method)           : 'GET',
+            type        = option.type   ? pastry.lc(option.type)             : 'xml',
+            data        = option.data   ? querystring.stringify(option.data) : null,
             contentType = option.contentType,
             isAsync     = option.isAsync;
 
@@ -75,7 +75,7 @@ define('io/ajax', [
                 return (status >= 200 && status < 300)            ||
                        (status === 304)                           ||
                        (!status && location.protocol === 'file:') ||
-                       (!status && bomInfo.versions.safari);
+                       (!status && bomUtils.versions.safari);
             };
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) {
