@@ -10,9 +10,10 @@ define('dom/data', [
     /*
      * @author      : 绝云（wensen.lws）
      * @description : dom dataSet related
+     * @note        : if DataSet is supported, use DataSet
      */
-    var dataSet;
+    var domData;
 
-    return pastry.domData = dataSet;
+    return pastry.domData = domData;
 });
 
