@@ -3,11 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <title>color</title>
-    <link rel="stylesheet" href="./color/style.css">
+    <link rel="stylesheet" href="../../dist/debug.css">
+<style>
+    table {
+        margin      : 0 auto;
+        font-family : monospace;
+    }
+</style>
 </head>
 <body>
-    <table id="colorTable">
-        <tr>
+    <table class="pui-tb-bordered">
+        <tr class="pui-js-header">
             <th>name</th>
             <th>color</th>
             <th>greyColor</th>
@@ -15,68 +21,54 @@
             <th>hsla</th>
         </tr>
     </table>
-    <script src="../../dist/browser-debug.js"></script>
-    <script>
-        require([
-            'pastry',
-            'Class',
-            'dom/query',
-            'class/Color'
-        ], function (
-            pastry,
-            Class,
-            query,
-            Color
-        ) {
-            var doc = document,
-                $table = query.one('#colorTable');
+<script src="../../dist/browser-debug.js"></script>
+<script>
+    require([
+        'pastry',
+        'class/Color',
+        'dom/query',
+        'dom/construct',
+        'fmt/sprintf'
+    ], function (
+        pastry,
+        Color,
+        domQuery,
+        domConstruct,
+        sprintf
+    ) {
+        function createColorTr (name, color) {
+            var color     = new Color(color),
+                greyColor = color.toGrey(),
+                fontColor = greyColor.r >= 128 ? 'black' : 'white',
+                tmpl =
+                    '<tr>' +
+                        '<td>%s</td>' +
+                        '<td style="color: %s; background-color: %s;">%s</td>' +
+                        '<td style="color: %s; background-color: %s;">%s</td>' +
+                        '<td>%s</td>' +
+                        '<td>%s</td>' +
+                    '</tr>',
+                colorHTML = sprintf(tmpl,
+                    name,
+                    fontColor, color.toString(), color.toHex(),
+                    fontColor, greyColor.toString(), greyColor.toHex(),
+                    color.toCss(true),
+                    color.toHsla()
+                );
 
-            function createColorTr (name, color) {
-                var $tr       = doc.createElement('tr'),
-                    color     = new Color(color),
-                    greyColor = color.toGrey(),
-                    $tds      = {},
-                    fontColor = greyColor.r > 125 ? 'black' : 'white';
-
-                pastry.each([
-                    'name',
-                    'color',
-                    'greyColor',
-                    'css',
-                    'hsla'
-                ], function (str) {
-                    $tds[str] = doc.createElement('td');
-                });
-
-                $tds.name.innerHTML      = name;
-                $tds.color.innerHTML     = color.toHex();
-                $tds.hsla.innerHTML      = color.toHsla();
-                $tds.css.innerHTML       = color.toCss(true);
-                $tds.greyColor.innerHTML = greyColor.toHex();
-
-                $tds.color.style['background-color']     = color;
-                $tds.greyColor.style['background-color'] = greyColor;
-                $tds.color.style['color']     = fontColor;
-                $tds.greyColor.style['color'] = fontColor;
-
-                pastry.each([
-                    'name',
-                    'color',
-                    'greyColor',
-                    'css',
-                    'hsla'
-                ], function (str) {
-                    $tr.appendChild($tds[str]);
-                });
+            // destroy color instance {
                 color.destroy();
                 greyColor.destroy();
-                return $tr;
-            };
+            // }
+            return domConstruct.toDom(colorHTML);
+        };
 
-            pastry.each(Color.named, function (rgb, name) {
-                $table.appendChild(createColorTr(name, rgb));
-            });
+        var $table = domQuery.one('table');
+
+        pastry.each(Color.named, function (rgb, name) {
+            domConstruct.place(createColorTr(name, rgb), $table);
         });
-    </script>
+    });
+</script>
 </body>
 </html>
