@@ -47,8 +47,8 @@ module.exports = [
         "src/dom/style.js",
         "src/dom/attr.js",
         "src/dom/class.js",
+        "src/dom/data.js",
         // TODO {
-            // "src/dom/data.js",
             // "src/dom/on.js",
         // }
     // }

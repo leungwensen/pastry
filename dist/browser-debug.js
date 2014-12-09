@@ -2375,6 +2375,7 @@ define('dom/utils', [
         isQuirks       : pastry.lc(doc.compatMode) === 'backcompat' || doc.documentMode === 5, // 怪异模式
         hasTextContent : 'textContent' in testDiv,
         hasClassList   : 'classList'   in testDiv,
+        hasDataSet     : 'dataset'     in testDiv,
     };
 });
 
@@ -2393,19 +2394,20 @@ define('dom/query', [
      * @author      : 绝云（wensen.lws）
      * @description : selector
      * @note        : browser only
+     * @note        : MODERN browsers only
      */
-    var
-        // utils {
+    var // utils {
             toArray   = pastry.toArray,
             arrayLike = pastry.isArrayLike,
             isString  = pastry.isString,
             isNode    = domUtils.isNode,
             contains  = domUtils.contains,
         // }
-        doc      = document,
-        win      = window,
-        re_quick = /^(?:#([\w-]+)|(\w+)|\.([\w-]+))$/, // 匹配快速选择器
-        result   = {};
+        doc = document,
+        win = window,
+        nodeTypeStr = 'nodeType',
+        re_quick    = /^(?:#([\w-]+)|(\w+)|\.([\w-]+))$/, // 匹配快速选择器
+        result      = {};
 
     function normalizeRoot (root) {
         if (!root) {
@@ -2414,7 +2416,7 @@ define('dom/query', [
         if (isString(root)) {
             return query(root)[0];
         }
-        if (!root['nodeType'] && arrayLike(root)) {
+        if (!root[nodeTypeStr] && arrayLike(root)) {
             return root[0];
         }
         return root;
@@ -2448,7 +2450,7 @@ define('dom/query', [
                 }
             }
         // }
-        if (selector && (selector.document || (selector.nodeType && selector.nodeType === 9))) {
+        if (selector && (selector.document || (selector[nodeTypeStr] && selector[nodeTypeStr] === 9))) {
             return !optRoot ? [selector] : [];
         }
         return toArray((root).querySelectorAll(selector));
@@ -2459,8 +2461,8 @@ define('dom/query', [
 
     // 封装 api {
         return pastry.domQuery = pastry.extend(result, {
-            all  : query,
-            one  : queryOne,
+            all : query,
+            one : queryOne,
         });
     // }
 });
@@ -3258,6 +3260,50 @@ define('dom/class', [
                 pastry.each(classStr, function (c) {
                     domClass[domClass.contains(node, c) ? 'remove' : 'add'](node, c);
                 });
+            }
+        }
+    };
+});
+
+/* jshint strict: true, undef: true, unused: true */
+/* global define */
+
+define('dom/data', [
+    'pastry',
+    'dom/attr',
+    'dom/utils',
+    'dom/query'
+], function(
+    pastry,
+    domAttr,
+    domUtils,
+    domQuery
+) {
+    'use strict';
+    /*
+     * @author      : 绝云（wensen.lws）
+     * @description : dom dataSet related
+     * @note        : if DataSet is supported, use DataSet
+     */
+    var dataSetStr = 'dataset',
+        dataPrefix = 'data-',
+        hasDataSet = domUtils.hasDataSet,
+        domData;
+
+    return pastry.domData = domData = {
+        get: function (node, name) {
+            node = domQuery.one(node);
+            if (hasDataSet) {
+                return node[dataSetStr][name];
+            }
+            return domAttr.get(node, dataPrefix + name);
+        },
+        set: function (node, name, value) {
+            node = domQuery.one(node);
+            if (hasDataSet) {
+                node[dataSetStr][name] = value;
+            } else {
+                domAttr.set(node, dataPrefix + name, value);
             }
         }
     };
