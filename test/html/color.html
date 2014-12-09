@@ -27,12 +27,18 @@
         'pastry',
         'class/Color',
         'dom/query',
+        'dom/data',
+        'dom/class',
+        'dom/style',
         'dom/construct',
         'fmt/sprintf'
     ], function (
         pastry,
         Color,
         domQuery,
+        domData,
+        domClass,
+        domStyle,
         domConstruct,
         sprintf
     ) {
@@ -54,13 +60,24 @@
                     fontColor, greyColor.toString(), greyColor.toHex(),
                     color.toCss(true),
                     color.toHsla()
-                );
+                ),
+                $tr = domConstruct.toDom(colorHTML);
 
+            // testing {
+                domData.set($tr, 'color', color.toString());
+                domStyle.set($tr, {
+                    height : '30px',
+                    width  : '100%',
+                });
+                domClass.add($tr, 'hello hoo weee haaa');
+                domClass.remove($tr, 'hello');
+                domClass.toggle($tr, 'hello weee');
+            // }
             // destroy color instance {
                 color.destroy();
                 greyColor.destroy();
             // }
-            return domConstruct.toDom(colorHTML);
+            return $tr;
         };
 
         var $table = domQuery.one('table');
