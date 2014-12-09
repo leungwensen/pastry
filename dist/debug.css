@@ -198,8 +198,8 @@ video {
 .line-height2 {
   line-height: 2em;
 }
-table.pui-tb-border th,
-table.pui-tb-border td {
+table.pui-tb-bordered th,
+table.pui-tb-bordered td {
   border: 1px solid gray;
 }
 table.pui-tb-padding05 th,
