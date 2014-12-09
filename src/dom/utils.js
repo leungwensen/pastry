@@ -36,6 +36,7 @@ define('dom/utils', [
         isQuirks       : pastry.lc(doc.compatMode) === 'backcompat' || doc.documentMode === 5, // 怪异模式
         hasTextContent : 'textContent' in testDiv,
         hasClassList   : 'classList'   in testDiv,
+        hasDataSet     : 'dataset'     in testDiv,
     };
 });
 

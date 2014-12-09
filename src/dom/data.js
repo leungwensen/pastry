@@ -2,9 +2,15 @@
 /* global define */
 
 define('dom/data', [
-    'pastry'
+    'pastry',
+    'dom/attr',
+    'dom/utils',
+    'dom/query'
 ], function(
-    pastry
+    pastry,
+    domAttr,
+    domUtils,
+    domQuery
 ) {
     'use strict';
     /*
@@ -12,8 +18,27 @@ define('dom/data', [
      * @description : dom dataSet related
      * @note        : if DataSet is supported, use DataSet
      */
-    var domData;
+    var dataSetStr = 'dataset',
+        dataPrefix = 'data-',
+        hasDataSet = domUtils.hasDataSet,
+        domData;
 
-    return pastry.domData = domData;
+    return pastry.domData = domData = {
+        get: function (node, name) {
+            node = domQuery.one(node);
+            if (hasDataSet) {
+                return node[dataSetStr][name];
+            }
+            return domAttr.get(node, dataPrefix + name);
+        },
+        set: function (node, name, value) {
+            node = domQuery.one(node);
+            if (hasDataSet) {
+                node[dataSetStr][name] = value;
+            } else {
+                domAttr.set(node, dataPrefix + name, value);
+            }
+        }
+    };
 });
 
