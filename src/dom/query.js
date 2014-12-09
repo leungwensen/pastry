@@ -13,19 +13,20 @@ define('dom/query', [
      * @author      : 绝云（wensen.lws）
      * @description : selector
      * @note        : browser only
+     * @note        : MODERN browsers only
      */
-    var
-        // utils {
+    var // utils {
             toArray   = pastry.toArray,
             arrayLike = pastry.isArrayLike,
             isString  = pastry.isString,
             isNode    = domUtils.isNode,
             contains  = domUtils.contains,
         // }
-        doc      = document,
-        win      = window,
-        re_quick = /^(?:#([\w-]+)|(\w+)|\.([\w-]+))$/, // 匹配快速选择器
-        result   = {};
+        doc = document,
+        win = window,
+        nodeTypeStr = 'nodeType',
+        re_quick    = /^(?:#([\w-]+)|(\w+)|\.([\w-]+))$/, // 匹配快速选择器
+        result      = {};
 
     function normalizeRoot (root) {
         if (!root) {
@@ -34,7 +35,7 @@ define('dom/query', [
         if (isString(root)) {
             return query(root)[0];
         }
-        if (!root['nodeType'] && arrayLike(root)) {
+        if (!root[nodeTypeStr] && arrayLike(root)) {
             return root[0];
         }
         return root;
@@ -68,7 +69,7 @@ define('dom/query', [
                 }
             }
         // }
-        if (selector && (selector.document || (selector.nodeType && selector.nodeType === 9))) {
+        if (selector && (selector.document || (selector[nodeTypeStr] && selector[nodeTypeStr] === 9))) {
             return !optRoot ? [selector] : [];
         }
         return toArray((root).querySelectorAll(selector));
@@ -79,8 +80,8 @@ define('dom/query', [
 
     // 封装 api {
         return pastry.domQuery = pastry.extend(result, {
-            all  : query,
-            one  : queryOne,
+            all : query,
+            one : queryOne,
         });
     // }
 });
