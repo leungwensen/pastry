@@ -9,7 +9,14 @@ module.exports = function (grunt) {
         conf = {
             browserModules : require('./data/js/browserModules.js'),
             nodeModules    : require('./data/js/nodeModules.js')
-        };
+        },
+        banner = '/*! <%= pkg.name %> - v<%= pkg.version %> - ' +
+            '<%= grunt.template.today("yyyy-mm-dd") %> */';
+
+    pastry.extend(pkg, {
+        main    : pastry.sprintf(pkg.main   , pkg.version),
+        browser : pastry.sprintf(pkg.browser, pkg.version)
+    });
 
     grunt.initConfig({
         pkg: pkg,
@@ -32,7 +39,9 @@ module.exports = function (grunt) {
 
         concat: {
             options: {
-                separator: '',
+                separator    : '',
+                stripBanners : true,
+                banner       : banner
             },
             browserDebug: {
                 src  : conf.browserModules,
@@ -93,8 +102,9 @@ module.exports = function (grunt) {
 
         uglify: {
             options: {
+                banner: banner
             },
-            core: {
+            release: {
                 files: {
                     '<%= pkg.browser %>' : '<%= dist.browser %>',
                     '<%= pkg.main %>'    : '<%= dist.node %>'

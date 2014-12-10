@@ -48,9 +48,7 @@ module.exports = [
         "src/dom/attr.js",
         "src/dom/class.js",
         "src/dom/data.js",
-        // TODO {
-            // "src/dom/on.js",
-        // }
+        "src/dom/event.js",
     // }
     // ajax, etc. {
         "src/io/ajax.js",
