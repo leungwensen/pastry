@@ -1,5 +1,4 @@
-/* jshint strict: true, undef: true, unused: true */
-/* global exports, module */
+/*! pastry - v0.3.141210 - 2014-12-10 *//* global exports, module */
 
 (function (GLOBAL) {
     'use strict';
@@ -43,9 +42,9 @@
             return toStr.call(obj) === '[object ' + type + ']';
         };
     // }
-    // 版本号 {
-        P.VERSION = '0.2.0';
-    // }
+    // // 版本号 {
+    //     P.VERSION = '{VERSION}';
+    // // }
     // ES5 && ES6 函数集 {
         P.index = function (up) {
             /*
@@ -666,7 +665,6 @@
     // }
 }(this));
 
-/* jshint strict: true, undef: true, unused: true */
 // /* global xxx, yyy */
 
 (function (GLOBAL) {
@@ -742,7 +740,6 @@
     // }
 }(this));
 
-/* jshint strict: true, undef: true, unused: true */
 // /* global document */
 
 var define;
@@ -889,7 +886,6 @@ var define;
     // }
 }(this));
 
-/* jshint strict: true, undef: true, unused: true */
 /* global define, document, location */
 
 define('module/path', [
@@ -1007,7 +1003,6 @@ define('module/path', [
     };
 });
 
-/* jshint strict: true, undef: true, unused: true */
 /* global define, document */
 
 define('module/request', [
@@ -1095,7 +1090,6 @@ define('module/request', [
     return request;
 });
 
-/* jshint strict: true, undef: true, unused: true */
 /* global define, document, window */
 
 define('module/loader', [
@@ -1210,7 +1204,6 @@ define('module/loader', [
         });
 });
 
-/* jshint strict: true, undef: true, unused: true */
 /* global define */
 
 define('module/config', [
@@ -1229,7 +1222,6 @@ define('module/config', [
     // return  module;
 });
 
-/* jshint strict: true, undef: true, unused: true */
 /* global define */
 
 define('fmt/date', [
@@ -1279,7 +1271,6 @@ define('fmt/date', [
     };
 });
 
-/* jshint strict: true, undef: true, unused: true */
 /* global define */
 
 define('fmt/sprintf', [
@@ -1411,7 +1402,6 @@ define('fmt/sprintf', [
 
     return pastry.sprintf = sprintf;
 });
-/* jshint strict: true, undef: true, unused: true */
 /* global define */
 
 define('fmt/vsprintf', [
@@ -1435,7 +1425,6 @@ define('fmt/vsprintf', [
     return pastry.vsprintf = vsprintf;
 });
 
-/* jshint strict: true, undef: true, unused: true */
 /* global define */
 
 define('json', [
@@ -1591,7 +1580,6 @@ define('json', [
     return shim;
 });
 
-/* jshint strict: true, undef: true, unused: true */
 /* global define */
 
 define('Class', [
@@ -1639,7 +1627,6 @@ define('Class', [
     return pastry.Class = Class;
 });
 
-/* jshint strict: true, undef: true, unused: true */
 /* global define */
 
 define('declare', [
@@ -1695,7 +1682,6 @@ define('declare', [
     return pastry.declare = declare;
 });
 
-/* jshint strict: true, undef: true, unused: true */
 /* global define */
 
 define('color/named', [
@@ -1862,7 +1848,6 @@ define('color/named', [
     return named;
 });
 
-/* jshint strict: true, undef: true, unused: true */
 /* global define */
 
 define('class/Color', [
@@ -2092,7 +2077,6 @@ define('class/Color', [
 
     return pastry.Color = declare('Color', classMaker);
 });
-/* jshint strict: true, undef: true, unused: true */
 /* global define, decodeURIComponent, encodeURIComponent */
 
 define('querystring', [
@@ -2178,7 +2162,6 @@ define('querystring', [
     return querystring;
 });
 
-/* jshint strict: true, undef: true, unused: true */
 /* global define, location, navigator, ActiveXObject */
 
 define('bom/utils', [
@@ -2337,7 +2320,6 @@ define('bom/utils', [
     };
 });
 
-/* jshint strict: true, undef: true, unused: true */
 /* global define, document, window */
 
 define('dom/utils', [
@@ -2379,7 +2361,6 @@ define('dom/utils', [
     };
 });
 
-/* jshint strict: true, undef: true, unused: true */
 /* global define, document, window */
 
 define('dom/query', [
@@ -2467,7 +2448,6 @@ define('dom/query', [
     // }
 });
 
-/* jshint strict: true, undef: true, unused: true */
 /* global define, document, self, top */
 
 define('dom/ready', [
@@ -2539,7 +2519,6 @@ define('dom/ready', [
     } : checkLoaded;
 });
 
-/* jshint strict: true, undef: true, unused: true */
 /* global define, document, window */
 
 define('dom/construct', [
@@ -2717,7 +2696,6 @@ define('dom/construct', [
     return pastry.domConstruct = domConstruct;
 });
 
-/* jshint strict: true, undef: true, unused: true */
 /* global define */
 
 define('dom/style', [
@@ -2943,7 +2921,6 @@ define('dom/style', [
     };
 });
 
-/* jshint strict: true, undef: true, unused: true */
 /* global define */
 
 define('dom/attr', [
@@ -3144,7 +3121,6 @@ define('dom/attr', [
     };
 });
 
-/* jshint strict: true, undef: true, unused: true */
 /* global define */
 
 define('dom/class', [
@@ -3265,7 +3241,6 @@ define('dom/class', [
     };
 });
 
-/* jshint strict: true, undef: true, unused: true */
 /* global define */
 
 define('dom/data', [
@@ -3309,7 +3284,105 @@ define('dom/data', [
     };
 });
 
-/* jshint strict: true, undef: true, unused: true */
+/* global define, document, window */
+
+define('dom/event', [
+    'pastry',
+    'dom/query'
+], function(
+    pastry,
+    domQuery
+) {
+    'use strict';
+    /*
+     * @author      : 绝云（wensen.lws）
+     * @description : event firing
+     * @reference   : http://dean.edwards.name/weblog/2005/10/add-event/
+     */
+    var doc = document,
+        win = window;
+
+    function addEvent(element, type, handler) {
+        element = domQuery.one(element);
+        if (element.addEventListener) {
+            element.addEventListener(type, handler, false);
+        } else {
+            // assign each event handler a unique ID
+            if (!handler.$$guid) {
+                handler.$$guid = addEvent.guid++;
+            }
+            // create a hash table of event types for the element
+            if (!element.events) {
+                element.events = {};
+            }
+            // create a hash table of event handlers for each element/event pair
+            var handlers = element.events[type];
+            if (!handlers) {
+                handlers = element.events[type] = {};
+                // store the existing event handler (if there is one)
+                if (element['on' + type]) {
+                    handlers[0] = element["on" + type];
+                }
+            }
+            // store the event handler in the hash table
+            handlers[handler.$$guid] = handler;
+            // assign a global event handler to do all the work
+            element['on' + type] = handleEvent;
+        }
+    }
+    // a counter used to create unique IDs
+    addEvent.guid = 1;
+
+    function removeEvent(element, type, handler) {
+        element = domQuery.one(element);
+        if (element.removeEventListener) {
+            element.removeEventListener(type, handler, false);
+        } else {
+            // delete the event handler from the hash table
+            if (element.events && element.events[type]) {
+                delete element.events[type][handler.$$guid];
+            }
+        }
+    }
+
+    function handleEvent(event) {
+        /* jshint validthis:true */
+        var returnValue = true,
+            elem        = this;
+        // grab the event object (IE uses a global event object)
+        event = event ||
+            fixEvent((doc.parentWindow || win).event);
+        // get a reference to the hash table of event handlers
+        var handlers = elem.events[event.type];
+        // execute each event handler
+        for (var i in handlers) {
+            elem.$$handleEvent = handlers[i];
+            if (elem.$$handleEvent(event) === false) {
+                returnValue = false;
+            }
+        }
+        return returnValue;
+    }
+
+    function fixEvent(event) {
+        // add W3C standard event methods
+        event.preventDefault = fixEvent.preventDefault;
+        event.stopPropagation = fixEvent.stopPropagation;
+        return event;
+    }
+    fixEvent.preventDefault = function() {
+        this.returnValue = false;
+    };
+    fixEvent.stopPropagation = function() {
+        this.cancelBubble = true;
+    };
+
+    return pastry.domEvent = {
+        on  : addEvent,
+        off : removeEvent
+    };
+});
+
 /* global define, XMLHttpRequest, ActiveXObject, location */
 
 define('io/ajax', [

@@ -1,5 +1,4 @@
-/* jshint strict: true, undef: true, unused: true */
-/* global exports, module */
+/*! pastry - v0.3.141210 - 2014-12-10 *//* global exports, module */
 
 (function (GLOBAL) {
     'use strict';
@@ -43,9 +42,9 @@
             return toStr.call(obj) === '[object ' + type + ']';
         };
     // }
-    // 版本号 {
-        P.VERSION = '0.2.0';
-    // }
+    // // 版本号 {
+    //     P.VERSION = '{VERSION}';
+    // // }
     // ES5 && ES6 函数集 {
         P.index = function (up) {
             /*
@@ -666,7 +665,6 @@
     // }
 }(this));
 
-/* jshint strict: true, undef: true, unused: true */
 // /* global xxx, yyy */
 
 (function (GLOBAL) {
@@ -742,7 +740,6 @@
     // }
 }(this));
 
-/* jshint strict: true, undef: true, unused: true */
 // /* global document */
 
 var define;
@@ -889,7 +886,6 @@ var define;
     // }
 }(this));
 
-/* jshint strict: true, undef: true, unused: true */
 /* global define */
 
 define('fmt/date', [
@@ -939,7 +935,6 @@ define('fmt/date', [
     };
 });
 
-/* jshint strict: true, undef: true, unused: true */
 /* global define */
 
 define('fmt/sprintf', [
@@ -1071,7 +1066,6 @@ define('fmt/sprintf', [
 
     return pastry.sprintf = sprintf;
 });
-/* jshint strict: true, undef: true, unused: true */
 /* global define */
 
 define('fmt/vsprintf', [
@@ -1095,7 +1089,6 @@ define('fmt/vsprintf', [
     return pastry.vsprintf = vsprintf;
 });
 
-/* jshint strict: true, undef: true, unused: true */
 /* global define */
 
 define('json', [
@@ -1251,7 +1244,6 @@ define('json', [
     return shim;
 });
 
-/* jshint strict: true, undef: true, unused: true */
 /* global define */
 
 define('Class', [
@@ -1299,7 +1291,6 @@ define('Class', [
     return pastry.Class = Class;
 });
 
-/* jshint strict: true, undef: true, unused: true */
 /* global define */
 
 define('declare', [
@@ -1355,7 +1346,6 @@ define('declare', [
     return pastry.declare = declare;
 });
 
-/* jshint strict: true, undef: true, unused: true */
 /* global define */
 
 define('color/named', [
@@ -1522,7 +1512,6 @@ define('color/named', [
     return named;
 });
 
-/* jshint strict: true, undef: true, unused: true */
 /* global define */
 
 define('class/Color', [
