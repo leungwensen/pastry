@@ -27,6 +27,7 @@
         'pastry',
         'class/Color',
         'dom/query',
+        'dom/event',
         'dom/data',
         'dom/class',
         'dom/style',
@@ -36,6 +37,7 @@
         pastry,
         Color,
         domQuery,
+        domEvent,
         domData,
         domClass,
         domStyle,
@@ -61,7 +63,10 @@
                     color.toCss(true),
                     color.toHsla()
                 ),
-                $tr = domConstruct.toDom(colorHTML);
+                $tr = domConstruct.toDom(colorHTML),
+                onClickFunc = function (e) {
+                    alert('clicked');
+                };
 
             // testing {
                 domData.set($tr, 'color', color.toString());
@@ -72,6 +77,10 @@
                 domClass.add($tr, 'hello hoo weee haaa');
                 domClass.remove($tr, 'hello');
                 domClass.toggle($tr, 'hello weee');
+                domEvent.on($tr, 'click', onClickFunc);
+                setTimeout(function () {
+                    domEvent.off($tr, 'click', onClickFunc);
+                }, 5000);
             // }
             // destroy color instance {
                 color.destroy();
