@@ -43,9 +43,9 @@
             return toStr.call(obj) === '[object ' + type + ']';
         };
     // }
-    // 版本号 {
-        P.VERSION = '0.2.0';
-    // }
+    // // 版本号 {
+    //     P.VERSION = '{VERSION}';
+    // // }
     // ES5 && ES6 函数集 {
         P.index = function (up) {
             /*
