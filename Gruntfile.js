@@ -95,7 +95,7 @@ module.exports = function (grunt) {
         less: {
             development: {
                 files: {
-                    '<%= dist.css %>' : 'src/less/main.less'
+                    '<%= dist.css %>' : 'src/ui/less/main.less'
                 }
             }
         },

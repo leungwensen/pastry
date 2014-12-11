@@ -53,6 +53,9 @@ module.exports = [
     // ajax, etc. {
         "src/io/ajax.js",
     // }
+    // template engine {
+        "src/template.js",
+    // }
     // UI {
         // popup {
         // }
