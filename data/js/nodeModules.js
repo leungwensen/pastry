@@ -29,6 +29,9 @@ module.exports = [
         "src/color/named.js",
         "src/class/Color.js",
     // }
+    // html utils {
+        "src/html/utils.js",
+    // }
     // template engine {
         "src/template.js",
     // }
