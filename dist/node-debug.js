@@ -1,4 +1,4 @@
-/*! pastry - v0.3.141210 - 2014-12-11 *//* global exports, module */
+/*! pastry - v0.3.141212 - 2014-12-12 *//* global exports, module */
 
 (function (GLOBAL) {
     'use strict';
@@ -478,7 +478,13 @@
                     }
                     return result;
                 };
-
+            P.invert = function(obj) {
+                var result = {};
+                P.each(obj, function (value, key) {
+                    result[value] = key;
+                });
+                return result;
+            };
             P.values = function (obj) {
                 /*
                  * @description : 获取对象值集合
@@ -1743,12 +1749,56 @@ define('class/Color', [
 });
 /* global define */
 
-define('template', [
+define('html/utils', [
     'pastry'
-    // 'dom/construct'
 ], function(
     pastry
-    // domConstruct
+) {
+    'use strict';
+    /*
+     * @author      : 绝云（wensen.lws）
+     * @description : utils for html
+     */
+    var escapeMap = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#x27;',
+            '`': '&#x60;'
+        },
+        unescapeMap = pastry.invert(escapeMap);
+
+    function createEscaper (map) {
+        // Regexes for identifying a key that needs to be escaped
+        var source        = '(?:' + pastry.keys(map).join('|') + ')',
+            testRegexp    = new RegExp(source),
+            replaceRegexp = new RegExp(source, 'g');
+
+        function escaper (match) {
+            return map[match];
+        }
+
+        return function (string) {
+            string = string === null ? '' : '' + string;
+            return testRegexp.test(string) ? string.replace(replaceRegexp, escaper) : string;
+        };
+    }
+
+    return {
+        escape   : pastry.escape   = createEscaper(escapeMap),
+        unescape : pastry.unescape = createEscaper(unescapeMap)
+    };
+});
+
+/* global define */
+
+define('template', [
+    'pastry',
+    'html/utils'
+], function(
+    pastry,
+    htmlUtils
 ) {
     'use strict';
     /*
@@ -1756,46 +1806,68 @@ define('template', [
      * @description : template engine
      */
     var template,
-        cache = {};
+        cache     = {},
+        helper    = {},
+        RE_parser = /([\s'\\])(?!(?:[^{]|\{(?!%))*%\})|(?:\{%(=|#)([\s\S]+?)%\})|(\{%)|(%\})/g;
         // defaultOpitons = {}; // TODO add grammar aliases, etc.
 
+    function render (s, p1, p2, p3, p4, p5) {
+        if (p1) { // whitespace, quote and backspace in HTML context
+            return {
+                "\n": "\\n",
+                "\r": "\\r",
+                "\t": "\\t",
+                " " : " "
+            }[p1] || "\\" + p1;
+        }
+        if (p2) { // interpolation: {%=prop%}, or unescaped: {%#prop%}
+            if (p2 === "=") {
+                return "'+_e(typeof" + p3 + "==='undefined'?'':" + p3 + ")+'";
+            }
+            return "'+(" + p3 + "==null?'':" + p3 + ")+'";
+        }
+        if (p4) { // evaluation start tag: {%
+            return "';";
+        }
+        if (p5) { // evaluation end tag: %}
+            return "_s+='";
+        }
+    }
+
+    // add helpers to pastry to pass to compiled functions, can be extended {
+        // helper.escape = htmlUtils.escape;
+        pastry.extend(helper, htmlUtils);
+    // }
+
     return pastry.template = template = {
+        helper: helper,
         compile: function (str/*, option*/) {
             // option = pastry.extend({}, defaultOpitons, option);
             if (!pastry.isString(str)) {
                 return str;
             }
-            /*jshint -W054*/
-            return cache[str] || (cache[str] = new Function('obj',
-                    'var p = [],' +
-                        'print = function(){' +
-                            'p.push.apply(p, arguments);' +
-                        '};' +
-                    // Introduce the data as local variables using with(){}
-                    'with(obj){' +
-                        'p.push("' +
-                            // Convert the template into pure JavaScript
-                            // (function () { // tobe extended
-                                str
-                                    .replace(/[\r\t\n]/g, ' ')
-                                    .split("<%").join('\t')
-                                    .replace(/((^|%>)[^\t]*)'/g, '$1\r')
-                                    .replace(/\t=(.*?)%>/g, "',$1,'")
-                                    .split('\t').join("');")
-                                    .split('%>').join("p.push('")
-                                    .split('\r').join("\\'") +
-                                    // .split('\r').join("\\'");
-                                // return str;
-                            // }()) +
-                        '");' +
-                    '};' +
-                    'return p.join("");'
+
+            /*jshint -W054*/ // new Function()
+            return cache[str] || (cache[str] = new Function('obj', 'helper',
+                    "var _e=helper.escape," +
+                        "print=function(s,e){" +
+                            "_s+=e?(s==null?'':s):_e(s);" +
+                        "};" +
+                    "with(obj){" +
+                        // include helper {
+                            // "include = function (s, d) {" +
+                            //     "_s += tmpl(s, d);}" + "," +
+                        // }
+                        "_s='" + str.replace(RE_parser, render) + "';" +
+                    "}" +
+                    "return _s;"
                 )
             );
         },
         render: function (str, data/*, option*/) {
             // option = option || {};
-            return template.compile(str/*, option*/)(data);
+            // console.log(template.compile(str).toString());
+            return template.compile(str/*, option*/)(data, template.helper);
         }
     };
 });

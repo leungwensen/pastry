@@ -6,7 +6,7 @@
 
     "main"    : "release/%s/pastry.node.min.js",
     "browser" : "release/%s/pastry.min.js",
-    "version" : "0.3.141210",
+    "version" : "0.3.141212",
 
     "author": {
         "description" : "team of pastry",
@@ -25,6 +25,7 @@
         "commander"             : "*" ,
         "express"               : "*" ,
         "graphviz"              : "*" ,
+        "pastry"                : "*" ,
         "grunt"                 : "*" ,
         "grunt-contrib-clean"   : "*" ,
         "grunt-contrib-concat"  : "*" ,
@@ -44,7 +45,6 @@
         "moment"                : "*" ,
         "node-static"           : "*" ,
         "npm-download-counts"   : "*" ,
-        "pastry"                : "*" ,
         "uglify-js"             : "*"
     },
 
