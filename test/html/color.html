@@ -25,6 +25,7 @@
 <script>
     require([
         'pastry',
+        'template',
         'class/Color',
         'dom/query',
         'dom/event',
@@ -35,6 +36,7 @@
         'fmt/sprintf'
     ], function (
         pastry,
+        template,
         Color,
         domQuery,
         domEvent,
@@ -89,11 +91,46 @@
             return $tr;
         };
 
-        var $table = domQuery.one('table');
+        var $table = domQuery.one('table'),
+            colors = {},
+            tmpl   =
+                '{% pastry.each(colors, function(color, name) { %}' +
+                    '<tr>' +
+                        '<td>{%= name %}</td>' +
+                        '<td style="color: {%= color.fontColor %}; background-color: {%= color.toString() %};">{%= color.toHex() %}</td>' +
+                        '<td style="color: {%= color.fontColor %}; background-color: {%= color.greyColor.toString() %};">{%= color.greyColor.toHex() %}</td>' +
+                        '<td>{%= color.toCss() %}</td>' +
+                        '<td>{%= color.toHsla() %}</td>' +
+                    '</tr>' +
+                '{% }); %}',
+            renderedHTML;
+
 
         pastry.each(Color.named, function (rgb, name) {
-            domConstruct.place(createColorTr(name, rgb), $table);
+            var color       = new Color(rgb);
+            color.greyColor = color.toGrey();
+            color.fontColor = color.greyColor.r > 128 ? 'black' : 'white';
+            colors[name]    = color;
         });
+        renderedHTML = template.render(tmpl, {
+            colors: colors
+        });
+
+        domConstruct.empty($table);
+        domConstruct.place(domConstruct.toDom(renderedHTML), $table);
+
+        pastry.each(colors, function (color) {
+            color.greyColor.destroy();
+            color.destroy();
+        });
+
+        setTimeout(function () {
+            domConstruct.empty($table);
+            pastry.each(Color.named, function (rgb, name) {
+                domConstruct.place(createColorTr(name, rgb), $table);
+            });
+        }, 3000);
+
     });
 </script>
 </body>
