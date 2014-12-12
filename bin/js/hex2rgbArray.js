@@ -4,7 +4,7 @@
 
 var
     fs     = require('fs'),
-    pastry = require('pastry'),
+    pastry = require('../../dist/node-debug.js'),
 
     hexJSONFile  = './data/json/hexByNamedColor.json',
     rgbJSONFile  = './data/json/rgbByNamedColor.json',

@@ -3,22 +3,22 @@
 'use strict';
 
 var genJSON  = require('commander'),
-    PT       = require('pastry'),
+    pastry   = require('../../dist/node-debug.js'),
     fs       = require('fs'),
 
     list = function (val) {      // for commander, get an array of strings
         var list = val.split(',');
-        PT.each(list, function (val, i) {
-            list[i] = PT.trim(val);
+        pastry.each(list, function (val, i) {
+            list[i] = pastry.trim(val);
         });
         return list;
     },
     stringify = function (val) { // for commander, get a string
-        return PT.trim(val);
+        return pastry.trim(val);
     },
     str2arr = function (str) {   // '[xxx, xxx]' => ['xxx', 'xxx']
-        return PT.map(str.replace(/\[|\]/gm, '').split(','), function (val) {
-            return PT.trim(val);
+        return pastry.map(str.replace(/\[|\]/gm, '').split(','), function (val) {
+            return pastry.trim(val);
         });
     },
 
@@ -31,9 +31,9 @@ var genJSON  = require('commander'),
         val = val.replace(type, '');
         parts = val.split(',');
         return {
-            'type'        : PT.trim(type.replace(/\{|\}/gm, '')),
-            'name'        : PT.trim(parts[0]),
-            'description' : PT.trim(parts.slice(1).join(''))
+            'type'        : pastry.trim(type.replace(/\{|\}/gm, '')),
+            'name'        : pastry.trim(parts[0]),
+            'description' : pastry.trim(parts.slice(1).join(''))
         };
     },
     /*
@@ -43,18 +43,18 @@ var genJSON  = require('commander'),
         var type = val.match(/\{\w+\s*\}/)[0],
             description = val.replace(type, '');
         return {
-            'type'        : PT.trim(type.replace(/\{|\}/gm, '')),
-            'description' : PT.trim(description)
+            'type'        : pastry.trim(type.replace(/\{|\}/gm, '')),
+            'description' : pastry.trim(description)
         };
     },
     /*
      * @any : {this is what will be dealed with}
      */
     embellishValue = function (val) {
-        val = PT.S(val);
+        val = pastry.S(val);
         try {
-            var jsonObj = PT.JSON.parse(val);
-            if (PT.isObj(jsonObj) || PT.isArr(jsonObj) || PT.isFunc(jsonObj)) {
+            var jsonObj = pastry.JSON.parse(val);
+            if (pastry.isObj(jsonObj) || pastry.isArr(jsonObj) || pastry.isFunc(jsonObj)) {
                 return jsonObj;
             }
         } catch (e) {
@@ -79,15 +79,15 @@ var genJSON  = require('commander'),
             ret[key] = ret[key] || [];
             ret[key].push(embellishReturn(value));
         } else if (/^require/.test(key)) {
-            if (!PT.has(ret, key)) {
+            if (!pastry.has(ret, key)) {
                 ret[key] = [];
             }
             ret[key] = ret[key].concat(str2arr(value));
         } else {
-            if (PT.has(ret, key)) {
+            if (pastry.has(ret, key)) {
                 var oldValue = ret[key],
                     newValue = embellishValue(value);
-                if (PT.isArr(oldValue) && !PT.isArr(newValue)) {
+                if (pastry.isArr(oldValue) && !pastry.isArr(newValue)) {
                     ret[key].push(newValue);
                 } else {
                     ret[key] = [];
@@ -113,8 +113,8 @@ var genJSON  = require('commander'),
                  .replace(/\*\s+/gm          , '' )  // remove '*'
                  .replace(/\s+/gm            , ' '); // '\s+' => '\s'
         stringList = doc.split('@'); // params[i]: xxxx : xxxx xxx, xxx.
-        PT.each(stringList, function (str) {
-            str = PT.trim(str);
+        pastry.each(stringList, function (str) {
+            str = pastry.trim(str);
             if (str === '' || str === null) {
                 return;
             }
@@ -122,7 +122,7 @@ var genJSON  = require('commander'),
             try {
                 key = str.match(/^\w+\s*:\s*/)[0];
                 value = str.replace(key, '');
-                key = PT.trim(key).replace(/\s*\:\s*/ , '');
+                key = pastry.trim(key).replace(/\s*\:\s*/ , '');
                 addComment(ret, key, value);
             } catch (e) {
                 console.log(e, str);
@@ -140,13 +140,13 @@ var genJSON  = require('commander'),
                 return;
             }
             var targetFilename = genJSON.directory + filename.replace(/^.*[\\\/]|\.js$/gm, '') + '.doc.json',
-                fileContent = PT.S(data),
+                fileContent = pastry.S(data),
                 docs = fileContent.match(/(\/\*([\s\S]*?)\*\/)|(\/\/(.*)$)/gm),
                 targetContent = [];
-            PT.each(docs, function (doc) {
+            pastry.each(docs, function (doc) {
                 targetContent.push(doc2JSON(doc));
             });
-            fs.writeFile(targetFilename, PT.JSON.stringify(targetContent, undefined, 2), function (err) {
+            fs.writeFile(targetFilename, pastry.JSON.stringify(targetContent, undefined, 2), function (err) {
                 if (err) {
                     console.log('writting into ' + targetFilename + " failed:\n" + err);
                 }
@@ -166,7 +166,7 @@ genJSON.directory  = genJSON.directory || 'doc';
 genJSON.directory += /\/$/.test(genJSON.directory) ? '' : '/';
 
 // deal with each source file
-PT.each(genJSON.files, function (path) {
+pastry.each(genJSON.files, function (path) {
     if (/\.js$/.test(path)) {
         // when path is a .js source file already
         genJSONFromFile(path);
@@ -176,7 +176,7 @@ PT.each(genJSON.files, function (path) {
             if (err) {
                 console.log('reading directory ' + path + " failed:\n" + err);
             }
-            PT.each(files, function (file) {
+            pastry.each(files, function (file) {
                 if (/\.js$/.test(file)) {
                     genJSONFromFile(path + file);
                 }

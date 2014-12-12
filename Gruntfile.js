@@ -1,7 +1,7 @@
 /* jshint strict: true, undef: true, unused: true */
 /* global module */
 
-var pastry = require('pastry');
+var pastry = require('./dist/node-debug.js');
 
 module.exports = function (grunt) {
     'use strict';
