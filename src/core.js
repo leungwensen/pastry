@@ -479,7 +479,13 @@
                     }
                     return result;
                 };
-
+            P.invert = function(obj) {
+                var result = {};
+                P.each(obj, function (value, key) {
+                    result[value] = key;
+                });
+                return result;
+            };
             P.values = function (obj) {
                 /*
                  * @description : 获取对象值集合
