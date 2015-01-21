@@ -3,54 +3,65 @@
 
 define('declare', [
     'pastry',
-    'Class'
+    'declare/c3mro'
 ], function(
     pastry,
-    Class
+    c3mroMerge
 ) {
     'use strict';
     /*
      * @author      : 绝云（wensen.lws）
      * @description : Class utils
      */
-    var undef,
 
-        str_class        = '__class',
-        NS               = str_class + '__',
-        str_className    = str_class + 'Name',
-        str_prototype    = 'prototype',
-        str_superClasses = '__superClasses',
-        str_constructor  = '__constructor',
+    return pastry.declare = function(/*name, superClasses, protoObj*/) {
+        var uberClass,
+            tempConstructor,
+            lin          = '_linearization',
+            args         = pastry.toArray(arguments),
+            name         = pastry.isString(args[0]) ? args.shift() : '',
+            superClasses = args.length > 1 ? args.shift() : [],
+            protoObj     = args[0] ? args.shift() : {},
+            bases        = [],
+            Tmp          = function () {},
+            hasCtor      = false,
+            ctor         = function () {};
 
-        declare = function (/*className, superClasses, props*/) {
-            var args          = pastry.toArray(arguments),
-                className     = pastry.isString(args[0]) ? args.shift() : undef,
-                superClasses  = args.length > 1 ? args.shift() : [],
-                props         = args[0],
-                constructor   = props && props.constructor ? props.constructor : function (info) {
-                    return this.init(info);
-                };
+        superClasses = pastry.isArray(superClasses) ? superClasses : [superClasses];
+        pastry.each(superClasses, function(clazz) {
+            clazz[lin] = clazz[lin] || [clazz];
+            bases.push(clazz[lin]);
+        });
 
-            constructor[str_prototype]    = {};
-            constructor[str_superClasses] = superClasses;
+        if (bases.length) {
+            bases.push(superClasses);
+            bases = c3mroMerge.apply(null, bases);
+        }
 
-            if (superClasses.length === 0) {
-                constructor[str_prototype] = Class[str_prototype];
-                constructor[str_superClasses] = [Class];
-            } else {
-                pastry.each(superClasses, function (superClass) {
-                    pastry.extend(constructor[str_prototype], superClass[str_prototype]);
-                });
+        tempConstructor = protoObj.constructor;
+        if (tempConstructor !== Object.prototype.constructor) {
+            hasCtor = true;
+            ctor = tempConstructor;
+        }
+
+        ctor[lin]    = [ctor].concat(bases);
+        ctor.parents = bases.slice(0);
+
+        protoObj.constructor = ctor;
+        while ((uberClass = bases.shift())) {
+            protoObj = pastry.extend({}, uberClass.prototype, protoObj);
+            Tmp.prototype = protoObj;
+            if (!hasCtor) {
+                protoObj.constructor = ctor;
             }
+            protoObj = new Tmp();
+        }
 
-            constructor[str_className] = className || pastry.uuid(NS);
+        ctor.className = name;
+        ctor.prototype = protoObj;
+        ctor.prototype.constructor = ctor;
 
-            pastry.extend(constructor[str_prototype], props);
-            constructor[str_prototype][str_class] = constructor[str_prototype][str_constructor] = constructor;
-
-            return constructor;
-        };
-
-    return pastry.declare = declare;
+        return ctor;
+    };
 });
 

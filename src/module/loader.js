@@ -81,7 +81,7 @@ define('module/loader', [
             } else {
                 meta.uri = data.cwd;
             }
-            if (src === '' || (pastry.isString(src) && src.indexOf(data.cwd) > -1)) {
+            if (src === '' || (pastry.isString(src) && src === data.cwd)) {
                 if (meta.id) { // script tag 中的具名模块
                     // meta.id = './' + meta.id; // @FIXME 去掉这个处理
                 } else { // script tag 中的匿名模块
@@ -89,12 +89,16 @@ define('module/loader', [
                 }
             }
         })
-        .on('module-inited', function (mod) {
+        .on('module-initialised', function (mod) {
+            var uri;
             if (!(pastry.isString(mod.uri) && mod.uri.indexOf('/') > -1)) {
-                pastry.extend(mod, {
-                    uri: id2Uri(mod.id)
-                });
+                uri = mod.uri = id2Uri(mod.id);
             }
+            // 同一 script 中定义了多个 id 的情况 {
+                if (mod.id) {
+                    mod.relativeUri = id2Uri('./' + mod.id, mod.uri);
+                }
+            // }
         })
         .on('module-depsProcessed', function (mod) {
             pastry.each(mod.deps, function (id, index) {

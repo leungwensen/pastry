@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>hotkey</title>
+    <link rel="stylesheet" href="../../dist/debug.css">
+    <link rel="stylesheet" href="../../dist/font/style.css">
+</style>
+</head>
+<body>
+<script src="../../dist/browser-debug.js"></script>
+<script>
+    require([
+        'dom/hotkey'
+    ], function (
+        hotkey
+    ) {
+        console.log(hotkey);
+        hotkey
+            .on('z', function () {
+                alert('z pressed');
+            })
+            .on('x', function () {
+                alert('x pressed');
+            })
+            .on('command+x', function () {
+                alert('command+x pressed');
+            });
+    });
+</script>
+</body>
+</html>

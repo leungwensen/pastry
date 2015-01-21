@@ -23,7 +23,7 @@ var define;
              * @description: 模块构造函数
              */
             var mod = this;
-            mod.init(meta);
+            mod.initialise(meta);
             return mod;
         },
 
@@ -41,16 +41,37 @@ var define;
     event(Module); // 加上事件相关函数: on(), off(), emit(), trigger()
 
     Module.prototype = {
-        init: function (meta) {
+        initialise: function (meta) {
             /*
              * @description: 初始化
              */
-            var mod = this;
+            var mod = this,
+                id,
+                uri,
+                relativeUri;
             pastry.extend(mod, meta);
-            Module.emit('module-inited', mod);
-            moduleByUri[mod.uri] = mod;
-            moduleByUri[mod.id]  = mod;
-            queueByUri[mod.uri]  = mod;
+            Module.emit('module-initialised', mod);
+            if (uri = mod.uri) {
+                if (!moduleByUri[uri]) {
+                    moduleByUri[uri] = mod;
+                }
+                if (!queueByUri[uri]) {
+                    queueByUri[uri] = mod;
+                }
+            }
+            if (id = mod.id) {
+                if (!moduleByUri[id]) {
+                    moduleByUri[id] = mod;
+                }
+            }
+            if (relativeUri = mod.relativeUri) {
+                if (!moduleByUri[relativeUri]) {
+                    moduleByUri[relativeUri] = mod;
+                }
+                if (!queueByUri[relativeUri]) {
+                    queueByUri[mod.relativeUri] = mod;
+                }
+            }
             return mod;
         },
         processDeps: function () {
@@ -62,23 +83,30 @@ var define;
             var mod           = this,
                 depModExports = [];
             if ('exports' in mod) {
+                delete queueByUri[mod.uri];
+                delete queueByUri[mod.relativeUri];
                 return mod;
             }
 
             if (pastry.every(mod.deps, function (uri) {
                 return !!executedByUri[uri];
             })) {
-                var modFactory = mod.factory,
-                    modUri     = mod.uri,
-                    modId      = mod.id;
+                var modFactory     = mod.factory,
+                    modUri         = mod.uri,
+                    modId          = mod.id,
+                    modRelativeUri = mod.relativeUri;
 
                 pastry.each(mod.deps, function (uri) {
                     depModExports.push(exportsByUri[uri]);
                 });
-                mod.exports = exportsByUri[modUri] = exportsByUri[modId] = pastry.isFunction(modFactory) ?
-                    modFactory.apply(undef, depModExports) : modFactory;
-                executedByUri[modUri] = true;
-                executedByUri[modId]  = true;
+                mod.exports =
+                    exportsByUri[modUri] =
+                    exportsByUri[modId] =
+                    exportsByUri[modRelativeUri] = pastry.isFunction(modFactory) ?
+                        modFactory.apply(undef, depModExports) : modFactory;
+                executedByUri[modUri] =
+                    executedByUri[modId] =
+                    executedByUri[modRelativeUri] = true;
                 delete queueByUri[modUri];
                 Module.emit('module-executed', mod);
             }

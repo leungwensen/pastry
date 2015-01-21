@@ -1,0 +1,5 @@
+src: <%= dist.node %>
+
+options:
+  specs: test/jasmine/**/*.spec.js
+  summary: true

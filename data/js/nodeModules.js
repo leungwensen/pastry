@@ -5,7 +5,7 @@
 
 module.exports = [
     // core {
-        "src/core.js",
+        "src/pastry.js",
     // }
     // event {
         "src/event.js",
@@ -17,17 +17,18 @@ module.exports = [
         "src/fmt/date.js",
         "src/fmt/sprintf.js",
         "src/fmt/vsprintf.js",
+        "src/fmt/camelCase.js",
     // }
     // json shim {
         "src/json.js",
     // }
-    // Class & declare {
-        "src/Class.js",
+    // declare {
+        "src/declare/c3mro.js",
         "src/declare.js",
     // }
     // color utils {
         "src/color/named.js",
-        "src/class/Color.js",
+        "src/Color.js",
     // }
     // html utils {
         "src/html/utils.js",

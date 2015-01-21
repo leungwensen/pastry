@@ -112,7 +112,7 @@ define('module/path', [
     data.dir  = data.base = dirname(loaderPath || data.cwd);
 
     return {
-        id2Uri: id2Uri
+        id2Uri : id2Uri
     };
 });
 

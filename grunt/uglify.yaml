@@ -1,0 +1,8 @@
+options:
+  banner: <%= banner %>
+
+release:
+  files:
+    '<%= pkg.browser %>' : '<%= dist.browser %>'
+    '<%= pkg.main %>'    : '<%= dist.node %>'
+    '<%= pkg.amd %>'     : '<%= dist.amd %>'

@@ -1,51 +1,48 @@
+
 {
     "name"        : "pastry",
     "title"       : "pastry",
     "description" : "easing SPA(single page application) development.",
     "homepage"    : "https://github.com/leungwensen/pastry",
-
-    "main"    : "release/%s/pastry.node.min.js",
-    "browser" : "release/%s/pastry.min.js",
-    "version" : "0.3.141212",
+    "browser"     : "release/<%= pkg.version %>/pastry.min.js",
+    "amd"         : "release/<%= pkg.version %>/pastry.amd.min.js",
+    "main"        : "release/<%= pkg.version %>/pastry.node.min.js",
+    "version"     : "0.3.150121",
 
     "author": {
         "description" : "team of pastry",
         "url"         : "https://github.com/leungwensen/pastry/graphs/contributors"
     },
 
-    "bugs" : {
+    "bugs": {
         "url" : "https://github.com/leungwensen/pastry/issues"
     },
 
-    "dependencies"    : {},
+    "dependencies": {
+        "optimist": "*"
+    },
 
     "devDependencies" : {
-        "assert"                : "*" ,
-        "browserstack-runner"   : "*" ,
-        "commander"             : "*" ,
-        "express"               : "*" ,
-        "graphviz"              : "*" ,
-        "pastry"                : "*" ,
-        "grunt"                 : "*" ,
-        "grunt-contrib-clean"   : "*" ,
-        "grunt-contrib-concat"  : "*" ,
-        "grunt-contrib-connect" : "*" ,
-        "grunt-contrib-copy"    : "*" ,
-        "grunt-contrib-cssmin"  : "*" ,
-        "grunt-contrib-jasmine" : "*" ,
-        "grunt-contrib-jshint"  : "*" ,
-        "grunt-contrib-less"    : "*" ,
-        "grunt-contrib-uglify"  : "*" ,
-        "grunt-contrib-watch"   : "*" ,
-        "grunt-html-validation" : "*" ,
-        "grunt-jekyll"          : "*" ,
-        "js-beautify"           : "*" ,
-        "js-yaml"               : "*" ,
-        "madge"                 : "*" ,
-        "moment"                : "*" ,
-        "node-static"           : "*" ,
-        "npm-download-counts"   : "*" ,
-        "uglify-js"             : "*"
+        "assert"                : "*",
+        "browserstack-runner"   : "*",
+        "commander"             : "*",
+        "graphviz"              : "*",
+        "grunt"                 : "*",
+        "time-grunt"            : "*",
+        "load-grunt-config"     : "*",
+        "grunt-contrib-clean"   : "*",
+        "grunt-contrib-concat"  : "*",
+        "grunt-contrib-connect" : "*",
+        "grunt-contrib-copy"    : "*",
+        "grunt-contrib-cssmin"  : "*",
+        "grunt-contrib-jasmine" : "*",
+        "grunt-contrib-jshint"  : "*",
+        "grunt-contrib-less"    : "*",
+        "grunt-contrib-uglify"  : "*",
+        "grunt-contrib-watch"   : "*",
+        "grunt-html-validation" : "*",
+        "grunt-jekyll"          : "*"
+
     },
 
     "engines" : {
@@ -53,7 +50,6 @@
     },
 
     "keywords": [
-        "CRO",
         "JS",
         "single page application",
         "SPA",
@@ -74,3 +70,4 @@
         "test" : "grunt travis --verbose"
     }
 }
+

@@ -1,4 +1,5 @@
-/*! pastry - v0.3.141212 - 2014-12-12 *//* global exports, module */
+/*! pastry - v0.3.150121 */
+/* global exports, module */
 
 (function (GLOBAL) {
     'use strict';
@@ -16,7 +17,7 @@
 
     var
     // 命名空间 {
-        P = {},
+        pastry = {},
     // }
     // 局部变量 {
         A  = Array,
@@ -24,29 +25,62 @@
         O  = Object,
         S  = String,
         PS = 'prototype',
-        U  = 'undefined',
+        US = 'undefined',
         AP = A[PS],
         FP = F[PS],
-        OP = O[PS],
+        // OP = O[PS],
         SP = S[PS],
-
-        isObject,
-        isFunction,
-
-        toStr = {}.toString,
-        slice = AP.slice,
 
         noop = function () { },
 
-        isType = function (type, obj) {
-            return toStr.call(obj) === '[object ' + type + ']';
-        };
+        // helpers {
+            toStr = {}.toString,
+            slice = AP.slice,
+
+            arrayFromSecondElement = function (arr) {
+                return slice.call(arr, 1);
+            },
+            applyNativeFunction = function (nativeFunc, target, args) {
+                return nativeFunc.apply(target, arrayFromSecondElement(args));
+            },
+
+            // isType() {
+                isType = function (type, obj) {
+                    return toStr.call(obj) === '[object ' + type + ']';
+                },
+                isArrayLike = pastry.isArrayLike = function (obj) {
+                    return (typeof obj === 'object' && isFinite(obj.length));
+                },
+                isFunction = pastry.isFunction = function (obj) {
+                    return isType('Function', obj);
+                },
+                isNumber = pastry.isNumber = function (obj) {
+                    return isType('Number', obj);
+                },
+                isObject = pastry.isObject = function (obj) {
+                    var type = typeof obj;
+                    return type === 'function' || type === 'object' && !!obj;
+                },
+                isPlainObject = pastry.isPlainObject = function (obj) {
+                    return isType('Object', obj);
+                },
+            // }
+
+            toArray = pastry.toArray = function (obj) {
+                return isArrayLike(obj) ? slice.call(obj) : [];
+            },
+
+            each,
+            hasValue;
+        // }
+
     // }
     // // 版本号 {
-    //     P.VERSION = '{VERSION}';
+    //     pastry.VERSION = '{VERSION}';
     // // }
+
     // ES5 && ES6 函数集 {
-        P.index = function (up) {
+        pastry.index = function (up) {
             /*
              * @description: 为实现 indexOf 和 lastIndexOf 而设计的函数
              */
@@ -57,7 +91,7 @@
                     return -1;
                 }
                 if (!fromIndex) {
-                    fromIndex = 0;
+                    fromIndex = up ? 0 : arr.length;
                 } else if (fromIndex < 0) {
                     fromIndex = Math.max(0, arr.length + fromIndex);
                 }
@@ -77,7 +111,7 @@
                 return -1;
             };
         };
-        P.indexOf = AP.indexOf ?
+        pastry.indexOf = AP.indexOf ?
             /*
              * @description : 返回 index （不存在则为 -1）
              * @parameter*  : {Array } arr           , 要遍历的数组
@@ -86,10 +120,10 @@
              * @return      : {Number} index
              * @syntax      : pastry.indexOf(arr, searchElement[, fromIndex])
              */
-            function (arr, searchElement, fromIndex) {
-                return arr.indexOf(searchElement, fromIndex);
-            } : P.index(true);
-        P.lastIndexOf = AP.lastIndexOf ?
+            function (arr) {
+                return applyNativeFunction(AP.indexOf, arr, arguments);
+            } : pastry.index(true);
+        pastry.lastIndexOf = AP.lastIndexOf ?
             /*
              * @description : 返回最后一个 index （不存在则为 -1）
              * @parameter*  : {Array } arr           , 要遍历的数组
@@ -98,11 +132,16 @@
              * @return      : {Number} index
              * @syntax      : pastry.indexOf(arr, searchElement[, fromIndex])
              */
-            function (arr, searchElement, fromIndex) {
-                return arr.lastIndexOf(searchElement, fromIndex);
-            } : P.index();
+            function (arr) {
+                return applyNativeFunction(AP.lastIndexOf, arr, arguments);
+            } : pastry.index();
 
-        P.each = P.forEach = OP.forEach ?
+        function objForEach (obj, callback, thisObj) {
+            for (var key in obj) {
+                callback.call(thisObj, obj[key], key, obj);
+            }
+        }
+        each = pastry.each = pastry.forEach = AP.forEach ?
             /*
              * @description : 遍历
              * @parameter*  : {Object  } obj      , 待循环变量
@@ -112,14 +151,27 @@
              * @syntax      : pastry.forEach(obj Object, callback Function[, thisObj Object]);
              */
             function (obj, callback, thisObj) {
-                obj.forEach(callback, thisObj);
-            } : function (obj, callback, thisObj) {
-                for (var key in obj) {
-                    callback.call(thisObj, obj[key], key, obj);
+                if (isArrayLike(obj)) {
+                    return applyNativeFunction(AP.forEach, obj, arguments);
+                } else if (isPlainObject(obj)) {
+                    objForEach(obj, callback, thisObj);
                 }
+                return obj;
+            } : function (obj, callback, thisObj) {
+                if (isArrayLike(obj)) {
+                    var len = obj.length;
+                    for (var i = 0; i < len; i++) {
+                        if (i in obj) {
+                            callback.call(thisObj, obj[i], i, obj);
+                        }
+                    }
+                } else if (isPlainObject(obj)) {
+                    objForEach(obj, callback, thisObj);
+                }
+                return obj;
             };
 
-        P.eachReverse = function (arr, callback, thisObj) {
+        pastry.eachReverse = function (arr, callback, thisObj) {
             /*
              * @description : 逆序遍历
              * @parameter*  : {Array   } arr      , 待循环数组
@@ -133,9 +185,10 @@
                     callback.call(thisObj, arr[i], i, arr);
                 }
             }
+            return arr;
         };
 
-        P.every = AP.every ?
+        pastry.every = AP.every ?
             /*
              * @description : 测试是否对于 arr 中的元素，callback 都返回 true
              * @parameter*  : {Array   } arr      , 待测试数组
@@ -144,8 +197,8 @@
              * @return      : {Boolean } 结果
              * @syntax      : pastry.every(arr, callback[, thisObj])
              */
-            function (arr, callback, thisObj) {
-                return arr.every(callback, thisObj);
+            function (arr) {
+                return applyNativeFunction(AP.every, arr, arguments);
             } : function (arr, callback, thisObj) {
                 var i;
                 for (i = 0; i < arr.length; i ++) {
@@ -156,7 +209,7 @@
                 return true;
             };
 
-        P.filter = AP.filter ?
+        pastry.filter = AP.filter ?
             /*
              * @description : 根据 callback 是否通过来过滤 arr 中的元素，返回过滤后的数组
              * @parameter*  : {Array   } arr      , 待过滤数组
@@ -165,11 +218,11 @@
              * @return      : {Array   } 结果数组
              * @syntax      : pastry.filter(arr, callback[, thisObj])
              */
-            function (arr, callback, thisObj) {
-                return arr.filter(callback, thisObj);
+            function (arr) {
+                return applyNativeFunction(AP.filter, arr, arguments);
             } : function (arr, callback, thisObj) {
                 var res = [];
-                P.each(arr, function (element, key) {
+                each(arr, function (element, key) {
                     if (callback.call(thisObj, element, key, arr)) {
                         res.push(element);
                     }
@@ -177,7 +230,7 @@
                 return res;
             };
 
-        P.map = AP.map ?
+        pastry.map = AP.map ?
             /*
              * @description : 用 arr 通过 callback 函数加工各个元素得到新的数组
              * @parameter*  : {Array   } arr      , 待加工数组
@@ -186,17 +239,17 @@
              * @return      : {Array   } 结果数组
              * @syntax      : pastry.map(arr, callback[, thisObj])
              */
-            function (arr, callback, thisObj) {
-                return arr.map(callback, thisObj);
+            function (arr) {
+                return applyNativeFunction(AP.map, arr, arguments);
             } : function (arr, callback, thisObj) {
                 var res = [];
-                P.each(arr, function (element, key) {
+                each(arr, function (element, key) {
                     res.push(callback.call(thisObj, element, key, arr));
                 });
                 return res;
             };
 
-        P.some = AP.some ?
+        pastry.some = AP.some ?
             /*
              * @description : 测试 arr 中每个元素，当有真的时候退出并返回 true
              * @parameter*  : {Array   } arr      , 待测试数组
@@ -205,8 +258,8 @@
              * @return      : {Boolean } 真值
              * @syntax      : pastry.some(arr, callback[, thisObj])
              */
-            function (arr, callback, thisObj) {
-                return arr.some(callback, thisObj);
+            function (arr) {
+                return applyNativeFunction(AP.some, arr, arguments);
             } : function (arr, callback, thisObj) {
                 var i;
                 for (i = 0; i < arr.length; i ++) {
@@ -217,7 +270,7 @@
                 return false;
             };
 
-        P.reduce = AP.reduce ?
+        pastry.reduce = AP.reduce ?
             /*
              * @description : 从左到右遍历数组，运行函数并得到最终值
              * @parameter*  : {Array   } arr      , 待遍历数组
@@ -230,9 +283,8 @@
             // @paramForCallback  : {Number  } index         , index
             // @paramForCallback  : {Array   } array         , 数组变量
              */
-            function (arr, callback, thisObj) {
-                return thisObj ?
-                    arr.reduce(callback, thisObj) : arr.reduce(callback);
+            function (arr) {
+                return applyNativeFunction(AP.reduce, arr, arguments);
             } : function (arr, callback, thisObj) {
                 var i, value;
                 if (thisObj) {
@@ -247,7 +299,7 @@
                 }
                 return value;
             };
-        P.reduceRight = AP.reduceRight ?
+        pastry.reduceRight = AP.reduceRight ?
             /*
              * @description : 从右到左遍历数组，运行函数并得到最终值
              * @parameter*  : {Array   } arr      , 待遍历数组
@@ -260,9 +312,8 @@
             // @paramForCallback  : {Number  } index         , index
             // @paramForCallback  : {Array   } array         , 数组变量
              */
-            function (arr, callback, thisObj) {
-                return thisObj ?
-                    arr.reduceRight(callback, thisObj) : arr.reduceRight(callback);
+            function (arr) {
+                return applyNativeFunction(AP.reduceRight, arr, arguments);
             } : function (arr, callback, thisObj) {
                 var i, value;
                 if (thisObj) {
@@ -278,7 +329,7 @@
                 return value;
             };
 
-        P.trim = SP.trim ?
+        pastry.trim = SP.trim ?
             /*
              * @description : 移除空白子串
              * @parameter*  : {string} str, 待处理字符串
@@ -290,7 +341,7 @@
             } : function (str) {
                 return str.replace(/^\s+|\s+$/g, '');
             };
-        P.trimLeft = SP.trimLeft ?
+        pastry.trimLeft = SP.trimLeft ?
             /*
              * @description : 移除左空白子串
              * @parameter*  : {string} str, 待处理字符串
@@ -302,7 +353,7 @@
             } : function (str) {
                 return str.replace(/^\s+/g, '');
             };
-        P.trimRight = SP.trimRight ?
+        pastry.trimRight = SP.trimRight ?
             /*
              * @description : 移除右空白子串
              * @parameter*  : {string} str, 待处理字符串
@@ -317,81 +368,86 @@
     // }
     // helper 函数集 {
         // 字符串相关 {
-            P.lc = function (str) {
+            pastry.lc = function (str) {
                 /*
                  * @syntax: pastry.lc(str String);
                  */
-                return str.toString().toLowerCase();
+                return (str + '').toLowerCase();
             };
-            P.uc = function (str) {
+            pastry.uc = function (str) {
                 /*
                  * @syntax: pastry.uc(str String);
                  */
-                return str.toString().toUpperCase();
+                return (str + '').toUpperCase();
             };
-            P.hasSubString = function (str, subStr) {
+            pastry.hasSubString = function (str, subStr) {
                 /*
                  * @syntax: pastry.hasSubString(str String, subStr String);
                  */
                 return (str.indexOf(subStr) > -1);
             };
+            pastry.capitalize = function (str) {
+                str = str + '';
+                return str.charAt(0).toUpperCase() + str.substr(1);
+            };
         // }
-        // 类型判断 pastry.is$Type(obj) {
+        // 其它类型判断 pastry.is$Type(obj) {
             /*
              * @description : 类型判断
              * @parameter*  : {Any} obj, 待判断对象
              * @syntax      : pastry.is$Type(obj Any);
              */
-            P.each([
+            each([
                 'Array',
                 'Arguments',
                 'Boolean',
                 'Date',
                 'Error',
-                'Number',
                 'RegExp',
                 'String'
             ], function (type) {
-                P['is' + type] = function (obj) {
+                pastry['is' + type] = function (obj) {
                     return isType(type, obj);
                 };
             });
-            P.isFunction = isFunction = function (obj) {
-                return isType('Function', obj);
+            if (A.isArray) {
+                pastry.isArray = A.isArray;
+            }
+            pastry.isNaN = function (obj) {
+                return isNumber(obj) && obj !== +obj;
             };
-            P.isObject = isObject = function (obj) {
-                var type = typeof obj;
-                return type === 'object' && !!obj;
+            pastry.isFinite = function (obj) {
+                return isNumber(obj) && isFinite(obj) && !isNaN(obj);
             };
-            P.isNaN = function (obj) {
-                return P.isNumber(obj) && obj !== +obj;
-            };
-            P.isFinite = function (obj) {
-                return P.isNumber(obj) && isFinite(obj) && !isNaN(obj);
-            };
-            P.isUndefined = function (obj) {
+            pastry.isUndefined = function (obj) {
                 return obj === undefined;
             };
-            P.isNull = function (obj) {
+            pastry.isNull = function (obj) {
                 return obj === null;
             };
-            if (A.isArray) {
-                P.isArray = A.isArray;
-            }
         // }
         // 数组、对象相关 {
-            P.isArrayLike = function (obj) {
-                return (typeof obj === 'object' && isFinite(obj.length));
+            pastry.range = function (start, stop, step) {
+                if (arguments.length <= 1) {
+                    stop = start || 0;
+                    start = 0;
+                }
+                step = step || 1;
+
+                var length = Math.max(Math.ceil((stop - start) / step), 0),
+                    range  = new Array(length),
+                    idx    = 0;
+                for (; idx < length; idx++, start += step) {
+                    range[idx] = start;
+                }
+                return range;
             };
-            P.toArray = function (obj) {
-                return P.isArrayLike(obj) ? slice.call(obj) : [];
-            };
-            P.flatten = function (array) {
+            pastry.flatten = function (array) {
                 /*
                  * @description: 扁平化二维数组
                  */
                 for (var r = [], i = 0, l = array.length; i < l; ++i) {
-                    if (P.isArrayLike(array[i])) {
+                    if (isArrayLike(array[i])) {
                         r = r.concat(array[i]);
                     } else {
                         r[r.length] = array[i];
@@ -399,46 +455,46 @@
                 }
                 return r;
             };
-            P.merge = function (dest) {
+            pastry.merge = function (dest) {
                 /*
                  * @description : 合并对象
                  * @parameter*  : {Object} dest, 目标对象
                  * @syntax      : pastry.merge(dest Object[, src1 Object, src2 Object, ...]);
                  */
-                if (isObject(dest) || isFunction(dest)) {
-                    P.each(P.toArray(arguments).slice(1), function (source) {
-                        if (source) {
-                            for (var prop in source) {
-                                if (isObject(source[prop])) {
+                each(arrayFromSecondElement(arguments), function (source) {
+                    if (source) {
+                        for (var prop in source) {
+                            if (toStr.call(source[prop]) !== toStr.call(dest[prop])) {
+                                dest[prop] = source[prop];
+                            } else {
+                                if (isPlainObject(source[prop])) {
                                     dest[prop] = dest[prop] || {};
-                                    P.merge(dest[prop], source[prop]);
+                                    pastry.merge(dest[prop], source[prop]);
                                 } else {
                                     dest[prop] = source[prop];
                                 }
                             }
                         }
-                    });
-                }
+                    }
+                });
                 return dest;
             };
-            P.extend = function (dest) {
+            pastry.extend = function (dest) {
                 /*
                  * @description : 扩展对象
                  * @parameter*  : {Object} dest, 目标对象
                  * @syntax      : pastry.extend(dest Object[, src1 Object, src2 Object, ...]);
                  */
-                if (isObject(dest) || isFunction(dest)) {
-                    P.each(P.toArray(arguments).slice(1), function (source) {
-                        if (source) {
-                            for (var prop in source) {
-                                dest[prop] = source[prop];
-                            }
+                each(arrayFromSecondElement(arguments), function (source) {
+                    if (source) {
+                        for (var prop in source) {
+                            dest[prop] = source[prop];
                         }
-                    });
-                }
+                    }
+                });
                 return dest;
             };
-            P.remove = function (arr, fromIndex, toIndex) {
+            pastry.remove = function (arr, fromIndex, toIndex) {
                 /*
                  * @description : 删除数组元素
                  * @parameter*  : {Array } arr       , 待处理数组
@@ -448,14 +504,14 @@
                  */
                 var rest,
                     len = arr.length;
-                if (!P.isNumber(fromIndex)) {
+                if (!isNumber(fromIndex)) {
                     return arr;
                 }
                 rest = arr.slice((toIndex || fromIndex) + 1 || len);
                 arr.length = fromIndex < 0 ? len + fromIndex : fromIndex;
                 return arr.push.apply(arr, rest);
             };
-            P.keys = O.keys ?
+            pastry.keys = O.keys ?
                 /*
                  * @description : 获取对象键集合
                  * @parameter*  : {object} obj, 对象
@@ -466,38 +522,38 @@
                 } : function (obj) {
                     var result = [];
                     if (isFunction(obj)) {
-                        P.each(obj, function (value, key) {
-                            if (key !== P) {
+                        each(obj, function (value, key) {
+                            if (key !== PS) {
                                 result.push(key);
                             }
                         });
                     } else {
-                        P.each(obj, function (value, key) {
+                        each(obj, function (value, key) {
                             result.push(key);
                         });
                     }
                     return result;
                 };
-            P.invert = function(obj) {
+            pastry.invert = function(obj) {
                 var result = {};
-                P.each(obj, function (value, key) {
+                each(obj, function (value, key) {
                     result[value] = key;
                 });
                 return result;
             };
-            P.values = function (obj) {
+            pastry.values = function (obj) {
                 /*
                  * @description : 获取对象值集合
                  * @parameter*  : {object} obj, 对象
                  * @syntax      : pastry.values(obj)
                  */
                 var values = [];
-                P.each(obj, function (value) {
+                each(obj, function (value) {
                     values.push(value);
                 });
                 return values;
             };
-            P.hasKey = function (obj, key) {
+            pastry.hasKey = function (obj, key) {
                 /*
                  * @description : 检查是否存在键
                  * @parameter*  : {Object} obj, 待检查对象
@@ -506,56 +562,96 @@
                  */
                 return obj.hasOwnProperty(key);
             };
-            P.hasValue = function (obj, value) {
+            hasValue = pastry.hasValue = function (obj, value) {
                 /*
                  * @description : 检查是否存在值
                  * @parameter*  : {Object} obj   , 待检查对象
                  * @parameter*  : {String} value , 值
                  * @syntax      : pastry.hasValue(obj, value)
                  */
-                return (P.indexOf(P.values(obj), value) > -1);
+                return (pastry.indexOf(pastry.values(obj), value) > -1);
             };
-            P.uniq = function (arr) {
+            pastry.uniq = function (arr) {
                 /*
                  * @description : 求集合
                  * @parameter*  : {Array} arr, 求集合数组
                  * @syntax      : pastry.uniq(arr Array);
                  */
                 var resultArr = [];
-                P.each(arr, function (element) {
-                    if (!P.hasValue(resultArr, element)) {
+                each(arr, function (element) {
+                    if (!hasValue(resultArr, element)) {
                         resultArr.push(element);
                     }
                 });
                 return resultArr;
             };
-            P.union = function (/*arr1, arr2 */) {
+            pastry.union = function (/*arr1, arr2 */) {
                 /*
                  * @description : 合集
                  * @parameter*  : {Array} arr1, 求合集数组
                  * @syntax      : pastry.union([arr1 Array, arr2 Array, ...]);
                  */
                 var resultArr = [],
-                    sourceArrs = P.toArray(arguments).slice();
-                P.each(sourceArrs, function (arr) {
+                    sourceArrs = toArray(arguments);
+                each(sourceArrs, function (arr) {
                     resultArr.concat(arr);
                 });
-                return P.uniq(resultArr);
+                return pastry.uniq(resultArr);
+            };
+            pastry.difference = function (arr) {
+                var rest = pastry.flatten(arrayFromSecondElement(arguments), true, true, []);
+                return pastry.filter(arr, function(value){
+                    return !hasValue(rest, value);
+                });
+            };
+            pastry.intersect = function (a, b) {
+                var result = [];
+                each(a, function (value) {
+                    if (hasValue(b, value)) {
+                        result.push(value);
+                    }
+                });
+                return result;
+            };
+            pastry.destroy = function (obj) {
+                /*
+                 * @description : 销毁对象
+                 * @parameter*  : {Object} obj, 待销毁对象
+                 * @syntax      : pastry.destroy(obj);
+                 */
+                for (var p in obj) {
+                    if (obj.hasOwnProperty(p)) {
+                        delete obj[p];
+                    }
+                }
+                obj.prototype = obj['__proto__'] = null;
+                obj = null;
+            };
+            pastry.clone = function (obj) {
+                /*
+                 * @description : 克隆对象
+                 * @parameter*  : {Object} obj, 待克隆对象
+                 * @syntax      : pastry.clone(obj);
+                 */
+                if (!isObject(obj)) {
+                    return obj;
+                }
+                return isArrayLike(obj) ? toArray(obj) : pastry.extend({}, obj);
             };
         // }
         // 函数相关 {
-            P.bind = FP.bind ?
+            pastry.bind = FP.bind ?
                 /*
                  * @description : 绑定函数运行上下文
                  * @parameter*  : {Function} func, 目标函数
                  * @parameter*  : {Object  } oThis, 上下文
                  * @syntax      : pastry.uuid(func Function, oThis Object);
                  */
-                function (func, oThis) {
-                    return func.bind(oThis, P.toArray(arguments).slice(2));
+                function (func) {
+                    return applyNativeFunction(FP.bind, func, arguments);
                 } : function (func, oThis) {
                     if (isFunction(oThis) && isFunction(func)) {
-                        var aArgs  = P.toArray(arguments).slice(2),
+                        var aArgs  = toArray(arguments).slice(2),
                             FNOP   = function () {},
                             fBound = function () {
                                 return func.apply(
@@ -563,8 +659,8 @@
                                     aArgs.concat(arguments)
                                 );
                             };
-                        FNOP[P]   = func[P];
-                        fBound[P] = new FNOP();
+                        FNOP[pastry]   = func[pastry];
+                        fBound[pastry] = new FNOP();
                         return fBound;
                     }
                 };
@@ -574,20 +670,20 @@
              * @description : debug 相关函数
              * @syntax      : pastry.[INFO|LOG|WARN|ERROR]
              */
-            P.each([
+            each([
                 'info',
                 'log',
                 'warn'
             ], function (type) {
-                P[type.toUpperCase()] = (typeof console === U) ? noop : P.bind(console[type], console);
+                pastry[type.toUpperCase()] = (typeof console === US) ? noop : pastry.bind(console[type], console);
             });
-            P.ERROR = function (err) {
-                P.WARN(err);
+            pastry.ERROR = function (err) {
+                pastry.WARN(err);
                 throw new Error(err);
             };
         // }
         // 其它 {
-            P.getAny = function (callbackList) {
+            pastry.getAny = function (callbackList) {
                 /*
                  * @description : 从一系列 callback 函数里按顺序尝试取值，并返回第一个可用值
                  * @parameter*  : {Array} callbackList, 回调函数列表
@@ -603,7 +699,7 @@
                 }
                 return returnValue;
             };
-            P.uuid = function (prefix) {
+            pastry.uuid = function (prefix) {
                 /*
                  * @description : 生成uuid
                  * @parameter   : {String} prefix, 前缀
@@ -627,47 +723,43 @@
          * @parameter   : {Boolean} override, 是否覆盖
          * @syntax      : pastry.mixin(obj Object[, override Boolean]);
          */
-        P.mixin = function (obj, override) {
-            P.each(obj, function (value, key) {
-                if (P[key] && !override) {
-                    P.ERROR('P.' + key + ' already exists');
+        pastry.mixin = function (obj, override) {
+            each(obj, function (value, key) {
+                if (pastry[key] && !override) {
+                    pastry.ERROR('pastry.' + key + ' already exists');
                 } else {
-                    P[key] = value;
+                    pastry[key] = value;
                 }
             });
         };
     // }
     // 输出全局变量 {
-        P.setGLOBAL = function (key, value) {
+        pastry.setGLOBAL = function (key, value) {
             /*
              * @description : 设置全局变量
              * @parameter   : {String} key, 变量名
              * @parameter   : {Any   } value, 值
              * @syntax      : pastry.setGLOBAL(key String, value Any);
              */
-            if (typeof exports !== U) {
+            if (typeof exports !== US) {
                 exports[key] = value;
             }
             GLOBAL[key] = value;
         };
-        P.each([
+        each([
             'P',
             'pastry',
             'PASTRY'
         ], function (alias) {
-            P.setGLOBAL(alias, P);
+            // set global names and alias
+            pastry.setGLOBAL(alias, pastry);
         });
 
-        if (typeof exports !== U) {
-            if (typeof module !== U && module.exports) {
-                module.exports = P;
+        if (typeof exports !== US) {
+            if (typeof module !== US && module.exports) {
+                module.exports = pastry;
             }
         }
-    // }
-    // 获取全局变量 {
-        P.getGLOBAL = function (key) {
-            return GLOBAL[key];
-        };
     // }
 }(this));
 
@@ -681,8 +773,7 @@
      * @description : event 模块，包括全局和局部的
      */
 
-    var
-        pastry = GLOBAL.pastry,
+    var pastry = GLOBAL.pastry,
 
         // defination of event function {
             event = function (target) {
@@ -728,8 +819,12 @@
                      */
                     var args = pastry.toArray(arguments),
                         list = events[args.shift()] || [];
-                    pastry.each(list, function (event) {
-                        event.callback.apply(event.context, args);
+                    pastry.each(list, function (evt) {
+                        if (!evt.callback) {
+                            pastry.LOG(evt, list);
+                            pastry.ERROR('event callback is not defined');
+                        }
+                        evt.callback.apply(evt.context, args);
                     });
                     return target;
                 };
@@ -770,7 +865,7 @@ var define;
              * @description: 模块构造函数
              */
             var mod = this;
-            mod.init(meta);
+            mod.initialise(meta);
             return mod;
         },
 
@@ -788,16 +883,37 @@ var define;
     event(Module); // 加上事件相关函数: on(), off(), emit(), trigger()
 
     Module.prototype = {
-        init: function (meta) {
+        initialise: function (meta) {
             /*
              * @description: 初始化
              */
-            var mod = this;
+            var mod = this,
+                id,
+                uri,
+                relativeUri;
             pastry.extend(mod, meta);
-            Module.emit('module-inited', mod);
-            moduleByUri[mod.uri] = mod;
-            moduleByUri[mod.id]  = mod;
-            queueByUri[mod.uri]  = mod;
+            Module.emit('module-initialised', mod);
+            if (uri = mod.uri) {
+                if (!moduleByUri[uri]) {
+                    moduleByUri[uri] = mod;
+                }
+                if (!queueByUri[uri]) {
+                    queueByUri[uri] = mod;
+                }
+            }
+            if (id = mod.id) {
+                if (!moduleByUri[id]) {
+                    moduleByUri[id] = mod;
+                }
+            }
+            if (relativeUri = mod.relativeUri) {
+                if (!moduleByUri[relativeUri]) {
+                    moduleByUri[relativeUri] = mod;
+                }
+                if (!queueByUri[relativeUri]) {
+                    queueByUri[mod.relativeUri] = mod;
+                }
+            }
             return mod;
         },
         processDeps: function () {
@@ -809,23 +925,30 @@ var define;
             var mod           = this,
                 depModExports = [];
             if ('exports' in mod) {
+                delete queueByUri[mod.uri];
+                delete queueByUri[mod.relativeUri];
                 return mod;
             }
 
             if (pastry.every(mod.deps, function (uri) {
                 return !!executedByUri[uri];
             })) {
-                var modFactory = mod.factory,
-                    modUri     = mod.uri,
-                    modId      = mod.id;
+                var modFactory     = mod.factory,
+                    modUri         = mod.uri,
+                    modId          = mod.id,
+                    modRelativeUri = mod.relativeUri;
 
                 pastry.each(mod.deps, function (uri) {
                     depModExports.push(exportsByUri[uri]);
                 });
-                mod.exports = exportsByUri[modUri] = exportsByUri[modId] = pastry.isFunction(modFactory) ?
-                    modFactory.apply(undef, depModExports) : modFactory;
-                executedByUri[modUri] = true;
-                executedByUri[modId]  = true;
+                mod.exports =
+                    exportsByUri[modUri] =
+                    exportsByUri[modId] =
+                    exportsByUri[modRelativeUri] = pastry.isFunction(modFactory) ?
+                        modFactory.apply(undef, depModExports) : modFactory;
+                executedByUri[modUri] =
+                    executedByUri[modId] =
+                    executedByUri[modRelativeUri] = true;
                 delete queueByUri[modUri];
                 Module.emit('module-executed', mod);
             }
@@ -1005,7 +1128,7 @@ define('module/path', [
     data.dir  = data.base = dirname(loaderPath || data.cwd);
 
     return {
-        id2Uri: id2Uri
+        id2Uri : id2Uri
     };
 });
 
@@ -1178,7 +1301,7 @@ define('module/loader', [
             } else {
                 meta.uri = data.cwd;
             }
-            if (src === '' || (pastry.isString(src) && src.indexOf(data.cwd) > -1)) {
+            if (src === '' || (pastry.isString(src) && src === data.cwd)) {
                 if (meta.id) { // script tag 中的具名模块
                     // meta.id = './' + meta.id; // @FIXME 去掉这个处理
                 } else { // script tag 中的匿名模块
@@ -1186,12 +1309,16 @@ define('module/loader', [
                 }
             }
         })
-        .on('module-inited', function (mod) {
+        .on('module-initialised', function (mod) {
+            var uri;
             if (!(pastry.isString(mod.uri) && mod.uri.indexOf('/') > -1)) {
-                pastry.extend(mod, {
-                    uri: id2Uri(mod.id)
-                });
+                uri = mod.uri = id2Uri(mod.id);
             }
+            // 同一 script 中定义了多个 id 的情况 {
+                if (mod.id) {
+                    mod.relativeUri = id2Uri('./' + mod.id, mod.uri);
+                }
+            // }
         })
         .on('module-depsProcessed', function (mod) {
             pastry.each(mod.deps, function (id, index) {
@@ -1208,24 +1335,6 @@ define('module/loader', [
                 }
             });
         });
-});
-
-/* global define */
-
-define('module/config', [
-    'Module'
-], function (
-    Module
-) {
-    'use strict';
-    /*
-     * @author      : 绝云 (wensen.lws@alibaba-inc.com)
-     * @description : configuration
-     * @TODO
-     */
-    Module.config = function () { };
-    // var  module;
-    // return  module;
 });
 
 /* global define */
@@ -1433,6 +1542,78 @@ define('fmt/vsprintf', [
 
 /* global define */
 
+define('fmt/camelCase', [
+    'pastry'
+], function(
+    pastry
+) {
+    'use strict';
+    /*
+     * @author      : 绝云（wensen.lws）
+     * @description : description
+     * @reference   : https://github.com/substack/camelize/blob/master/index.js
+     */
+
+    function camelise (str) {
+        return str
+            .replace(/^[_.\- ]+/, '')
+            .replace(/[_.-](\w|$)/g, function (_, x) {
+                return pastry.uc(x);
+            });
+    }
+    function uncamelise (str, separator) {
+        separator = separator || '_'; // default separator: _
+
+        return str.replace(/([a-z])([A-Z])/g, function(_, a, b) {
+            return a + separator + pastry.lc(b);
+        });
+    }
+    function walk (obj, isUncamelise, separator) {
+        /*
+         * @NOTE: only the key strings will be transformed
+         */
+        if (!obj || !pastry.isObject(obj)) {
+            return obj;
+        }
+        if (!obj || pastry.isDate(obj) || pastry.isRegExp(obj)) {
+            return obj;
+        }
+        if (pastry.isArray(obj)) {
+            return pastry.map(obj, function (value) {
+                return walk(value, isUncamelise, separator);
+            });
+        }
+        return pastry.reduce(pastry.keys(obj), function (acc, key) {
+            var camel = isUncamelise ? uncamelise(key, separator) : camelise(key);
+            acc[camel] = walk(obj[key], isUncamelise, separator);
+            return acc;
+        }, {});
+    }
+
+    return pastry.camelCase = {
+        camelise: function (str) {
+            if (pastry.isString(str)) {
+                return camelise(str);
+            }
+            if (pastry.isObject(str)) {
+                return walk(str);
+            }
+            return str;
+        },
+        uncamelise: function (str, separator) {
+            if (pastry.isString(str)) {
+                return uncamelise(str, separator);
+            }
+            if (pastry.isObject(str)) {
+                return walk(str, true, separator);
+            }
+            return str;
+        }
+    };
+});
+
+/* global define */
+
 define('json', [
     'pastry',
     'fmt/date'
@@ -1588,104 +1769,134 @@ define('json', [
 
 /* global define */
 
-define('Class', [
+define('declare/c3mro', [
     'pastry'
 ], function(
     pastry
 ) {
     'use strict';
     /*
-     * @author      : 绝云
-     * @description : Class utils
+     * @author      : 绝云（wensen.lws）
+     * @description : description
      */
+    var indexOf = pastry.indexOf;
 
-    var
-        str_className   = '__className',
-        str_constructor = '__constructor',
-        Class = function () { };
+    function cloneArray (arr) {
+        return arr.slice(0);
+    }
+    function isGoodHead (head, rest) {
+        var isGood = true;
+        pastry.some(rest, function (lin) {
+            if (indexOf(lin, head) > 0) {
+                isGood = false;
+            }
+        });
 
-    Class[str_className] = 'Class';
-    Class.instanceof = function (instance, superClass) {
-        return instance instanceof superClass || (
-            instance[str_constructor] &&
-            instance[str_constructor][str_className] === superClass[str_className]
-        );
-    };
+        if (isGood) {
+            pastry.each(rest, function (lin) {
+                if (indexOf(lin, head) === 0) {
+                    lin.shift();
+                }
+            });
+        }
+        return isGood;
+    }
+    function eachHead (bases) {
+        var result = [],
+            badLinearization = 0;
 
-    Class.prototype = {
-        init: function (info) {
-            var instance = this;
-            pastry.extend(instance, info);
-            return instance;
-        },
-        destroy: function () {
-            var instance = this;
-            for (var p in instance) {
-                if (instance.hasOwnProperty(p)) {
-                    delete instance[p];
+        while (bases.length) {
+            var base = bases.shift();
+            if (!base.length) {
+                continue;
+            }
+
+            if (isGoodHead(base[0], bases)) {
+                result.push(base.shift());
+                badLinearization = 0;
+            } else {
+                badLinearization += 1;
+                if (badLinearization === bases.length) {
+                    pastry.ERROR('Bad Linearization');
                 }
             }
-            // instance.prototype = instance['__proto__'] = null;
-            // instance = null;
+            if (base.length) {
+                bases.push(base);
+            }
         }
-    };
+        return result;
+    }
 
-    return pastry.Class = Class;
+    return pastry.mroMerge = function () {
+        var bases = pastry.map(pastry.toArray(arguments), cloneArray);
+        return eachHead(bases);
+    };
 });
 
 /* global define */
 
 define('declare', [
     'pastry',
-    'Class'
+    'declare/c3mro'
 ], function(
     pastry,
-    Class
+    c3mroMerge
 ) {
     'use strict';
     /*
      * @author      : 绝云（wensen.lws）
      * @description : Class utils
      */
-    var undef,
 
-        str_class        = '__class',
-        NS               = str_class + '__',
-        str_className    = str_class + 'Name',
-        str_prototype    = 'prototype',
-        str_superClasses = '__superClasses',
-        str_constructor  = '__constructor',
+    return pastry.declare = function(/*name, superClasses, protoObj*/) {
+        var uberClass,
+            tempConstructor,
+            lin          = '_linearization',
+            args         = pastry.toArray(arguments),
+            name         = pastry.isString(args[0]) ? args.shift() : '',
+            superClasses = args.length > 1 ? args.shift() : [],
+            protoObj     = args[0] ? args.shift() : {},
+            bases        = [],
+            Tmp          = function () {},
+            hasCtor      = false,
+            ctor         = function () {};
 
-        declare = function (/*className, superClasses, props*/) {
-            var args          = pastry.toArray(arguments),
-                className     = pastry.isString(args[0]) ? args.shift() : undef,
-                superClasses  = args.length > 1 ? args.shift() : [],
-                props         = args[0],
-                constructor   = props && props.constructor ? props.constructor : function (info) {
-                    return this.init(info);
-                };
+        superClasses = pastry.isArray(superClasses) ? superClasses : [superClasses];
+        pastry.each(superClasses, function(clazz) {
+            clazz[lin] = clazz[lin] || [clazz];
+            bases.push(clazz[lin]);
+        });
 
-            constructor[str_prototype]    = {};
-            constructor[str_superClasses] = superClasses;
+        if (bases.length) {
+            bases.push(superClasses);
+            bases = c3mroMerge.apply(null, bases);
+        }
 
-            if (superClasses.length === 0) {
-                constructor[str_prototype] = Class[str_prototype];
-                constructor[str_superClasses] = [Class];
-            } else {
-                pastry.each(superClasses, function (superClass) {
-                    pastry.extend(constructor[str_prototype], superClass[str_prototype]);
-                });
+        tempConstructor = protoObj.constructor;
+        if (tempConstructor !== Object.prototype.constructor) {
+            hasCtor = true;
+            ctor = tempConstructor;
+        }
+
+        ctor[lin]    = [ctor].concat(bases);
+        ctor.parents = bases.slice(0);
+
+        protoObj.constructor = ctor;
+        while ((uberClass = bases.shift())) {
+            protoObj = pastry.extend({}, uberClass.prototype, protoObj);
+            Tmp.prototype = protoObj;
+            if (!hasCtor) {
+                protoObj.constructor = ctor;
             }
+            protoObj = new Tmp();
+        }
 
-            constructor[str_className] = className || pastry.uuid(NS);
+        ctor.className = name;
+        ctor.prototype = protoObj;
+        ctor.prototype.constructor = ctor;
 
-            pastry.extend(constructor[str_prototype], props);
-            constructor[str_prototype][str_class] = constructor[str_prototype][str_constructor] = constructor;
-
-            return constructor;
-        };
-
-    return pastry.declare = declare;
+        return ctor;
+    };
 });
 
 /* global define */
@@ -1856,7 +2067,7 @@ define('color/named', [
 
 /* global define */
 
-define('class/Color', [
+define('Color', [
     'pastry',
     'declare',
     'color/named'
@@ -1869,11 +2080,9 @@ define('class/Color', [
     /*
      * @author      : 绝云
      * @description : 颜色构造函数
-     * @TODO        : 构建基类，完成基础的继承／生命周期／事件／方法等封装
      * @note        : can be used in nodejs
      */
-    var
-        lc    = pastry.lc,
+    var lc    = pastry.lc,
         round = Math.round,
 
         initProps = {
@@ -1887,7 +2096,7 @@ define('class/Color', [
             var instance = this;
 
             if (color) {
-                instance.init(color);
+                instance.initialise(color);
             }
         },
 
@@ -2019,7 +2228,7 @@ define('class/Color', [
 
     classMaker = pastry.extend(initProps, {
         constructor: Color,
-        init: function (color) {
+        initialise: function (color) {
             var instance = this;
             if (pastry.isString(color)) {
                 Color.fromString(color, this);
@@ -2078,11 +2287,15 @@ define('class/Color', [
             var instance = this,
                 g = round((instance.r + instance.g + instance.b) / 3);
             return Color.makeGrey(g, instance.a);
+        },
+        destroy: function () {
+            pastry.destroy(this);
         }
     });
 
     return pastry.Color = declare('Color', classMaker);
 });
+
 /* global define, decodeURIComponent, encodeURIComponent */
 
 define('querystring', [
@@ -2186,6 +2399,7 @@ define('bom/utils', [
         platform  = nav.platform,
         plugins   = nav.plugins,
         versions  = {},
+        detectedPlatform,
         detectedPlugins;
 
     function toInt (value, base) {
@@ -2311,18 +2525,25 @@ define('bom/utils', [
         return result;
     }
 
-    detectedPlugins = detectPlugin(plugins);
+    detectedPlugins  = detectPlugin(plugins);
+    detectedPlatform = detectPlatform(platform) || detectPlatform(userAgent) || 'unknown';
 
     pastry.extend(versions, detectVersion(userAgent), detectedPlugins);
 
     return {
         host      : location.host,
-        platform  : detectPlatform(platform) || detectPlatform(userAgent) || 'unknown',
+        platform  : detectPlatform,
         plugins   : detectedPlugins,
         userAgent : userAgent,
         versions  : versions,
         isWebkit  : !!versions.webkit,
         isIE      : !!versions.msie,
+        isApple   : (
+            detectedPlatform.mac    ||
+            detectedPlatform.ipad   ||
+            detectedPlatform.ipod   ||
+            detectedPlatform.iphone
+        )
     };
 });
 
@@ -2344,6 +2565,12 @@ define('dom/utils', [
         testDiv = doc.createElement('div');
 
     return pastry.domUtils = {
+        hasTextContent : 'textContent' in testDiv,
+        hasClassList   : 'classList'   in testDiv,
+        hasDataSet     : 'dataset'     in testDiv,
+        isQuirks       : pastry.lc(doc.compatMode) === 'backcompat' || doc.documentMode === 5, // 怪异模式
+        testDiv        : testDiv,
+
         contains: 'compareDocumentPosition' in html ?
             function (element, container) {
                 return (container.compareDocumentPosition(element) & 16) === 16;
@@ -2360,10 +2587,6 @@ define('dom/utils', [
                 typeof element === 'object' &&
                 (t = element.nodeType) && (t === 1 || t === 9);
         },
-        isQuirks       : pastry.lc(doc.compatMode) === 'backcompat' || doc.documentMode === 5, // 怪异模式
-        hasTextContent : 'textContent' in testDiv,
-        hasClassList   : 'classList'   in testDiv,
-        hasDataSet     : 'dataset'     in testDiv,
     };
 });
 
@@ -2389,12 +2612,22 @@ define('dom/query', [
             isString  = pastry.isString,
             isNode    = domUtils.isNode,
             contains  = domUtils.contains,
+            testDiv   = domUtils.testDiv,
         // }
+        // matchesSelector {
+            matchesSelector = testDiv.matches ||
+                testDiv.webkitMatchesSelector ||
+                testDiv.mozMatchesSelector    ||
+                testDiv.msMatchesSelector     ||
+                testDiv.oMatchesSelector,
+            hasMatchesSelector = matchesSelector && matchesSelector.call(testDiv, 'div'),
+        // }
+
         doc = document,
         win = window,
-        nodeTypeStr = 'nodeType',
-        re_quick    = /^(?:#([\w-]+)|(\w+)|\.([\w-]+))$/, // 匹配快速选择器
-        result      = {};
+        nodeTypeStr   = 'nodeType',
+        re_quick      = /^(?:#([\w-]+)|(\w+)|\.([\w-]+))$/, // 匹配快速选择器
+        result        = {};
 
     function normalizeRoot (root) {
         if (!root) {
@@ -2422,6 +2655,9 @@ define('dom/query', [
             return !optRoot || (selector !== win && isNode(root) && contains(selector, root)) ?
                 [selector] : [];
         }
+        if (selector.nodeType === 11) { // document fragment
+            return pastry.toArray(selector.childNodes);
+        }
         if (selector && arrayLike(selector)) {
             return pastry.flatten(selector);
         }
@@ -2446,10 +2682,37 @@ define('dom/query', [
         return query(selector, optRoot)[0];
     }
 
+    function match (element, selector) {
+        /*
+         * @matches selector
+         */
+        if (hasMatchesSelector) {
+            return matchesSelector.call(element, selector);
+        }
+        var parentElem = element.parentNode,
+            nodes;
+
+        // if the element is an orphan, and the browser doesn't support matching
+        // orphans, append it to a documentFragment
+        if (!parentElem && !hasMatchesSelector) {
+            parentElem = document.createDocumentFragment();
+            parentElem.appendChild(element);
+        }
+            // from the parent element's context, get all nodes that match the selector
+        nodes = query(selector, parentElem);
+
+        // since support for `matches()` is missing, we need to check to see if
+        // any of the nodes returned by our query match the given element
+        return pastry.some(nodes, function (node) {
+            return node === element;
+        });
+    }
+
     // 封装 api {
         return pastry.domQuery = pastry.extend(result, {
-            all : query,
-            one : queryOne,
+            all   : query,
+            one   : queryOne,
+            match : match
         });
     // }
 });
@@ -2589,6 +2852,7 @@ define('dom/construct', [
         toDom: function (frag) {
             frag += '';
 
+
             var match  = frag.match(RE_tag),
                 tag    = match ? pastry.lc(match[1]) : '',
                 master = masterDiv, // 每次拷贝缓存好的 div，否则会引入问题
@@ -2597,7 +2861,7 @@ define('dom/construct', [
             if (match && tagWrap[tag]) {
                 wrap = tagWrap[tag];
                 master.innerHTML = wrap.pre + frag + wrap.post;
-                for(i = wrap.length; i; --i){
+                for (i = wrap.length; i; --i) {
                     master = master.firstChild;
                 }
             } else {
@@ -2644,9 +2908,11 @@ define('dom/construct', [
                     case 'first':
                         if (refNode.firstChild) {
                             insertBefore(node, refNode.firstChild);
+                        } else {
+                            refNode.appendChild(node);
                         }
                         break;
-                    default:
+                    default: // 'last' or others
                         refNode.appendChild(node);
                 }
             }
@@ -2704,14 +2970,177 @@ define('dom/construct', [
 
 /* global define */
 
+define('dom/class', [
+    'pastry',
+    'dom/utils',
+    'dom/query'
+], function(
+    pastry,
+    domUtils,
+    domQuery
+) {
+    'use strict';
+    /*
+     * @author      : 绝云（wensen.lws）
+     * @description : dom classList related
+     * @note        : if ClassList is supported, use ClassList
+     */
+    var RE_spaces    = /\s+/,
+        className    = 'className',
+        spaceStr     = ' ',
+        hasClassList = domUtils.hasClassList,
+        tmpArray     = [''],
+        domClass;
+
+    function str2array (str) {
+        if (pastry.isString(str)) {
+            if (str && !RE_spaces.test(str)) {
+                tmpArray[0] = str;
+                return tmpArray;
+            }
+            var arr = str.split(RE_spaces);
+            if (arr.length && !arr[0]) {
+                arr.shift();
+            }
+            if (arr.length && !arr[arr.length - 1]) {
+                arr.pop();
+            }
+            return arr;
+        }
+        if (!str) {
+            return [];
+        }
+        return pastry.filter(str, function (x) {
+            return x;
+        });
+    }
+    function fillSpace (str) {
+        return spaceStr + str + spaceStr;
+    }
+
+    return pastry.domClass = domClass = {
+        contains: function (node, classStr) {
+            node     = domQuery.one(node);
+            classStr = pastry.trim(classStr);
+            if (hasClassList) {
+                return node.classList.contains(classStr);
+            }
+            return fillSpace(node[className]).indexOf(fillSpace(classStr)) >= 0;
+        },
+        add: function (node, classStr) {
+            node     = domQuery.one(node);
+            classStr = str2array(classStr);
+            if (hasClassList) {
+                pastry.each(classStr, function (c) {
+                    node.classList.add(c);
+                });
+            } else {
+                var oldClassName = node[className],
+                    oldLen, newLen;
+                oldClassName = oldClassName ? fillSpace(oldClassName) : spaceStr;
+                oldLen = oldClassName.length;
+                pastry.each(classStr, function (c) {
+                    if (c && oldClassName.indexOf(fillSpace(c)) < 0) {
+                        oldClassName += c + spaceStr;
+                    }
+                });
+                newLen = oldClassName.length;
+                if (oldLen < newLen) {
+                    node[className] = oldClassName.substr(1, newLen - 2);
+                }
+            }
+        },
+        remove: function (node, classStr) {
+            node     = domQuery.one(node);
+            classStr = str2array(classStr);
+            if (hasClassList) {
+                pastry.each(classStr, function (c) {
+                    node.classList.remove(c);
+                });
+            } else {
+                var cls = fillSpace(node[className]);
+                pastry.each(classStr, function (c) {
+                    cls = cls.replace(fillSpace(c), spaceStr);
+                });
+                cls = pastry.trim(cls);
+                if (node[className] !== cls) {
+                    node[className] = cls;
+                }
+            }
+        },
+        clear: function (node) {
+            node = domQuery.one(node);
+            node[className] = '';
+        },
+        toggle: function (node, classStr) {
+            node     = domQuery.one(node);
+            classStr = str2array(classStr);
+            if (hasClassList) {
+                pastry.each(classStr, function (c) {
+                    node.classList.toggle(c);
+                });
+            } else {
+                pastry.each(classStr, function (c) {
+                    domClass[domClass.contains(node, c) ? 'remove' : 'add'](node, c);
+                });
+            }
+        }
+    };
+});
+
+/* global define */
+
+define('dom/data', [
+    'pastry',
+    'dom/utils',
+    'dom/query'
+], function(
+    pastry,
+    domUtils,
+    domQuery
+) {
+    'use strict';
+    /*
+     * @author      : 绝云（wensen.lws）
+     * @description : dom dataSet related
+     * @note        : if DataSet is supported, use DataSet
+     */
+    var dataSetStr = 'dataset',
+        dataPrefix = 'data-',
+        hasDataSet = domUtils.hasDataSet,
+        domData;
+
+    return pastry.domData = domData = {
+        get: function (node, name) {
+            node = domQuery.one(node);
+            if (hasDataSet) {
+                return node[dataSetStr][name];
+            }
+            return node[dataPrefix + name];
+        },
+        set: function (node, name, value) {
+            node = domQuery.one(node);
+            if (hasDataSet) {
+                node[dataSetStr][name] = value;
+            } else {
+                node[dataPrefix + name] = value;
+            }
+        }
+    };
+});
+
+/* global define */
+
 define('dom/style', [
     'pastry',
     'bom/utils',
+    'dom/data',
     'dom/utils',
     'dom/query'
 ], function(
     pastry,
     bomUtils,
+    domData,
     domUtils,
     domQuery
 ) {
@@ -2748,6 +3177,52 @@ define('dom/style', [
         }catch(e){
             return f ? {} : null;
         }
+    }
+    function isHidden (element) {
+        return domStyle.get(element, 'display') === 'none' ||
+            domUtils.contains(element.ownerDocument, element);
+    }
+    function showHide (elements, show) {
+        var display, hidden,
+            values = [];
+
+        pastry.each(elements, function (elem, index) {
+            if (elem.style) {
+                values[index] = domData.get(elem, 'olddisplay');
+                display = elem.style.display;
+                if (show) {
+                    // Reset the inline display of this element to learn if it is
+                    // being hidden by cascaded rules or not
+                    if ( !values[index] && display === 'none' ) {
+                        elem.style.display = '';
+                    }
+
+                    // Set elements which have been overridden with display: none
+                    // in a stylesheet to whatever the default browser style is
+                    // for such an element
+                    if (elem.style.display === '' && isHidden(elem)) {
+                        values[index] = domData.set(elem, 'olddisplay', domStyle.get(elem, 'display'));
+                    }
+                } else {
+                    hidden = isHidden(elem);
+
+                    if ( display !== 'none' || !hidden ) {
+                        domData.set(elem, 'olddisplay', hidden ? display : domStyle.get(elem, 'display'));
+                    }
+                }
+            }
+        });
+
+        // Set the display of most of the elements in a second loop
+        // to avoid the constant reflow
+        pastry.each(elements, function (elem, index) {
+            if (elem.style) {
+                if (!show || elem.style.display === 'none' || elem.style.display === '') {
+                    elem.style.display = show ? values[index] || '' : 'none';
+                }
+            }
+        });
+        return elements;
     }
     function toStyleValue (node, type, value) {
         type = pastry.lc(type);
@@ -2808,8 +3283,8 @@ define('dom/style', [
                 af(node, 1).Enabled = true;
             }
 
-            if(node.tagName.toLowerCase() === 'tr'){
-                for(var td = node.firstChild; td; td = td.nextSibling){
+            if (node.tagName.toLowerCase() === 'tr') {
+                for (var td = node.firstChild; td; td = td.nextSibling) {
                     if(td.tagName.toLowerCase() === 'td'){
                         setOpacity(td, opacity);
                     }
@@ -2818,26 +3293,32 @@ define('dom/style', [
             return opacity;
         };
     } else {
-        getOpacity = function(node){
+        getOpacity = function (node) {
             return getComputedStyle(node).opacity;
         };
-        setOpacity = function(node, opacity){
+        setOpacity = function (node, opacity) {
             return node.style.opacity = opacity;
         };
     }
-
 
     // getComputedStyle {
         if (bomUtils.isWebkit) {
             getComputedStyle = function (node) {
                 var style;
                 if (node.nodeType === 1) {
-                    var dv = node.ownerDocument.defaultView;
+                    var dv = node.ownerDocument.defaultView,
+                        oldDisplay;
                     style = dv.getComputedStyle(node, null);
                     if (!style && node.style) {
+                        /*
+                         * early version safari (2.0?) has this bug: when element is display:none,
+                         * getComputedStyle returns null
+                         */
+                        oldDisplay = node.style.display;
                         node.style.display = '';
                         style = dv.getComputedStyle(node, null);
                     }
+                    node.style.display = oldDisplay; // and we should change it back.
                 }
                 return style || {};
             };
@@ -2855,40 +3336,40 @@ define('dom/style', [
     // toPixel {
         if (ieVersion) {
             toPixel = function(element, avalue){
-                if(!avalue){
+                if (!avalue) {
                     return 0;
                 }
                 // on IE7, medium is usually 4 pixels
-                if(avalue === 'medium'){
+                if (avalue === 'medium') {
                     return 4;
                 }
                 // style values can be floats, client code may
                 // want to round this value for integer pixels.
-                if(avalue.slice && avalue.slice(-2) === 'px'){
+                if (avalue.slice && avalue.slice(-2) === 'px') {
                     return parseFloat(avalue);
                 }
-                var s = element.style,
+                var s  = element.style,
                     rs = element.runtimeStyle,
                     cs = element.currentStyle,
-                    sLeft = s.left,
+                    sLeft  = s.left,
                     rsLeft = rs.left;
                 rs.left = cs.left;
-                try{
+                try {
                     // 'avalue' may be incompatible with style.left, which can cause IE to throw
                     // this has been observed for border widths using 'thin', 'medium', 'thick' constants
                     // those particular constants could be trapped by a lookup
                     // but perhaps there are more
                     s.left = avalue;
                     avalue = s.pixelLeft;
-                }catch(e){
+                } catch(e) {
                     avalue = 0;
                 }
-                s.left = sLeft;
+                s.left  = sLeft;
                 rs.left = rsLeft;
                 return avalue;
             };
         } else {
-            toPixel = function(element, value){
+            toPixel = function (element, value) {
                 return parseFloat(value) || 0;
             };
         }
@@ -2923,6 +3404,18 @@ define('dom/style', [
                 domStyle.set(node, x, name[x]);
             }
             return domStyle.getComputedStyle(n);
+        },
+
+        show: function (node) {
+            showHide(domQuery.all(node), true);
+        },
+
+        hide: function (node) {
+            showHide(domQuery.all(node), false);
+        },
+
+        toggle: function (node) {
+            return domStyle.get(node, 'opacity') ? domStyle.hide(node) : domStyle.show(node);
         }
     };
 });
@@ -3127,177 +3620,16 @@ define('dom/attr', [
     };
 });
 
-/* global define */
-
-define('dom/class', [
-    'pastry',
-    'dom/utils',
-    'dom/query'
-], function(
-    pastry,
-    domUtils,
-    domQuery
-) {
-    'use strict';
-    /*
-     * @author      : 绝云（wensen.lws）
-     * @description : dom classList related
-     * @note        : if ClassList is supported, use ClassList
-     */
-    var RE_spaces    = /\s+/,
-        className    = 'className',
-        spaceStr     = ' ',
-        hasClassList = domUtils.hasClassList,
-        tmpArray     = [''],
-        domClass;
-
-    function str2array (str) {
-        if (pastry.isString(str)) {
-            if (str && !RE_spaces.test(str)) {
-                tmpArray[0] = str;
-                return tmpArray;
-            }
-            var arr = str.split(RE_spaces);
-            if (arr.length && !arr[0]) {
-                arr.shift();
-            }
-            if (arr.length && !arr[arr.length - 1]) {
-                arr.pop();
-            }
-            return arr;
-        }
-        if (!str) {
-            return [];
-        }
-        return pastry.filter(str, function (x) {
-            return x;
-        });
-    }
-    function fillSpace (str) {
-        return spaceStr + str + spaceStr;
-    }
-
-    return pastry.domClass = domClass = {
-        contains: function (node, classStr) {
-            node     = domQuery.one(node);
-            classStr = pastry.trim(classStr);
-            if (hasClassList) {
-                return node.classList.contains(classStr);
-            }
-            return fillSpace(node[className]).indexOf(fillSpace(classStr)) >= 0;
-        },
-        add: function (node, classStr) {
-            node     = domQuery.one(node);
-            classStr = str2array(classStr);
-            if (hasClassList) {
-                pastry.each(classStr, function (c) {
-                    node.classList.add(c);
-                });
-            } else {
-                var oldClassName = node[className],
-                    oldLen, newLen;
-                oldClassName = oldClassName ? fillSpace(oldClassName) : spaceStr;
-                oldLen = oldClassName.length;
-                pastry.each(classStr, function (c) {
-                    if (c && oldClassName.indexOf(fillSpace(c)) < 0) {
-                        oldClassName += c + spaceStr;
-                    }
-                });
-                newLen = oldClassName.length;
-                if (oldLen < newLen) {
-                    node[className] = oldClassName.substr(1, newLen - 2);
-                }
-            }
-        },
-        remove: function (node, classStr) {
-            node     = domQuery.one(node);
-            classStr = str2array(classStr);
-            if (hasClassList) {
-                pastry.each(classStr, function (c) {
-                    node.classList.remove(c);
-                });
-            } else {
-                var cls = fillSpace(node[className]);
-                pastry.each(classStr, function (c) {
-                    cls = cls.replace(fillSpace(c), spaceStr);
-                });
-                cls = pastry.trim(cls);
-                if (node[className] !== cls) {
-                    node[className] = cls;
-                }
-            }
-        },
-        clear: function (node) {
-            node = domQuery.one(node);
-            node[className] = '';
-        },
-        toggle: function (node, classStr) {
-            node     = domQuery.one(node);
-            classStr = str2array(classStr);
-            if (hasClassList) {
-                pastry.each(classStr, function (c) {
-                    node.classList.toggle(c);
-                });
-            } else {
-                pastry.each(classStr, function (c) {
-                    domClass[domClass.contains(node, c) ? 'remove' : 'add'](node, c);
-                });
-            }
-        }
-    };
-});
-
-/* global define */
-
-define('dom/data', [
-    'pastry',
-    'dom/attr',
-    'dom/utils',
-    'dom/query'
-], function(
-    pastry,
-    domAttr,
-    domUtils,
-    domQuery
-) {
-    'use strict';
-    /*
-     * @author      : 绝云（wensen.lws）
-     * @description : dom dataSet related
-     * @note        : if DataSet is supported, use DataSet
-     */
-    var dataSetStr = 'dataset',
-        dataPrefix = 'data-',
-        hasDataSet = domUtils.hasDataSet,
-        domData;
-
-    return pastry.domData = domData = {
-        get: function (node, name) {
-            node = domQuery.one(node);
-            if (hasDataSet) {
-                return node[dataSetStr][name];
-            }
-            return domAttr.get(node, dataPrefix + name);
-        },
-        set: function (node, name, value) {
-            node = domQuery.one(node);
-            if (hasDataSet) {
-                node[dataSetStr][name] = value;
-            } else {
-                domAttr.set(node, dataPrefix + name, value);
-            }
-        }
-    };
-});
-
 /* global define, document, window */
 
 define('dom/event', [
     'pastry',
-    'dom/query'
+    'dom/query',
+    'dom/utils'
 ], function(
     pastry,
-    domQuery
+    domQuery,
+    domUtils
 ) {
     'use strict';
     /*
@@ -3340,13 +3672,16 @@ define('dom/event', [
     addEvent.guid = 1;
 
     function removeEvent(element, type, handler) {
+        var delegateWrapper = handler._delegateWrapper;
         element = domQuery.one(element);
         if (element.removeEventListener) {
             element.removeEventListener(type, handler, false);
+            element.removeEventListener(type, delegateWrapper, false);
         } else {
             // delete the event handler from the hash table
             if (element.events && element.events[type]) {
                 delete element.events[type][handler.$$guid];
+                delete element.events[type][delegateWrapper.$$guid];
             }
         }
     }
@@ -3372,7 +3707,7 @@ define('dom/event', [
 
     function fixEvent(event) {
         // add W3C standard event methods
-        event.preventDefault = fixEvent.preventDefault;
+        event.preventDefault  = fixEvent.preventDefault;
         event.stopPropagation = fixEvent.stopPropagation;
         return event;
     }
@@ -3383,9 +3718,493 @@ define('dom/event', [
         this.cancelBubble = true;
     };
 
+    function delegate (element, type, selector, handler, capture, once) {
+        if (pastry.isFunction(selector)) {
+            addEvent(element, type, selector);
+            return;
+        }
+        element = domQuery.one(element); // delegation is only for one element
+        if (!domUtils.isNode(element)) {
+            pastry.ERROR('cannot bind events to non-elements: ' + element);
+        }
+        function wrapper (e) {
+            // if this event has a delegateTarget, then we add it to the event
+            // object (so that handlers may have a reference to the delegator
+            // element) and fire the callback
+            if (e.delegateTarget = _getDelegateTarget(element, e.target, selector)) {
+                if (once === true) {
+                    removeEvent(element, type, wrapper);
+                }
+                handler.call(element, e);
+            }
+        }
+        handler._delegateWrapper = wrapper;
+        addEvent(element, type, wrapper, capture || false);
+        return handler;
+    }
+    function _getDelegateTarget (element, target, selector) {
+        while (target && target !== element) {
+            if (domQuery.match(target, selector)) {
+                return target;
+            }
+            target = target.parentElement;
+        }
+        return null;
+    }
+
+    function once (element, type, selector, callback, capture) {
+        delegate(element, type, selector, callback, capture, true);
+    }
+
     return pastry.domEvent = {
-        on  : addEvent,
-        off : removeEvent
+        on   : delegate,
+        once : once,
+        off  : removeEvent
+    };
+});
+
+/* global define, document */
+
+define('dom/hotkey', [
+    'pastry',
+    'bom/utils',
+    'dom/class',
+    'dom/event'
+], function(
+    pastry,
+    bomUtils,
+    domClass,
+    domEvent
+) {
+    'use strict';
+    /*
+     * @author      : 绝云（wensen.lws）
+     * @description : bind / unbind / trigger hotkeys
+     * @reference   : https://github.com/ccampbell/mousetrap/blob/master/mousetrap.js
+     */
+    var hotkey,
+        doc = document,
+
+        _MAP = {
+            8   : 'backspace',
+            9   : 'tab',
+            13  : 'enter',
+            16  : 'shift',
+            17  : 'ctrl',
+            18  : 'alt',
+            20  : 'capslock',
+            27  : 'esc',
+            32  : 'space',
+            33  : 'pageup',
+            34  : 'pagedown',
+            35  : 'end',
+            36  : 'home',
+            37  : 'left',
+            38  : 'up',
+            39  : 'right',
+            40  : 'down',
+            45  : 'ins',
+            46  : 'del',
+            91  : 'meta',
+            93  : 'meta',
+            224 : 'meta'
+        },
+        _KEYCODE_MAP = {
+            106 : '*',
+            107 : '+',
+            109 : '-',
+            110 : '.',
+            111 : '/',
+            186 : ';',
+            187 : '=',
+            188 : ',',
+            189 : '-',
+            190 : '.',
+            191 : '/',
+            192 : '`',
+            219 : '[',
+            220 : '\\',
+            221 : ']',
+            222 : '\''
+        },
+        _SHIFT_MAP = {
+            '~'  : '`',
+            '!'  : '1',
+            '@'  : '2',
+            '#'  : '3',
+            '$'  : '4',
+            '%'  : '5',
+            '^'  : '6',
+            '&'  : '7',
+            '*'  : '8',
+            '('  : '9',
+            ')'  : '0',
+            '_'  : '-',
+            '+'  : '=',
+            ':'  : ';',
+            '\"' : '\'',
+            '<'  : ',',
+            '>'  : '.',
+            '?'  : '/',
+            '|'  : '\\'
+        },
+        _SPECIAL_ALIASES = {
+            'option'  : 'alt',
+            'command' : 'meta',
+            'return'  : 'enter',
+            'escape'  : 'esc',
+            'mod'     : bomUtils.isApple
+        },
+        _REVERSE_MAP,
+
+        _resetTimer,
+        _callbacks          = {},
+        _directMap          = {},
+        _sequenceLevels     = {},
+        _ignoreNextKeyup    = false,
+        _ignoreNextKeypress = false,
+        _nextExpectedAction = false,
+
+        lc      = pastry.lc,
+        indexOf = pastry.indexOf,
+        each    = pastry.each;
+
+    // fulfill key maps {
+        for (var i = 1; i < 20; ++i) {
+            _MAP[111 + i] = 'f' + i;
+        }
+        for (i = 0; i <= 9; ++i) {
+            _MAP[i + 96] = i;
+        }
+    // }
+
+    function _characterFromEvent(e) {
+        var which = e.which;
+        if (e.type === 'keypress') {
+            var character = String.fromCharCode(which);
+
+            if (!e.shiftKey) {
+                character = lc(character);
+            }
+            return character;
+        }
+
+        if (_MAP[which]) {
+            return _MAP[which];
+        }
+        if (_KEYCODE_MAP[which]) {
+            return _KEYCODE_MAP[which];
+        }
+        return lc(String.fromCharCode(which));
+    }
+    function _modifiersMatch(modifiers1, modifiers2) {
+        return modifiers1.sort().join(',') === modifiers2.sort().join(',');
+    }
+    function _resetSequences(doNotReset) {
+        doNotReset = doNotReset || {};
+
+        var activeSequences = false,
+            key;
+
+        for (key in _sequenceLevels) {
+            if (doNotReset[key]) {
+                activeSequences = true;
+                continue;
+            }
+            _sequenceLevels[key] = 0;
+        }
+        if (!activeSequences) {
+            _nextExpectedAction = false;
+        }
+    }
+    function _isModifier(key) {
+        return indexOf(['shift', 'ctrl', 'alt', 'meta'], key) > -1;
+    }
+    function _getMatches(character, modifiers, e, sequenceName, combination, level) {
+        var i,
+            callback,
+            matches = [],
+            action = e.type;
+
+        if (!_callbacks[character]) {
+            return [];
+        }
+        if (action === 'keyup' && _isModifier(character)) {
+            modifiers = [character];
+        }
+
+        for (i = 0; i < _callbacks[character].length; ++i) {
+            callback = _callbacks[character][i];
+            if (!sequenceName && callback.seq && _sequenceLevels[callback.seq] !== callback.level) {
+                continue;
+            }
+            if (action !== callback.action) {
+                continue;
+            }
+            if ((action === 'keypress' && !e.metaKey && !e.ctrlKey) ||
+                _modifiersMatch(modifiers, callback.modifiers)) {
+                var deleteCombo = !sequenceName && callback.combo === combination,
+                    deleteSequence = sequenceName &&
+                        callback.seq === sequenceName &&
+                        callback.level === level;
+                if (deleteCombo || deleteSequence) {
+                    _callbacks[character].splice(i, 1);
+                }
+                matches.push(callback);
+            }
+        }
+        return matches;
+    }
+    function _eventModifiers(e) {
+        var modifiers = [];
+
+        each([
+            'shift',
+            'alt',
+            'ctrl',
+            'meta'
+        ], function (type) {
+            if (e[type + 'Key']) {
+                modifiers.push(type);
+            }
+        });
+        return modifiers;
+    }
+    function _preventDefault(e) {
+        if (e.preventDefault) {
+            e.preventDefault();
+            return;
+        }
+        e.returnValue = false;
+    }
+    function _stopPropagation(e) {
+        if (e.stopPropagation) {
+            e.stopPropagation();
+            return;
+        }
+        e.cancelBubble = true;
+    }
+    function _fireCallback(callback, e, combo, sequence) {
+        if (hotkey.stop(e, e.target || e.srcElement, combo, sequence)) {
+            return;
+        }
+        if (callback(e, combo) === false) {
+            _preventDefault(e);
+            _stopPropagation(e);
+        }
+    }
+    function _handleKey(character, modifiers, e) {
+        var callbacks = _getMatches(character, modifiers, e),
+            i,
+            doNotReset = {},
+            maxLevel = 0,
+            processedSequenceCallback = false;
+
+        for (i = 0; i < callbacks.length; ++i) {
+            if (callbacks[i].seq) {
+                maxLevel = Math.max(maxLevel, callbacks[i].level);
+            }
+        }
+        for (i = 0; i < callbacks.length; ++i) {
+            if (callbacks[i].seq) {
+                if (callbacks[i].level !== maxLevel) {
+                    continue;
+                }
+                processedSequenceCallback = true;
+                doNotReset[callbacks[i].seq] = 1;
+                _fireCallback(callbacks[i].callback, e, callbacks[i].combo, callbacks[i].seq);
+                continue;
+            }
+            if (!processedSequenceCallback) {
+                _fireCallback(callbacks[i].callback, e, callbacks[i].combo);
+            }
+        }
+        var ignoreThisKeypress = e.type === 'keypress' && _ignoreNextKeypress;
+        if (e.type === _nextExpectedAction && !_isModifier(character) && !ignoreThisKeypress) {
+            _resetSequences(doNotReset);
+        }
+
+        _ignoreNextKeypress = processedSequenceCallback && e.type === 'keydown';
+    }
+    function _handleKeyEvent(e) {
+        if (!pastry.isNumber(e.which)) {
+            e.which = e.keyCode;
+        }
+        var character = _characterFromEvent(e);
+        if (!character) {
+            return;
+        }
+        if (e.type === 'keyup' && _ignoreNextKeyup === character) {
+            _ignoreNextKeyup = false;
+            return;
+        }
+        hotkey.handleKey(character, _eventModifiers(e), e);
+    }
+    function _getReverseMap() {
+        if (!_REVERSE_MAP) {
+            _REVERSE_MAP = {};
+            for (var key in _MAP) {
+
+                // pull out the numeric keypad from here cause keypress should
+                // be able to detect the keys from the character
+                if (key > 95 && key < 112) {
+                    continue;
+                }
+
+                if (_MAP.hasOwnProperty(key)) {
+                    _REVERSE_MAP[_MAP[key]] = key;
+                }
+            }
+        }
+        return _REVERSE_MAP;
+    }
+    function _pickBestAction(key, modifiers, action) {
+        if (!action) {
+            action = _getReverseMap()[key] ? 'keydown' : 'keypress';
+        }
+        if (action === 'keypress' && modifiers.length) {
+            action = 'keydown';
+        }
+        return action;
+    }
+    function _keysFromString(combination) {
+        if (combination === '+') {
+            return ['+'];
+        }
+        return combination.split('+');
+    }
+    function _getKeyInfo(combination, action) {
+        var keys,
+            key,
+            i,
+            modifiers = [];
+        keys = _keysFromString(combination);
+
+        for (i = 0; i < keys.length; ++i) {
+            key = keys[i];
+
+            if (_SPECIAL_ALIASES[key]) {
+                key = _SPECIAL_ALIASES[key];
+            }
+
+            if (action && action !== 'keypress' && _SHIFT_MAP[key]) {
+                key = _SHIFT_MAP[key];
+                modifiers.push('shift');
+            }
+            if (_isModifier(key)) {
+                modifiers.push(key);
+            }
+        }
+
+        action = _pickBestAction(key, modifiers, action);
+        return {
+            key: key,
+            modifiers: modifiers,
+            action: action
+        };
+    }
+    function _resetSequenceTimer() {
+        clearTimeout(_resetTimer);
+        _resetTimer = setTimeout(_resetSequences, 1000);
+    }
+    function _bindSequence(combo, keys, callback, action) {
+        _sequenceLevels[combo] = 0;
+
+        function _increaseSequence(nextAction) {
+            return function() {
+                _nextExpectedAction = nextAction;
+                ++_sequenceLevels[combo];
+                _resetSequenceTimer();
+            };
+        }
+        function _callbackAndReset(e) {
+            _fireCallback(callback, e, combo);
+            if (action !== 'keyup') {
+                _ignoreNextKeyup = _characterFromEvent(e);
+            }
+
+            setTimeout(_resetSequences, 10);
+        }
+
+        for (var i = 0; i < keys.length; ++i) {
+            var isFinal = i + 1 === keys.length,
+                wrappedCallback = isFinal ? _callbackAndReset :
+                    _increaseSequence(action || _getKeyInfo(keys[i + 1]).action);
+            _bindSingle(keys[i], wrappedCallback, action, combo, i);
+        }
+    }
+    function _bindSingle(combination, callback, action, sequenceName, level) {
+        _directMap[combination + ':' + action] = callback;
+        combination = combination.replace(/\s+/g, ' ');
+
+        var sequence = combination.split(' '),
+            info;
+
+        if (sequence.length > 1) {
+            _bindSequence(combination, sequence, callback, action);
+            return;
+        }
+
+        info = _getKeyInfo(combination, action);
+
+        _callbacks[info.key] = _callbacks[info.key] || [];
+
+        _getMatches(info.key, info.modifiers, {type: info.action}, sequenceName, combination, level);
+
+        _callbacks[info.key][sequenceName ? 'unshift' : 'push']({
+            callback: callback,
+            modifiers: info.modifiers,
+            action: info.action,
+            seq: sequenceName,
+            level: level,
+            combo: combination
+        });
+    }
+    function _bindMultiple(combinations, callback, action) {
+        each(combinations, function (combination) {
+            _bindSingle(combination, callback, action);
+        });
+    }
+
+    each([
+        'keypress',
+        'keydown' ,
+        'keyup'
+    ], function (type) {
+        domEvent.on(doc, type, _handleKeyEvent);
+    });
+
+    return pastry.hotkey = hotkey = {
+        on: function (keys, callback, action) {
+            keys = pastry.isArray(keys) ? keys : [keys];
+            _bindMultiple(keys, callback, action);
+            return this;
+        },
+        off: function (keys, action) {
+            return hotkey.on(keys, function () {}, action);
+        },
+        trigger: function (keys, action) {
+            if (_directMap[keys + ':' + action]) {
+                _directMap[keys + ':' + action]({}, keys);
+            }
+            return this;
+        },
+        reset: function () {
+            _callbacks = {};
+            _directMap = {};
+            return this;
+        },
+        stop: function (e, element) {
+            // stop for input / select / textarea / contentEditable
+            if (domClass.contains(element, 'js-hotkey')) {
+                // if element has the classname 'js-hotkey', then no need to stop
+                return false;
+            }
+            var tagName = element.tagName;
+            return indexOf(['INPUT', 'SELECT', 'TEXTAREA'], tagName) > -1 ||
+                element.isContentEditable;
+        },
+        handleKey: _handleKey
     };
 });
 
@@ -3432,7 +4251,9 @@ define('io/ajax', [
             type        = option.type   ? pastry.lc(option.type)             : 'xml',
             data        = option.data   ? querystring.stringify(option.data) : null,
             contentType = option.contentType,
-            isAsync     = option.isAsync;
+            isAsync     = true, // https://xhr.spec.whatwg.org/ 不设置成 true，新版 chrome 会发飙
+            username    = option.username,
+            password    = option.password;
 
         // add handlers {
             pastry.each([
@@ -3469,12 +4290,16 @@ define('io/ajax', [
             };
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) {
-                    if (xhr.isSuccess() && option.success) {
-                        var response = xhr.responseText;
-                        if (type === 'json') {
-                            response = pastry.getAny([function () { return JSON.parse(response); }]) || response;
+                    if (xhr.isSuccess()) {
+                        if (option.success) {
+                            var response = xhr.responseText;
+                            if (type === 'json') {
+                                response = pastry.getAny([
+                                    function () { return JSON.parse(response); }
+                                ]) || response;
+                            }
+                            xhr.onsuccess(response);
                         }
-                        xhr.onsuccess(response);
                     } else if (option.error) {
                         xhr.onerror(xhr.statusText);
                     }
@@ -3486,19 +4311,19 @@ define('io/ajax', [
                 if (data) {
                     uri += (pastry.hasSubString(uri, '?') ? '&' : '?') + data;
                 }
-                xhr.open(method, uri, isAsync);
+                xhr.open(method, uri, isAsync, username, password);
                 xhr.setRequestHeader(
-                        'Content-Type',
-                        contentType || 'text/plain;charset=UTF-8'
-                    );
+                    'Content-Type',
+                    contentType || 'text/plain;charset=UTF-8'
+                );
             } else if (method === 'POST') {
-                xhr.open(method, uri, isAsync);
+                xhr.open(method, uri, isAsync, username, password);
                 xhr.setRequestHeader(
-                        'Content-Type',
-                        contentType || 'application/x-www-form-urlencoded;charset=UTF-8'
-                    );
+                    'Content-Type',
+                    contentType || 'application/x-www-form-urlencoded;charset=UTF-8'
+                );
             } else {
-                xhr.open(method, uri, isAsync);
+                xhr.open(method, uri, isAsync, username, password);
             }
             xhr.send(data);
         // }
@@ -3581,8 +4406,9 @@ define('template', [
             }[p1] || "\\" + p1;
         }
         if (p2) { // interpolation: {%=prop%}, or unescaped: {%#prop%}
+            p3 = pastry.trim(p3);
             if (p2 === "=") {
-                return "'+_e(typeof" + p3 + "==='undefined'?'':" + p3 + ")+'";
+                return "'+_e(" + p3 + ")+'";
             }
             return "'+(" + p3 + "==null?'':" + p3 + ")+'";
         }
@@ -3601,34 +4427,1481 @@ define('template', [
 
     return pastry.template = template = {
         helper: helper,
-        compile: function (str/*, option*/) {
-            // option = pastry.extend({}, defaultOpitons, option);
+        compile: function (str) {
             if (!pastry.isString(str)) {
                 return str;
             }
 
             /*jshint -W054*/ // new Function()
-            return cache[str] || (cache[str] = new Function('obj', 'helper',
-                    "var _e=helper.escape," +
+            return cache[str] || (cache[str] = new Function('obj', 'helper', 'ne',
+                    "var _e=ne?function(s){return s;}:helper.escape," +
                         "print=function(s,e){" +
                             "_s+=e?(s==null?'':s):_e(s);" +
                         "};" +
+                    "obj=obj||{};" + // 当obj传空的时候
                     "with(obj){" +
                         // include helper {
                             // "include = function (s, d) {" +
                             //     "_s += tmpl(s, d);}" + "," +
                         // }
-                        "_s='" + str.replace(RE_parser, render) + "';" +
+                        "_s='" +
+                        str
+                            .replace(RE_parser, render)
+                            .replace(/\\n\s*/g, '') + // 要是存在回车符号，会引起多解释一个 #text 对象的 bug
+                        "';" +
                     "}" +
                     "return _s;"
                 )
             );
         },
-        render: function (str, data/*, option*/) {
-            // option = option || {};
-            // console.log(template.compile(str).toString());
-            return template.compile(str/*, option*/)(data, template.helper);
+        render: function (str, data, option) {
+            option = option || {};
+            return template.compile(str)(data, template.helper, option.ne);
         }
     };
+});
+
+/* global define, document */
+
+define('Component', [
+    'pastry',
+    // 'event',
+    'declare',
+    'dom/construct',
+    'dom/query',
+    'dom/style'
+], function(
+    pastry,
+    // event,
+    declare,
+    domConstruct,
+    domQuery,
+    domStyle
+) {
+    'use strict';
+    /*
+     * @author      : 绝云（wensen.lws）
+     * @description : base constructor for ui components
+     */
+    var body = document.body,
+        componentMaker = declare('Component', [], {
+            initialise: function (info) {
+                var instance = this;
+
+                pastry.extend(instance, {
+                    container : null, // DOM 相关操作
+                    events    : {},
+                    // methods   : {}
+                }, info);
+                return instance;
+            },
+            destroy: function () {
+                var instance = this;
+
+                domConstruct.destroy(instance.container);
+                pastry.destroy(instance);
+                return instance;
+            },
+            placeAt: function (refNode, position) {
+                var instance = this,
+                    container;
+
+                refNode = domQuery.one(refNode) || body;
+                if (container = instance.container) {
+                    domConstruct.place(container, refNode, position);
+                }
+                return instance;
+            },
+            show: function () {
+                var instance = this,
+                    container;
+
+                if (container = instance.container) {
+                    domStyle.show(container);
+                }
+                return instance;
+            },
+            hide: function () {
+                var instance = this,
+                    container;
+
+                if (container = instance.container) {
+                    domStyle.hide(container);
+                }
+                return instance;
+            }
+        });
+
+    return pastry.Component = componentMaker;
+});
+
+define("ui/notify/template/wrapper", ["pastry","html/utils"], function (helper) {return function(obj, ne){
+var _e=ne?function(s){return s;}:helper.escape,print=function(s,e){_s+=e?(s==null?'':s):_e(s);};obj=obj||{};with(obj){_s='<div class="notify-wrapper" id="'+_e(id)+'"></div>';}return _s;
+}});
+/* jshint ignore:end */define("ui/notify/template/message", ["pastry","html/utils"], function (helper) {return function(obj, ne){
+var _e=ne?function(s){return s;}:helper.escape,print=function(s,e){_s+=e?(s==null?'':s):_e(s);};obj=obj||{};with(obj){_s='<div class="notify-message notify-message-'+_e(type)+'" id="'+_e(id)+'"><div class="notify-message-inner"><div class="notify-icon notify-icon-'+_e(type)+'">'; if (type === 'info') { _s+='<span class="icon icon-info-o"></span>'; } _s+=''; if (type === 'error') { _s+='<span class="icon icon-close-o"></span>'; } _s+=''; if (type === 'warning') { _s+='<span class="icon icon-warning-o"></span>'; } _s+=''; if (type === 'success') { _s+='<span class="icon icon-ok-o"></span>'; } _s+='</div><div class="notify-text"> '+_e(text)+' </div></div></div>';}return _s;
+}});
+/* jshint ignore:end *//* global define */
+
+define('ui/Notify', [
+    'pastry',
+    'declare',
+    'Component',
+    'dom/construct',
+    'dom/event',
+    'ui/notify/template/wrapper',
+    'ui/notify/template/message'
+], function(
+    pastry,
+    declare,
+    Component,
+    domConstruct,
+    domEvent,
+    templateWrapper,
+    templateMessage
+) {
+    'use strict';
+    /*
+     * @author      : 绝云（wensen.lws）
+     * @description : Notify component
+     */
+    var NS         = '__notify__',
+        NS_MESSAGE = '__notify_message__',
+
+        defaultOption = {
+            type     : 'info',
+            text     : 'message',
+            maxCount : 10,
+            lifetime : 5000,
+        },
+
+        Notify = declare('Notify', [Component], {
+            constructor: function (option) {
+                var instance = this;
+                option = option || {};
+
+                pastry.extend(instance, {
+                    id           : pastry.uuid(NS),
+                    message      : {},
+                    messageCount : 0,
+                    messageQueue : [],
+                    status       : {},
+                    option       : defaultOption,
+                }, option);
+                option.container = option.container || domConstruct.toDom(templateWrapper({
+                    id: instance.id
+                }));
+                instance.initialise(option);
+                instance.placeAt();
+                return instance;
+            },
+            _initMessage: function (option) {
+                var instance = this,
+                    message  = pastry.extend({}, option, {
+                        domNode: domConstruct.toDom(templateMessage(option))
+                    });
+
+                domEvent.on(message.domNode, 'click', function () {
+                    instance._hideById(message.id);
+                });
+                return message;
+            },
+            _showById: function (id) {
+                var instance = this,
+                    message  = instance.message[id];
+
+                if (message) {
+                    domConstruct.place(message.domNode, instance.container, 'first');
+                    instance.messageCount ++;
+                    if (pastry.isFunction(message.onShow)) {
+                        message.onShow();
+                    }
+                    message.timeout = setTimeout(function () {
+                        if (instance.message[message.id]) {
+                            instance._hideById(message.id);
+                        }
+                    }, message.lifetime ? message.lifetime : instance.option.lifetime);
+                }
+                return instance;
+            },
+            _hideById: function (id) {
+                var instance = this,
+                    message  = instance.message[id];
+
+                if (message) {
+                    domConstruct.destroy(message.domNode);
+                    instance.messageCount --;
+                    clearTimeout(message.timeout);
+                    instance._showNext();
+                    if (pastry.isFunction(message.onHide)) {
+                        message.onHide();
+                    }
+                    Component.prototype.destroy.apply(message);
+                    delete instance.message[id];
+                }
+                return instance;
+            },
+            _showNext: function () {
+                var instance = this,
+                    id = instance.messageQueue.pop();
+                if (id) {
+                    instance._showById(id);
+                }
+                return instance;
+            },
+            config: function (option) {
+                var instance = this;
+                pastry.extend(instance.option, option);
+                return instance;
+            },
+            log: function (option) {
+                var instance = this,
+                    id = option.id || pastry.uuid(NS_MESSAGE),
+                    message;
+
+                // instance.show();
+                option = pastry.extend({
+                    id: id
+                }, instance.option, option);
+
+                instance.message[id] = message = instance._initMessage(option);
+                if (instance.messageCount >= instance.option.maxCount) {
+                    instance.messageQueue.push(id);
+                } else {
+                    instance._showById(id);
+                }
+            }
+        });
+
+    return pastry.Notify = Notify;
+});
+
+define("ui/collapse/template/wrapper", ["pastry","html/utils"], function (helper) {return function(obj, ne){
+var _e=ne?function(s){return s;}:helper.escape,print=function(s,e){_s+=e?(s==null?'':s):_e(s);};obj=obj||{};with(obj){_s='<div class="panel-group" id="'+_e(id)+'"></div>';}return _s;
+}});
+/* jshint ignore:end */define("ui/collapse/template/section", ["pastry","html/utils"], function (helper) {return function(obj, ne){
+var _e=ne?function(s){return s;}:helper.escape,print=function(s,e){_s+=e?(s==null?'':s):_e(s);};obj=obj||{};with(obj){_s='<div class="panel panel-default"><div class="panel-heading"><h4 class="panel-title"><a data-toggle="collapse">'+_e(head)+'</a></h4></div><div class="panel-collapse collapse"><div class="panel-body">'+_e(body)+'</div></div></div>';}return _s;
+}});
+/* jshint ignore:end *//* global define */
+
+define('ui/Collapse', [
+    'pastry',
+    'declare',
+    'Component',
+    'dom/class',
+    'dom/construct',
+    'dom/event',
+    'dom/query',
+    // 'dom/style',
+    'dom/utils',
+    'ui/collapse/template/wrapper',
+    'ui/collapse/template/section'
+], function (
+    pastry,
+    declare,
+    Component,
+    domClass,
+    domConstruct,
+    domEvent,
+    domQuery,
+    // domStyle,
+    domUtils,
+    templateWrapper,
+    templateSection
+) {
+    'use strict';
+    /*
+     * @author      : 绝云（wensen.lws）
+     * @description : Collapse component
+     */
+
+    var
+        NS         = '__collapse__',
+        NS_SECTION = '__collapse.section__',
+        Section = declare('ui/collapse/Section', [Component], {
+            constructor: function (option) {
+                var instance = this;
+                pastry.extend(instance, {
+                    isOpen: false
+                }, option);
+                domEvent.on(instance.head, 'click', function () {
+                    instance._onClick();
+                });
+                return instance.isOpen ? instance.open() : instance.close();
+            },
+            _onClick: function () {
+                var instance = this;
+                runIfIsFunction(instance.onClick, instance);
+                return instance;
+            },
+            open: function () {
+                var instance = this;
+                instance.isOpen = true;
+                domClass.add(instance.body, 'in');
+                // domStyle.show(instance.body);
+                return instance;
+            },
+            close: function () {
+                var instance = this;
+                instance.isOpen = false;
+                domClass.remove(instance.body, 'in');
+                // domStyle.hide(instance.content);
+                return instance;
+            },
+            toggle: function () {
+                var instance = this;
+                domClass.toggle(instance.body, 'in');
+                // return instance.isOpen ? instance.close() : instance.open();
+                return instance;
+            },
+            destroy: function () {
+                var instance = this;
+                domConstruct.destroy(instance.head);
+                domConstruct.destroy(instance.body);
+                Component.prototype.destroy.call(instance);
+                return instance;
+            }
+        }),
+        Collapse = declare('ui/Collapse', [Component], {
+            constructor: function (element, option) {
+                var instance = this;
+                option = option || {};
+                if (domUtils.isNode(element)) {
+                    option.container = element;
+                } else {
+                    option = element;
+                }
+                pastry.extend(instance, {
+                    isAccordion : true,
+                    _sections   : {}
+                }, option);
+                instance.id = instance.id || pastry.uuid(NS);
+                if (!instance.container) {
+                    instance.container = domConstruct.toDom(templateWrapper(instance));
+                } else {
+                    instance.id = instance.container.id || instance.id;
+                }
+                pastry.each(domQuery.all('.panel', instance.container), function (element) {
+                    instance.addSection(element);
+                });
+                if (pastry.isArray(instance.sections)) {
+                    pastry.each(instance.sections, function (section) {
+                        instance.addSection(section);
+                    });
+                }
+                return instance;
+            },
+            eachSection: function (callback) {
+                var instance = this;
+                pastry.each(instance._sections, function (section) {
+                    runIfIsFunction(callback, section);
+                });
+                return instance;
+            },
+            addSection: function (option) {
+                /*
+                 * option can be an element(or string) or object
+                 */
+                var container,
+                    id,
+                    section,
+                    onClick,
+                    instance = this;
+                if (option instanceof Section) {
+                    instance._sections[option.id] = option;
+                    return instance;
+                }
+
+                if (domUtils.isNode(option) || pastry.isString(option)) {
+                    container = domQuery.one(option);
+                    option = {
+                        container : container
+                    };
+                } else {
+                    if (option.head && pastry.isString(option.head)) {
+                        container = domConstruct.toDom(templateSection(option));
+                        pastry.extend(option, {
+                            container: container
+                        });
+                    } else if (option.container) {
+                        container = option.container;
+                    }
+                }
+                if (!option.id) {
+                    option.id = container.id || pastry.uuid(NS_SECTION);
+                }
+                id = option.id;
+                pastry.extend(option, {
+                    head : domQuery.one('.panel-title [data-toggle=collapse]', container),
+                    body : domQuery.one('.panel-collapse.collapse', container)
+                });
+
+                onClick = option.onClick;
+                option.onClick = function (obj) {
+                    runIfIsFunction(onClick, obj);
+                    instance.toggleSection(obj.id);
+                };
+
+                section = new Section(option);
+                instance._sections[id] = section;
+                if (!domUtils.contains(section.container, instance.container)) {
+                    section.placeAt(instance.container);
+                }
+                return instance;
+            },
+            removeSection: function (id) {
+                var instance = this;
+                instance._sections[id].destroy();
+                delete instance._sections[id];
+                return instance;
+            },
+            openSection: function (id) {
+                var instance = this,
+                    section  = instance._sections[id];
+                if (instance.isAccordion) {
+                    instance.eachSection(function (section) {
+                        section.close();
+                    });
+                }
+                section.open();
+                return instance;
+            },
+            closeSection: function (id) {
+                var instance = this;
+                instance._sections[id].close();
+                return instance;
+            },
+            toggleSection: function (id) {
+                var instance = this,
+                    section  = instance._sections[id];
+                return section.isOpen ? instance.closeSection(id) : instance.openSection(id);
+            },
+            destroy: function () {
+                var instance = this;
+                instance.eachSection(function (section) {
+                    section.destroy();
+                });
+                Component.prototype.destroy.call(instance);
+                instance = null;
+            }
+        });
+
+    Collapse.Section = Section;
+    Collapse.render  = function (container, option) {
+        container = domQuery.one(container);
+        return new Collapse(container, option);
+    };
+
+    function runIfIsFunction (func, args) {
+        if (pastry.isFunction(func)) {
+            func.call(null, args);
+        }
+    }
+
+    return pastry.Collapse = Collapse;
+});
+
+define("ui/tree/template/wrapper", ["pastry","html/utils"], function (helper) {return function(obj, ne){
+var _e=ne?function(s){return s;}:helper.escape,print=function(s,e){_s+=e?(s==null?'':s):_e(s);};obj=obj||{};with(obj){_s='<table class="tree-wrapper table table-hover" id="'+_e(id)+'">'; if (hasHead) { _s+='<thead><tr><th>'+_e(treeColumnName)+'</th>'; helper.each(extraColumns, function (col) { _s+='<th>'+_e(col.label)+'</th>'; }); _s+='</tr></thead>'; } _s+='<tbody></tbody></table>';}return _s;
+}});
+/* jshint ignore:end */define("ui/tree/template/node", ["pastry","html/utils"], function (helper) {return function(obj, ne){
+var _e=ne?function(s){return s;}:helper.escape,print=function(s,e){_s+=e?(s==null?'':s):_e(s);};obj=obj||{};with(obj){_s='<tr class="tree-node '; if (isSelected) { _s+='selected'; } _s+='" data-id="'+_e(id)+'"><td><span class="tree-node-indenter" style="margin-left: '+_e(indent)+'px;">'; if (isBranch) { _s+='<span class="tree-node-expander icon '+_e(expanderIconClass)+'" data-id="'+_e(id)+'"></span>'; } _s+='</span>'; if (hasCheckbox) { _s+='<label class="tree-node-checkbox checkbox-inline"><input type="checkbox" value="'+_e(id)+'"></label>'; } _s+='<span class="tree-node-icon icon '+_e(iconClass)+'"></span><span class="tree-node-label">'+_e(label)+'</span></td>'; if (extraColumns) { _s+=''; helper.each(extraColumns, function (col) { _s+='<td>'+_e(obj[col.key])+'</td>'; }); _s+=''; } _s+='</tr>';}return _s;
+}});
+/* jshint ignore:end *//* global define */
+
+define('ui/tree/node/event', [
+    // 'pastry',
+    'event'
+    // 'dom/data',
+    // 'dom/event'
+], function(
+    // pastry,
+    event
+    // domData,
+    // domEvent
+) {
+    'use strict';
+    /*
+     * @author      : 绝云（wensen.lws）
+     * @description : bind events for ui/Tree
+     */
+    return function (node) {
+        // instance events {
+            event(node); // add node instance events
+            node.on('clicked'     , function () { node.onClicked();     });
+            node.on('collapsed'   , function () { node.onCollapsed();   });
+            node.on('contextmenu' , function () { node.onContextmenu(); });
+            node.on('dblclicked'  , function () { node.onDblclicked();  });
+            node.on('expanded'    , function () { node.onExpanded();    });
+            node.on('selected'    , function () { node.onSelected();    });
+        // }
+        // dom events {
+        // }
+        return node;
+    };
+});
+
+/* global define */
+
+define('ui/tree/event', [
+    // 'pastry',
+    'event',
+    'dom/data',
+    'dom/event'
+], function(
+    // pastry,
+    event,
+    domData,
+    domEvent
+) {
+    'use strict';
+    /*
+     * @author      : 绝云（wensen.lws）
+     * @description : bind events for ui/Tree
+     */
+    function getTreeNodeFromDelegateEventAndTree (e, tree) {
+        return tree.nodeById[domData.get(e.delegateTarget, 'id')];
+    }
+    return function (tree) {
+        var treeContainer = tree.container;
+
+        // instance events {
+            event(tree); // add tree instance events
+            tree.on('node-clicked'     , function (node) { tree.onNodeClicked(node);     });
+            tree.on('node-collapsed'   , function (node) { tree.onNodeCollapsed(node);   });
+            tree.on('node-contextmenu' , function (node) { tree.onNodeContextmenu(node); });
+            tree.on('node-dblclicked'  , function (node) { tree.onNodeDblclicked(node);  });
+            tree.on('node-expanded'    , function (node) { tree.onNodeExpanded(node);    });
+            tree.on('node-selected'    , function (node) { tree.onNodeSelected(node);    });
+        // }
+        // dom events {
+            // domEvent.on(treeContainer, 'contextmenu', function () {
+            //     return false;
+            // });
+            domEvent.on(treeContainer, 'click', '.tree-node-expander', function (e) {
+                getTreeNodeFromDelegateEventAndTree(e, tree).toggle();
+            });
+            domEvent.on(treeContainer, 'click', '.tree-node', function (e) {
+                var treeNode = getTreeNodeFromDelegateEventAndTree(e, tree);
+                treeNode.trigger('clicked');
+                tree.trigger('node-clicked', treeNode);
+            });
+            domEvent.on(treeContainer, 'contextmenu', '.tree-node', function (e) {
+                var treeNode = getTreeNodeFromDelegateEventAndTree(e, tree);
+                e.preventDefault();
+                treeNode.trigger('contextmenu');
+                tree.trigger('node-contextmenu', treeNode);
+            });
+            domEvent.on(treeContainer, 'dblclick', '.tree-node', function (e) {
+                var treeNode = getTreeNodeFromDelegateEventAndTree(e, tree);
+                treeNode.trigger('dblclicked');
+                tree.trigger('node-dblclicked', treeNode);
+            });
+            domEvent.on(treeContainer, 'mousedown', '.tree-node', function (e) {
+                var treeNode = getTreeNodeFromDelegateEventAndTree(e, tree);
+                treeNode.select();
+                treeNode.trigger('selected');
+                tree.trigger('node-selected', treeNode);
+            });
+        // }
+
+        return tree;
+    };
+});
+
+/* global define */
+
+define('ui/tree/Node', [
+    'pastry',
+    'declare',
+    'event',
+    'Component',
+    'dom/class',
+    'dom/construct',
+    'dom/query',
+    'dom/style',
+    'ui/tree/node/event',
+    'ui/tree/template/node'
+], function(
+    pastry,
+    declare,
+    event,
+    Component,
+    domClass,
+    domConstruct,
+    domQuery,
+    domStyle,
+    bindEvent,
+    templateNode
+) {
+    'use strict';
+    /*
+     * @author      : 绝云（wensen.lws）
+     * @description : tree Node
+     */
+    var INDENT_LENGTH = 16, // indent for one level
+
+        NODE_SELECTED_CLASS          = 'selected',
+        BRANCH_ICON_CLASS            = 'icon-folder',
+        BRANCH_EXPANDED_ICON_CLASS   = 'icon-folder-open',
+        LEAF_ICON_CLASS              = 'icon-file',
+        EXPANDER_ICON_CLASS          = 'icon-arrow-right',
+        EXPANDER_EXPANDED_ICON_CLASS = 'icon-arrow-down',
+
+        extend  = pastry.extend,
+        indexOf = pastry.indexOf,
+        remove  = pastry.remove,
+        each    = pastry.each,
+        every   = pastry.every,
+
+        TreeNode = declare('ui/tree/Node', [Component], {
+            constructor: function (data) {
+                if (data instanceof TreeNode) {
+                    return data;
+                }
+                var node = this;
+                // initialize private attributes {
+                    extend(node, {
+                        // attributes {
+                            isRoot       : false , // 根节点
+                            isBranch     : false , // 枝干节点
+                            isLeaf       : true  , // 叶子节点
+                            isExpanded   : true  , // expanded
+                            isExpandable : false , // expandable
+                            isSelected   : false , // selected
+                            isFocused    : false , // focused
+                            isLoaded     : false , // loaded
+                        // }
+                        // elements {
+                            container       : null,
+                            indenterElement : null,
+                            expanderElement : null,
+                            labelElement    : null,
+                            iconElement     : null,
+                        // }
+                        // connections {
+                            children : [],
+                            parent   : null
+                        // }
+                    }, data);
+                // }
+                // bind events {
+                    bindEvent(node);
+                // }
+                return node;
+            },
+            // attributes {
+                hasCheckbox       : false , // checkbox
+                id                : null  ,
+                label             : null  , // label
+                indent            : 0     , // indent of the node
+                parentId          : null  ,
+                iconClass         : null  ,
+                expanderIconClass : null  ,
+            // }
+            // private methods {
+                _setLabel: function () {
+                    var node = this,
+                        label;
+                    if (node.getLabel) {
+                        label = node.getLabel();
+                    } else if (node.tree.getLabel) {
+                        label = node.tree.getLabel(node);
+                    } else {
+                        // alias
+                        label = node.label || node.name || '';
+                    }
+                    node.label = label;
+                    if (node.labelElement) {
+                        node.labelElement.innerHTML = label;
+                    }
+                    return node;
+                },
+                _setIconClass: function () {
+                    var node = this,
+                        iconClass;
+
+                    if (node.getIconClass) {
+                        iconClass = node.getIconClass();
+                    } else if (node.tree.getIconClass) {
+                        iconClass = node.tree.getIconClass(node);
+                    } else {
+                        if (node.isBranch) {
+                            iconClass = node.isExpanded ?
+                                BRANCH_EXPANDED_ICON_CLASS : BRANCH_ICON_CLASS;
+                        } else {
+                            iconClass = LEAF_ICON_CLASS;
+                        }
+                    }
+                    node.iconClass = iconClass;
+                    if (node.iconElement) {
+                        domClass.clear(node.iconElement);
+                        domClass.add(node.iconElement, 'tree-node-icon icon ' + iconClass);
+                    }
+                    return node;
+                },
+                _setSelectedClass: function () {
+                    var node = this,
+                        container = node.container;
+                    if (container) {
+                        domClass[node.isSelected ? 'add' : 'remove'](container, NODE_SELECTED_CLASS);
+                    }
+                    return node;
+                },
+                _setExpanderIconClass: function () {
+                    var node = this,
+                        expanderIconClass;
+
+                    if (node.isExpandable) {
+                        if (node.getExpanderIconClass) {
+                            expanderIconClass = node.getExpanderIconClass();
+                        } else if (node.tree.getExpanderIconClass) {
+                            expanderIconClass = node.tree.getExpanderIconClass(node);
+                        } else {
+                            expanderIconClass = node.isExpanded ?
+                                EXPANDER_EXPANDED_ICON_CLASS : EXPANDER_ICON_CLASS;
+                        }
+                        node.expanderIconClass = expanderIconClass;
+                        if (node.expanderElement) {
+                            domClass.clear(node.expanderElement);
+                            domClass.add(node.expanderElement, 'tree-node-expander icon ' + expanderIconClass);
+                        }
+                    }
+                    return node;
+                },
+                _setIndent: function () {
+                    var node = this,
+                        indent;
+
+                    indent = INDENT_LENGTH * node.getLevel(); // 计算缩进
+                    node.indent = indent;
+                    if (node.indenterElement) {
+                        domStyle.set(node.indenterElement, 'margin-left', indent + 'px');
+                    }
+                    return node;
+                },
+                _setLoaded: function () {
+                    var node = this;
+
+                    node.isLoaded = true;
+                    node.eachChild(function (child) {
+                        child.load();
+                    });
+                },
+                _setSelected: function () {
+                    var node = this,
+                        tree = node.tree,
+                        oldSelectedNode = tree.selectedNode;
+                    node.isSelected = true;
+                    if (oldSelectedNode) {
+                        oldSelectedNode.isSelected = false;
+                        oldSelectedNode._updateLayout();
+                    }
+                    tree.selectedNode = node;
+                    return node._updateLayout();
+                },
+                _reload: function () {
+                    var node = this;
+                    node.eachChild(function (child) {
+                        child.reload();
+                    });
+                },
+                _updateLayout: function () {
+                    return this
+                        ._setLabel()
+                        ._setIconClass()
+                        ._setSelectedClass()
+                        ._setExpanderIconClass()
+                        ._setIndent();
+                },
+                _canMoveTo: function (target) {
+                    var node = this;
+                    if (
+                        target.id === node.id || // 不能移动到自身
+                        target.isLeaf || // 不能移动到叶子节点
+                        indexOf(node.children, target) > -1 || // 不能移动到子节点
+                        indexOf(target.getAncestors(), node) > -1 // 也不能移动到子孙节点
+                    ) {
+                        return false;
+                    }
+                    return true;
+                },
+                _isAncestorsExpanded: function () {
+                    return every(this.getAncestors(), function (ancestor) {
+                        return ancestor.isExpanded;
+                    });
+                },
+            // }
+            // methods {
+                addChild: function (child) {
+                    var node = this;
+                    if (indexOf(node.children, child) === -1) {
+                        node.children.push(child);
+                    }
+                    child.isRoot   = false;
+                    child.parentId = node.id;
+                    child.parent   = node;
+                    if (child.isLoaded) {
+                        child.reload();
+                        if (child._isAncestorsExpanded()) {
+                            child.show();
+                        } else {
+                            child.hide();
+                        }
+                    }
+                    return node;
+                },
+                removeChild: function (child) {
+                    var node = this,
+                        index;
+                    if ((index = indexOf(node.children, child)) !== -1) {
+                        remove(node.children, index);
+                        if (child.isLoaded && node.isExpanded) {
+                            child.hide();
+                        }
+                    }
+                    return node;
+                },
+                moveTo: function (target) {
+                    /*
+                     * @description: move to a target node
+                     */
+                    var node = this;
+                    if (node._canMoveTo(target)) {
+                        if (node.parent) {
+                            node.parent.removeChild(node);
+                        }
+                        target.addChild(node);
+                    }
+                    return node;
+                },
+                eachChild: function (callback) {
+                    /*
+                     * @description: collapse the node
+                     */
+                    var node = this;
+                    each(node.children, function (child) {
+                        callback(child);
+                    });
+                    return node;
+                },
+                getParent: function () {
+                    var node = this,
+                        parentId = node.parentId;
+                    if (node.parent) {
+                        return node.parent;
+                    }
+                    if (typeof parentId !== 'undefined') {
+                        return node.tree.nodeById[parentId];
+                    }
+                    return null;
+                },
+                getAncestors: function () {
+                    var node = this,
+                        ancestors = [];
+                    while(node = node.getParent()) {
+                        ancestors.push(node);
+                    }
+                    return ancestors;
+                },
+                getLevel: function () {
+                    return this.getAncestors().length;
+                },
+                select: function () {
+                    /*
+                     * @description: set to be selected
+                     */
+                    return this._setSelected();
+                },
+                show: function () {
+                    /*
+                     * @description: show the node
+                     */
+                    var node = this;
+                    Component.prototype.show.apply(node);
+                    if (node.isExpanded) {
+                        node.eachChild(function (child) {
+                            child.show();
+                        });
+                    }
+                    return node;
+                },
+                hide: function () {
+                    /*
+                     * @description: hide the node
+                     */
+                    var node = this;
+                    Component.prototype.hide.apply(node);
+                    if (node.isExpanded) {
+                        node.eachChild(function (child) {
+                            child.hide();
+                        });
+                    }
+                    return node;
+                },
+                expand: function () {
+                    /*
+                     * @description: expand the node
+                     */
+                    var node = this;
+                    node.isExpanded = true;
+                    node.eachChild(function (child) {
+                        child.show();
+                    });
+                    node._updateLayout();
+                    node.trigger('expanded');
+                    node.tree.trigger('node-expanded', node);
+                    return node;
+                },
+                collapse: function () {
+                    /*
+                     * @description: collapse the node
+                     */
+                    var node = this;
+                    node.isExpanded = false;
+                    node.eachChild(function (child) {
+                        child.hide();
+                    });
+                    return node._updateLayout();
+                },
+                toggle: function () {
+                    /*
+                     * @description: expand or collapse the node
+                     */
+                    var node = this;
+                    return node.isExpanded ? node.collapse() : node.expand();
+                },
+                render: function () {
+                    /*
+                     * @description: render the node,
+                     *      get attributes
+                     *      get Elements
+                     */
+                    var node = this,
+                        container;
+
+                    // get attributes {
+                        if (!node.parent) {
+                            node.isRoot = true;
+                        }
+                        if (node.children.length) {
+                            node.isBranch = true;
+                            node.isLeaf = false;
+                        }
+                        node.isExpandable = node.isBranch;
+                    // }
+                    // get nodes {
+                        container = node.container = node.container ||
+                            domConstruct.toDom(templateNode(node, true)); // unescape
+                        node.indenterElement = node.indenterElement ||
+                            domQuery.one('.tree-node-indenter', container);
+                        node.expanderElement = node.expanderElement ||
+                            domQuery.one('.tree-node-expander', container);
+                        node.labelElement = node.labelElement ||
+                            domQuery.one('.tree-node-label', container);
+                        node.iconElement = node.iconElement ||
+                            domQuery.one('.tree-node-icon', container);
+                    // }
+                    node._updateLayout();
+                    if (!node._isAncestorsExpanded()) {
+                        node.hide();
+                    }
+                    return node;
+                },
+                load: function () {
+                    /*
+                     * @description: load the node to the tree;
+                     */
+                    var node = this;
+
+                    if (!node.isLoaded) {
+                        if (node.isRoot) {
+                            node.placeAt(node.tree.bodyElement, 'first');
+                            node._setLoaded();
+                        } else if (node.parent.isLoaded) {
+                            node.placeAt(node.parent.container, 'after');
+                            node._setLoaded();
+                        }
+                    }
+                    return node;
+                },
+                reload: function () {
+                    var node = this;
+                    if (!node.isLoaded) {
+                        node.load();
+                    } else {
+                        node._updateLayout();
+                        if (node.isRoot) {
+                            node.placeAt(node.tree.bodyElement, 'first');
+                            node._reload();
+                        } else if (node.parent.isLoaded) {
+                            node.placeAt(node.parent.container, 'after');
+                            node._reload();
+                        }
+                    }
+                    return node;
+                },
+                update: function (option) {
+                    return extend(this, option).render();
+                },
+            // }
+            // events {
+                onClicked     : function () { },
+                onCollapsed   : function () { },
+                onContextmenu : function () { },
+                onDblclicked  : function () { },
+                onExpanded    : function () { },
+                onSelected    : function () { },
+            // }
+        });
+
+    return TreeNode;
+});
+
+/* global define */
+
+define('ui/Tree', [
+    'pastry',
+    'declare',
+    // 'event',
+    'Component',
+    'dom/construct',
+    'dom/query',
+    'ui/tree/Node',
+    'ui/tree/event',
+    'ui/tree/template/wrapper'
+], function(
+    pastry,
+    declare,
+    // event,
+    Component,
+    domConstruct,
+    domQuery,
+    TreeNode,
+    bindTreeEvent,
+    templateWrapper
+) {
+    'use strict';
+    /*
+     * @author      : 绝云（wensen.lws）
+     * @description : Tree
+     */
+    var NS      = '__tree__',
+        NS_NODE = '__tree_node__',
+
+        isArray = pastry.isArray,
+        indexOf = pastry.indexOf,
+        remove  = pastry.remove,
+        each    = pastry.each,
+        extend  = pastry.extend,
+        uuid    = pastry.uuid,
+
+        Tree = declare('ui/Tree', [Component], {
+            // constructor {
+                constructor: function (option) {
+                    option = option || {};
+                    var tree = this,
+                        container;
+
+                    extend(tree, {
+                        id           : uuid(NS),
+                        data         : [],
+                        nodes        : [],   // node instances
+                        nodeById     : {},   // node instances by id
+                        container    : null, // element
+                        headElement  : null, // element
+                        bodyElement  : null, // element
+                        selectedNode : null, // selected node
+                    }, option);
+                    // render container {
+                        if (option.container) {
+                            tree.container = domQuery.one(option.container);
+                        }
+                        if (!tree.container) {
+                            tree.container = domConstruct.toDom(templateWrapper(tree));
+                        }
+                        container = tree.container;
+                    // }
+                    // get other dom nodes {
+                        if (tree.hasHead) {
+                            tree.headElement = domQuery.one('thead', container);
+                        }
+                        tree.bodyElement = domQuery.one('tbody', container);
+                    // }
+                    // add nodes {
+                        tree.addNodes(tree.data);
+                        delete tree.data;
+                    // }
+                    // bind events {
+                        bindTreeEvent(tree);
+                    // }
+                    return tree;
+                },
+            // }
+            // attributes {
+                hasHead        : false,
+                treeColumnName : 'tree',
+                extraColumns   : [], // extra columns
+            // }
+            // private methods {
+                _processData: function (items) {
+                    var tree = this;
+
+                    // add id, extraColumns, tree, etc {
+                        each(items, function (item) {
+                            var id = item.id;
+                            extend(item, {
+                                extraColumns : tree.extraColumns,
+                                tree         : tree,
+                            });
+                            if (typeof item.id === 'undefined') {
+                                id = item.id = uuid(NS_NODE);
+                            }
+                            if (!tree.nodeById[id]) {
+                                tree.nodeById[item.id] = item; // for counting length
+                            }
+                        });
+                    // }
+                    return tree;
+                },
+                _processNodes: function (nodes) {
+                    /*
+                     * @description: processing nodes
+                     */
+                    var tree = this,
+                        parentId,
+                        parent;
+
+                    each(nodes, function (node) {
+                        // add parent-child connections {
+                            parent = node.getParent();
+                            if (node.parentId !== null) {
+                                if (parent) {
+                                    node.parent = parent;
+                                    parent.addChild(node);
+                                } else {
+                                    pastry.ERROR('node with id ' + parentId + ' does not exists');
+                                }
+                            }
+                        // }
+                    });
+                    return tree;
+                },
+            // }
+            // methods {
+                addNodes: function (items) {
+                    /*
+                     * @description: add nodes
+                     */
+                    var tree  = this,
+                        nodes = [];
+
+                    items = items || [];
+                    if (!isArray(items)) {
+                        items = [items];
+                    }
+                    tree._processData(items);
+                    // turn items into nodes {
+                        each(items, function (item) {
+                            var id = item.id,
+                                node = tree.nodeById[id];
+                            if (node instanceof TreeNode) {
+                                return;
+                            }
+                            item = new TreeNode(item);
+                            tree.nodes.push(item);
+                            nodes.push(item);
+                            tree.nodeById[item.id] = item;
+                        });
+                    // }
+                    // process nodes {
+                        tree._processNodes(nodes);
+                    // }
+                    // load nodes {
+                        tree.eachNode(function (node) {
+                            node.render(); // 必须和 load 分开做
+                        });
+                        tree.eachNode(function (node) {
+                            node.load();
+                        });
+                    // }
+                    return tree;
+                },
+                addNode: function (item) {
+                    return this.addNodes([item]);
+                },
+                removeNodes: function (nodes) {
+                    /*
+                     * @description: remove nodes
+                     */
+                    var tree = this,
+                        parent;
+                    if (!isArray(nodes)) {
+                        nodes = [nodes];
+                    }
+                    tree.eachNode(nodes, function (node) {
+                        var treeNodeIndex = indexOf(tree.nodes, node);
+                        if (treeNodeIndex > -1) {
+                            remove(tree.nodes, treeNodeIndex);
+                        }
+                        delete tree.nodeById[node.id];
+                        if (parent = node.parent) {
+                            parent.removeChild(node);
+                        }
+                        node.eachChild(function (child) {
+                            child.destroy();
+                        });
+                        node.destroy();
+                    });
+                    return tree;
+                },
+                queryNodes: function (query) {
+                    /*
+                     * @description: find nodes
+                     */
+                    var tree  = this;
+                    if (isArray(query)) {
+                        return query;
+                    } else if (pastry.isPlainObject(query)) {
+                        return pastry.filter(tree.nodes, function (node) {
+                            return queryFilter(node, query);
+                        });
+                    }
+                },
+                eachNode: function (query, callback) {
+                    /*
+                     * @description: processing each node
+                     */
+                    var tree = this,
+                        nodes = [];
+                    if (!pastry.isFunction(query)) {
+                        nodes = tree.queryNodes(query);
+                    } else {
+                        nodes = tree.nodes;
+                        callback = query;
+                    }
+                    each(nodes, function (node) {
+                        callback(node);
+                    });
+                    return tree;
+                },
+                expandNodes: function (/* node */) {
+                },
+            // }
+            // events {
+                onNodeClicked      : function (/* node */) { },
+                onNodeContextmenu  : function (/* node */) { },
+                onNodeDblclicked   : function (/* node */) { },
+                onNodeExpanded     : function (/* node */) { },
+                onNodeRightClicked : function (/* node */) { },
+                onNodeSelected     : function (/* node */) { }
+            // }
+        });
+
+    function queryFilter (target, queryObj) {
+        return pastry.every(queryObj, function (value, key) {
+            return target[key] === value;
+        });
+    }
+
+    // Tree.render = function (/* container, option */) {
+    // };
+
+    Tree.Node = TreeNode;
+    return pastry.Tree = Tree;
+});
+
+define("ui/tooltip/template/wrapper", ["pastry","html/utils"], function (helper) {return function(obj, ne){
+var _e=ne?function(s){return s;}:helper.escape,print=function(s,e){_s+=e?(s==null?'':s):_e(s);};obj=obj||{};with(obj){_s='<div class="tooltip" id="'+_e(id)+'"><div class="tooltip-arrow"></div><div class="tooltip-body"></div></div>';}return _s;
+}});
+/* jshint ignore:end *//* global define, document */
+
+define('ui/Tooltip', [
+    'pastry',
+    'declare',
+    'Component',
+    'dom/class',
+    'dom/construct',
+    'dom/query',
+    'dom/style',
+    'ui/tooltip/template/wrapper'
+], function(
+    pastry,
+    declare,
+    Component,
+    domClass,
+    domConstruct,
+    domQuery,
+    domStyle,
+    templateWrapper
+) {
+    'use strict';
+    /*
+     * @author      : 绝云
+     * @date        : 2015-01-06
+     * @description : 自定义ToolTip
+     * @syntax      :
+    //     var tooltip = new Tooltip();
+    //     tooltip.show(text, node, opt);
+    //     tooltip.show('some tips', $node, {
+    //         gravity : 's',   // 方向
+    //             // gravity:
+    //             // ---------------
+    //             // | nw | n | ne |
+    //             // ---------------
+    //             // | w  |   | e  |
+    //             // ---------------
+    //             // | sw | s | se |
+    //             // ---------------
+    //         html    : false, // 显示内容是否是 html
+    //         offset  : 10     // 偏移量
+    //     });
+    //     tooltip.hide();
+    //     tooltip.hide();
+     */
+    var
+        NS = '__tooltip__',
+
+        extend = pastry.extend,
+        each   = pastry.each,
+        body   = document.body,
+
+        Tooltip = declare('ui/Tooltip', [Component], {
+            constructor: function (option) {
+                option = option || {};
+                var tooltip = this,
+                    container;
+
+                tooltip.option = extend({
+                    gravity : 'n',   // 方向
+                    html    : false, // 是否显示html
+                    offset  : 6      // 偏移
+                }, option);
+                tooltip.id = option.id || pastry.uuid(NS);
+
+                container = tooltip.container = domConstruct.toDom(templateWrapper(tooltip));
+                tooltip.placeAt(body);
+                tooltip.wrapArrow = domQuery.one('.tooltip-arrow', container);
+                tooltip.wrapBody  = domQuery.one('.tooltip-body' , container);
+                tooltip.hide();
+                tooltip.isShown = false;
+                return tooltip;
+            },
+            show: function (text, node, option) {
+                /*
+                 * @description : 显示 tooltip
+                 * @syntax      : tooltip.show(text, node, option);
+                 * @param       : {string } text , 要显示的 tooltip 内容
+                 * @param       : {domNode} node , 要显示 tooltip 的节点
+                 * @param       : {object } option  , 显示 tooltip 的参数
+                 *     option.gravity : 方向
+                 *     option.html    : tooltip 是否是 html
+                 *     option.offset  : tooltip 显示偏移量
+                 */
+                var tooltip = this,
+                    container = tooltip.container,
+                    wrapArrow = tooltip.wrapArrow,
+                    wrapBody  = tooltip.wrapBody,
+                    showOpt   = extend({}, tooltip.option, option),
+                    gravity   = showOpt.gravity,
+                    bodyNode,
+                    nPos,
+                    tPos;
+
+                // 插入内容 {
+                    if (text && text !== ''){
+                        wrapBody.innerHTML = '';
+                        if (showOpt.html) {
+                            bodyNode = domConstruct.toDom(text);
+                            domConstruct.place(bodyNode, wrapBody, 'only');
+                        } else {
+                            wrapBody.innerHTML = text;
+                        }
+                    }
+                // }
+                // 显示 {
+                    domClass.clear(wrapArrow);
+                    domClass.add(wrapArrow, 'tooltip-arrow tooltip-arrow-' + gravity.charAt(0));
+
+                    domClass.clear(container);
+                    domClass.add(container, 'tooltip tooltip-' + gravity);
+                    if (showOpt.className) {
+                        domClass.add(container, 'tooltip-' + showOpt.className);
+                    }
+                    Component.prototype.show.call(tooltip);
+                    tooltip.isShown = true;
+                // }
+
+                // 获取位置信息 {
+                    nPos = extend({}, node.getBoundingClientRect(), {
+                        width  : node.offsetWidth,
+                        height : node.offsetHeight
+                    });
+
+                    // svg处理，解决矢量图放大缩小后坐标不正确问题 {
+                        if (typeof node.nearestViewportElement === 'object') {
+                            // SVG
+                            var rect = node.getBoundingClientRect();
+                            nPos.width = rect.width;
+                            nPos.height = rect.height;
+                        }
+                    // }
+                    tPos = {
+                        width  : wrapBody.offsetWidth,
+                        height : wrapBody.offsetHeight
+                    };
+                    showOpt.offset = showOpt.offset || 0;
+                    switch (gravity.charAt(0)) {
+                        case 'n':
+                            tPos = {
+                                top  : nPos.top + nPos.height + showOpt.offset,
+                                left : nPos.left + nPos.width/2 - tPos.width/2
+                            };
+                            break;
+                        case 's':
+                            tPos = {
+                                top  : nPos.top - tPos.height - showOpt.offset,
+                                left : nPos.left + nPos.width/2 - tPos.width/2
+                            };
+                            break;
+                        case 'e':
+                            tPos = {
+                                top  : nPos.top + nPos.height/2 - tPos.height/2,
+                                left : nPos.left - tPos.width - showOpt.offset
+                            };
+                            break;
+                        case 'w':
+                            tPos = {
+                                top  : nPos.top + nPos.height/2 - tPos.height/2,
+                                left : nPos.left + nPos.width + showOpt.offset
+                            };
+                            break;
+                    }
+                    // 加上滚动量 {
+                        tPos.top  += body.scrollTop;
+                        tPos.left += body.scrollLeft;
+                    //
+                    if (gravity.length === 2) {
+                        if (gravity.charAt(1) === 'w') {
+                            tPos.left = nPos.left + nPos.width/2 - 15;
+                        } else {
+                            tPos.left = nPos.left + nPos.width/2 - tPos.width + 15;
+                        }
+                    }
+                // }
+                // 定位 {
+                    each(tPos, function (value, key) {
+                        domStyle.set(container, key, value + 'px');
+                    });
+                // }
+                return tooltip;
+            },
+            hide: function () {
+                var tooltip = this;
+                tooltip.isShown = false;
+                return Component.prototype.hide.call(tooltip);
+            }
+        });
+    return pastry.Tooltip = Tooltip;
 });
 

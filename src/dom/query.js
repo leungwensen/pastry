@@ -21,12 +21,22 @@ define('dom/query', [
             isString  = pastry.isString,
             isNode    = domUtils.isNode,
             contains  = domUtils.contains,
+            testDiv   = domUtils.testDiv,
         // }
+        // matchesSelector {
+            matchesSelector = testDiv.matches ||
+                testDiv.webkitMatchesSelector ||
+                testDiv.mozMatchesSelector    ||
+                testDiv.msMatchesSelector     ||
+                testDiv.oMatchesSelector,
+            hasMatchesSelector = matchesSelector && matchesSelector.call(testDiv, 'div'),
+        // }
+
         doc = document,
         win = window,
-        nodeTypeStr = 'nodeType',
-        re_quick    = /^(?:#([\w-]+)|(\w+)|\.([\w-]+))$/, // 匹配快速选择器
-        result      = {};
+        nodeTypeStr   = 'nodeType',
+        re_quick      = /^(?:#([\w-]+)|(\w+)|\.([\w-]+))$/, // 匹配快速选择器
+        result        = {};
 
     function normalizeRoot (root) {
         if (!root) {
@@ -54,6 +64,9 @@ define('dom/query', [
             return !optRoot || (selector !== win && isNode(root) && contains(selector, root)) ?
                 [selector] : [];
         }
+        if (selector.nodeType === 11) { // document fragment
+            return pastry.toArray(selector.childNodes);
+        }
         if (selector && arrayLike(selector)) {
             return pastry.flatten(selector);
         }
@@ -78,10 +91,37 @@ define('dom/query', [
         return query(selector, optRoot)[0];
     }
 
+    function match (element, selector) {
+        /*
+         * @matches selector
+         */
+        if (hasMatchesSelector) {
+            return matchesSelector.call(element, selector);
+        }
+        var parentElem = element.parentNode,
+            nodes;
+
+        // if the element is an orphan, and the browser doesn't support matching
+        // orphans, append it to a documentFragment
+        if (!parentElem && !hasMatchesSelector) {
+            parentElem = document.createDocumentFragment();
+            parentElem.appendChild(element);
+        }
+            // from the parent element's context, get all nodes that match the selector
+        nodes = query(selector, parentElem);
+
+        // since support for `matches()` is missing, we need to check to see if
+        // any of the nodes returned by our query match the given element
+        return pastry.some(nodes, function (node) {
+            return node === element;
+        });
+    }
+
     // 封装 api {
         return pastry.domQuery = pastry.extend(result, {
-            all : query,
-            one : queryOne,
+            all   : query,
+            one   : queryOne,
+            match : match
         });
     // }
 });

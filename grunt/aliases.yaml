@@ -1,0 +1,28 @@
+dev:
+  - jshint
+  - compileTemplates
+  - concat
+  - copy
+  - jasmine
+  - less
+
+release:
+  - dev
+  - linkFontFiles
+  - uglify
+  - cssmin
+
+travis:
+  - jshint
+  - jasmine
+
+demo:
+  - connect:demo-ui
+  - watch
+
+default:
+  - jshint
+  - concat
+  - copy
+  - jasmine
+  - less

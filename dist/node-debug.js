@@ -1,4 +1,5 @@
-/*! pastry - v0.3.141212 - 2014-12-12 *//* global exports, module */
+/*! pastry - v0.3.150121 */
+/* global exports, module */
 
 (function (GLOBAL) {
     'use strict';
@@ -16,7 +17,7 @@
 
     var
     // 命名空间 {
-        P = {},
+        pastry = {},
     // }
     // 局部变量 {
         A  = Array,
@@ -24,29 +25,62 @@
         O  = Object,
         S  = String,
         PS = 'prototype',
-        U  = 'undefined',
+        US = 'undefined',
         AP = A[PS],
         FP = F[PS],
-        OP = O[PS],
+        // OP = O[PS],
         SP = S[PS],
-
-        isObject,
-        isFunction,
-
-        toStr = {}.toString,
-        slice = AP.slice,
 
         noop = function () { },
 
-        isType = function (type, obj) {
-            return toStr.call(obj) === '[object ' + type + ']';
-        };
+        // helpers {
+            toStr = {}.toString,
+            slice = AP.slice,
+
+            arrayFromSecondElement = function (arr) {
+                return slice.call(arr, 1);
+            },
+            applyNativeFunction = function (nativeFunc, target, args) {
+                return nativeFunc.apply(target, arrayFromSecondElement(args));
+            },
+
+            // isType() {
+                isType = function (type, obj) {
+                    return toStr.call(obj) === '[object ' + type + ']';
+                },
+                isArrayLike = pastry.isArrayLike = function (obj) {
+                    return (typeof obj === 'object' && isFinite(obj.length));
+                },
+                isFunction = pastry.isFunction = function (obj) {
+                    return isType('Function', obj);
+                },
+                isNumber = pastry.isNumber = function (obj) {
+                    return isType('Number', obj);
+                },
+                isObject = pastry.isObject = function (obj) {
+                    var type = typeof obj;
+                    return type === 'function' || type === 'object' && !!obj;
+                },
+                isPlainObject = pastry.isPlainObject = function (obj) {
+                    return isType('Object', obj);
+                },
+            // }
+
+            toArray = pastry.toArray = function (obj) {
+                return isArrayLike(obj) ? slice.call(obj) : [];
+            },
+
+            each,
+            hasValue;
+        // }
+
     // }
     // // 版本号 {
-    //     P.VERSION = '{VERSION}';
+    //     pastry.VERSION = '{VERSION}';
     // // }
+
     // ES5 && ES6 函数集 {
-        P.index = function (up) {
+        pastry.index = function (up) {
             /*
              * @description: 为实现 indexOf 和 lastIndexOf 而设计的函数
              */
@@ -57,7 +91,7 @@
                     return -1;
                 }
                 if (!fromIndex) {
-                    fromIndex = 0;
+                    fromIndex = up ? 0 : arr.length;
                 } else if (fromIndex < 0) {
                     fromIndex = Math.max(0, arr.length + fromIndex);
                 }
@@ -77,7 +111,7 @@
                 return -1;
             };
         };
-        P.indexOf = AP.indexOf ?
+        pastry.indexOf = AP.indexOf ?
             /*
              * @description : 返回 index （不存在则为 -1）
              * @parameter*  : {Array } arr           , 要遍历的数组
@@ -86,10 +120,10 @@
              * @return      : {Number} index
              * @syntax      : pastry.indexOf(arr, searchElement[, fromIndex])
              */
-            function (arr, searchElement, fromIndex) {
-                return arr.indexOf(searchElement, fromIndex);
-            } : P.index(true);
-        P.lastIndexOf = AP.lastIndexOf ?
+            function (arr) {
+                return applyNativeFunction(AP.indexOf, arr, arguments);
+            } : pastry.index(true);
+        pastry.lastIndexOf = AP.lastIndexOf ?
             /*
              * @description : 返回最后一个 index （不存在则为 -1）
              * @parameter*  : {Array } arr           , 要遍历的数组
@@ -98,11 +132,16 @@
              * @return      : {Number} index
              * @syntax      : pastry.indexOf(arr, searchElement[, fromIndex])
              */
-            function (arr, searchElement, fromIndex) {
-                return arr.lastIndexOf(searchElement, fromIndex);
-            } : P.index();
+            function (arr) {
+                return applyNativeFunction(AP.lastIndexOf, arr, arguments);
+            } : pastry.index();
 
-        P.each = P.forEach = OP.forEach ?
+        function objForEach (obj, callback, thisObj) {
+            for (var key in obj) {
+                callback.call(thisObj, obj[key], key, obj);
+            }
+        }
+        each = pastry.each = pastry.forEach = AP.forEach ?
             /*
              * @description : 遍历
              * @parameter*  : {Object  } obj      , 待循环变量
@@ -112,14 +151,27 @@
              * @syntax      : pastry.forEach(obj Object, callback Function[, thisObj Object]);
              */
             function (obj, callback, thisObj) {
-                obj.forEach(callback, thisObj);
-            } : function (obj, callback, thisObj) {
-                for (var key in obj) {
-                    callback.call(thisObj, obj[key], key, obj);
+                if (isArrayLike(obj)) {
+                    return applyNativeFunction(AP.forEach, obj, arguments);
+                } else if (isPlainObject(obj)) {
+                    objForEach(obj, callback, thisObj);
                 }
+                return obj;
+            } : function (obj, callback, thisObj) {
+                if (isArrayLike(obj)) {
+                    var len = obj.length;
+                    for (var i = 0; i < len; i++) {
+                        if (i in obj) {
+                            callback.call(thisObj, obj[i], i, obj);
+                        }
+                    }
+                } else if (isPlainObject(obj)) {
+                    objForEach(obj, callback, thisObj);
+                }
+                return obj;
             };
 
-        P.eachReverse = function (arr, callback, thisObj) {
+        pastry.eachReverse = function (arr, callback, thisObj) {
             /*
              * @description : 逆序遍历
              * @parameter*  : {Array   } arr      , 待循环数组
@@ -133,9 +185,10 @@
                     callback.call(thisObj, arr[i], i, arr);
                 }
             }
+            return arr;
         };
 
-        P.every = AP.every ?
+        pastry.every = AP.every ?
             /*
              * @description : 测试是否对于 arr 中的元素，callback 都返回 true
              * @parameter*  : {Array   } arr      , 待测试数组
@@ -144,8 +197,8 @@
              * @return      : {Boolean } 结果
              * @syntax      : pastry.every(arr, callback[, thisObj])
              */
-            function (arr, callback, thisObj) {
-                return arr.every(callback, thisObj);
+            function (arr) {
+                return applyNativeFunction(AP.every, arr, arguments);
             } : function (arr, callback, thisObj) {
                 var i;
                 for (i = 0; i < arr.length; i ++) {
@@ -156,7 +209,7 @@
                 return true;
             };
 
-        P.filter = AP.filter ?
+        pastry.filter = AP.filter ?
             /*
              * @description : 根据 callback 是否通过来过滤 arr 中的元素，返回过滤后的数组
              * @parameter*  : {Array   } arr      , 待过滤数组
@@ -165,11 +218,11 @@
              * @return      : {Array   } 结果数组
              * @syntax      : pastry.filter(arr, callback[, thisObj])
              */
-            function (arr, callback, thisObj) {
-                return arr.filter(callback, thisObj);
+            function (arr) {
+                return applyNativeFunction(AP.filter, arr, arguments);
             } : function (arr, callback, thisObj) {
                 var res = [];
-                P.each(arr, function (element, key) {
+                each(arr, function (element, key) {
                     if (callback.call(thisObj, element, key, arr)) {
                         res.push(element);
                     }
@@ -177,7 +230,7 @@
                 return res;
             };
 
-        P.map = AP.map ?
+        pastry.map = AP.map ?
             /*
              * @description : 用 arr 通过 callback 函数加工各个元素得到新的数组
              * @parameter*  : {Array   } arr      , 待加工数组
@@ -186,17 +239,17 @@
              * @return      : {Array   } 结果数组
              * @syntax      : pastry.map(arr, callback[, thisObj])
              */
-            function (arr, callback, thisObj) {
-                return arr.map(callback, thisObj);
+            function (arr) {
+                return applyNativeFunction(AP.map, arr, arguments);
             } : function (arr, callback, thisObj) {
                 var res = [];
-                P.each(arr, function (element, key) {
+                each(arr, function (element, key) {
                     res.push(callback.call(thisObj, element, key, arr));
                 });
                 return res;
             };
 
-        P.some = AP.some ?
+        pastry.some = AP.some ?
             /*
              * @description : 测试 arr 中每个元素，当有真的时候退出并返回 true
              * @parameter*  : {Array   } arr      , 待测试数组
@@ -205,8 +258,8 @@
              * @return      : {Boolean } 真值
              * @syntax      : pastry.some(arr, callback[, thisObj])
              */
-            function (arr, callback, thisObj) {
-                return arr.some(callback, thisObj);
+            function (arr) {
+                return applyNativeFunction(AP.some, arr, arguments);
             } : function (arr, callback, thisObj) {
                 var i;
                 for (i = 0; i < arr.length; i ++) {
@@ -217,7 +270,7 @@
                 return false;
             };
 
-        P.reduce = AP.reduce ?
+        pastry.reduce = AP.reduce ?
             /*
              * @description : 从左到右遍历数组，运行函数并得到最终值
              * @parameter*  : {Array   } arr      , 待遍历数组
@@ -230,9 +283,8 @@
             // @paramForCallback  : {Number  } index         , index
             // @paramForCallback  : {Array   } array         , 数组变量
              */
-            function (arr, callback, thisObj) {
-                return thisObj ?
-                    arr.reduce(callback, thisObj) : arr.reduce(callback);
+            function (arr) {
+                return applyNativeFunction(AP.reduce, arr, arguments);
             } : function (arr, callback, thisObj) {
                 var i, value;
                 if (thisObj) {
@@ -247,7 +299,7 @@
                 }
                 return value;
             };
-        P.reduceRight = AP.reduceRight ?
+        pastry.reduceRight = AP.reduceRight ?
             /*
              * @description : 从右到左遍历数组，运行函数并得到最终值
              * @parameter*  : {Array   } arr      , 待遍历数组
@@ -260,9 +312,8 @@
             // @paramForCallback  : {Number  } index         , index
             // @paramForCallback  : {Array   } array         , 数组变量
              */
-            function (arr, callback, thisObj) {
-                return thisObj ?
-                    arr.reduceRight(callback, thisObj) : arr.reduceRight(callback);
+            function (arr) {
+                return applyNativeFunction(AP.reduceRight, arr, arguments);
             } : function (arr, callback, thisObj) {
                 var i, value;
                 if (thisObj) {
@@ -278,7 +329,7 @@
                 return value;
             };
 
-        P.trim = SP.trim ?
+        pastry.trim = SP.trim ?
             /*
              * @description : 移除空白子串
              * @parameter*  : {string} str, 待处理字符串
@@ -290,7 +341,7 @@
             } : function (str) {
                 return str.replace(/^\s+|\s+$/g, '');
             };
-        P.trimLeft = SP.trimLeft ?
+        pastry.trimLeft = SP.trimLeft ?
             /*
              * @description : 移除左空白子串
              * @parameter*  : {string} str, 待处理字符串
@@ -302,7 +353,7 @@
             } : function (str) {
                 return str.replace(/^\s+/g, '');
             };
-        P.trimRight = SP.trimRight ?
+        pastry.trimRight = SP.trimRight ?
             /*
              * @description : 移除右空白子串
              * @parameter*  : {string} str, 待处理字符串
@@ -317,81 +368,86 @@
     // }
     // helper 函数集 {
         // 字符串相关 {
-            P.lc = function (str) {
+            pastry.lc = function (str) {
                 /*
                  * @syntax: pastry.lc(str String);
                  */
-                return str.toString().toLowerCase();
+                return (str + '').toLowerCase();
             };
-            P.uc = function (str) {
+            pastry.uc = function (str) {
                 /*
                  * @syntax: pastry.uc(str String);
                  */
-                return str.toString().toUpperCase();
+                return (str + '').toUpperCase();
             };
-            P.hasSubString = function (str, subStr) {
+            pastry.hasSubString = function (str, subStr) {
                 /*
                  * @syntax: pastry.hasSubString(str String, subStr String);
                  */
                 return (str.indexOf(subStr) > -1);
             };
+            pastry.capitalize = function (str) {
+                str = str + '';
+                return str.charAt(0).toUpperCase() + str.substr(1);
+            };
         // }
-        // 类型判断 pastry.is$Type(obj) {
+        // 其它类型判断 pastry.is$Type(obj) {
             /*
              * @description : 类型判断
              * @parameter*  : {Any} obj, 待判断对象
              * @syntax      : pastry.is$Type(obj Any);
              */
-            P.each([
+            each([
                 'Array',
                 'Arguments',
                 'Boolean',
                 'Date',
                 'Error',
-                'Number',
                 'RegExp',
                 'String'
             ], function (type) {
-                P['is' + type] = function (obj) {
+                pastry['is' + type] = function (obj) {
                     return isType(type, obj);
                 };
             });
-            P.isFunction = isFunction = function (obj) {
-                return isType('Function', obj);
+            if (A.isArray) {
+                pastry.isArray = A.isArray;
+            }
+            pastry.isNaN = function (obj) {
+                return isNumber(obj) && obj !== +obj;
             };
-            P.isObject = isObject = function (obj) {
-                var type = typeof obj;
-                return type === 'object' && !!obj;
+            pastry.isFinite = function (obj) {
+                return isNumber(obj) && isFinite(obj) && !isNaN(obj);
             };
-            P.isNaN = function (obj) {
-                return P.isNumber(obj) && obj !== +obj;
-            };
-            P.isFinite = function (obj) {
-                return P.isNumber(obj) && isFinite(obj) && !isNaN(obj);
-            };
-            P.isUndefined = function (obj) {
+            pastry.isUndefined = function (obj) {
                 return obj === undefined;
             };
-            P.isNull = function (obj) {
+            pastry.isNull = function (obj) {
                 return obj === null;
             };
-            if (A.isArray) {
-                P.isArray = A.isArray;
-            }
         // }
         // 数组、对象相关 {
-            P.isArrayLike = function (obj) {
-                return (typeof obj === 'object' && isFinite(obj.length));
+            pastry.range = function (start, stop, step) {
+                if (arguments.length <= 1) {
+                    stop = start || 0;
+                    start = 0;
+                }
+                step = step || 1;
+
+                var length = Math.max(Math.ceil((stop - start) / step), 0),
+                    range  = new Array(length),
+                    idx    = 0;
+                for (; idx < length; idx++, start += step) {
+                    range[idx] = start;
+                }
+                return range;
             };
-            P.toArray = function (obj) {
-                return P.isArrayLike(obj) ? slice.call(obj) : [];
-            };
-            P.flatten = function (array) {
+            pastry.flatten = function (array) {
                 /*
                  * @description: 扁平化二维数组
                  */
                 for (var r = [], i = 0, l = array.length; i < l; ++i) {
-                    if (P.isArrayLike(array[i])) {
+                    if (isArrayLike(array[i])) {
                         r = r.concat(array[i]);
                     } else {
                         r[r.length] = array[i];
@@ -399,46 +455,46 @@
                 }
                 return r;
             };
-            P.merge = function (dest) {
+            pastry.merge = function (dest) {
                 /*
                  * @description : 合并对象
                  * @parameter*  : {Object} dest, 目标对象
                  * @syntax      : pastry.merge(dest Object[, src1 Object, src2 Object, ...]);
                  */
-                if (isObject(dest) || isFunction(dest)) {
-                    P.each(P.toArray(arguments).slice(1), function (source) {
-                        if (source) {
-                            for (var prop in source) {
-                                if (isObject(source[prop])) {
+                each(arrayFromSecondElement(arguments), function (source) {
+                    if (source) {
+                        for (var prop in source) {
+                            if (toStr.call(source[prop]) !== toStr.call(dest[prop])) {
+                                dest[prop] = source[prop];
+                            } else {
+                                if (isPlainObject(source[prop])) {
                                     dest[prop] = dest[prop] || {};
-                                    P.merge(dest[prop], source[prop]);
+                                    pastry.merge(dest[prop], source[prop]);
                                 } else {
                                     dest[prop] = source[prop];
                                 }
                             }
                         }
-                    });
-                }
+                    }
+                });
                 return dest;
             };
-            P.extend = function (dest) {
+            pastry.extend = function (dest) {
                 /*
                  * @description : 扩展对象
                  * @parameter*  : {Object} dest, 目标对象
                  * @syntax      : pastry.extend(dest Object[, src1 Object, src2 Object, ...]);
                  */
-                if (isObject(dest) || isFunction(dest)) {
-                    P.each(P.toArray(arguments).slice(1), function (source) {
-                        if (source) {
-                            for (var prop in source) {
-                                dest[prop] = source[prop];
-                            }
+                each(arrayFromSecondElement(arguments), function (source) {
+                    if (source) {
+                        for (var prop in source) {
+                            dest[prop] = source[prop];
                         }
-                    });
-                }
+                    }
+                });
                 return dest;
             };
-            P.remove = function (arr, fromIndex, toIndex) {
+            pastry.remove = function (arr, fromIndex, toIndex) {
                 /*
                  * @description : 删除数组元素
                  * @parameter*  : {Array } arr       , 待处理数组
@@ -448,14 +504,14 @@
                  */
                 var rest,
                     len = arr.length;
-                if (!P.isNumber(fromIndex)) {
+                if (!isNumber(fromIndex)) {
                     return arr;
                 }
                 rest = arr.slice((toIndex || fromIndex) + 1 || len);
                 arr.length = fromIndex < 0 ? len + fromIndex : fromIndex;
                 return arr.push.apply(arr, rest);
             };
-            P.keys = O.keys ?
+            pastry.keys = O.keys ?
                 /*
                  * @description : 获取对象键集合
                  * @parameter*  : {object} obj, 对象
@@ -466,38 +522,38 @@
                 } : function (obj) {
                     var result = [];
                     if (isFunction(obj)) {
-                        P.each(obj, function (value, key) {
-                            if (key !== P) {
+                        each(obj, function (value, key) {
+                            if (key !== PS) {
                                 result.push(key);
                             }
                         });
                     } else {
-                        P.each(obj, function (value, key) {
+                        each(obj, function (value, key) {
                             result.push(key);
                         });
                     }
                     return result;
                 };
-            P.invert = function(obj) {
+            pastry.invert = function(obj) {
                 var result = {};
-                P.each(obj, function (value, key) {
+                each(obj, function (value, key) {
                     result[value] = key;
                 });
                 return result;
             };
-            P.values = function (obj) {
+            pastry.values = function (obj) {
                 /*
                  * @description : 获取对象值集合
                  * @parameter*  : {object} obj, 对象
                  * @syntax      : pastry.values(obj)
                  */
                 var values = [];
-                P.each(obj, function (value) {
+                each(obj, function (value) {
                     values.push(value);
                 });
                 return values;
             };
-            P.hasKey = function (obj, key) {
+            pastry.hasKey = function (obj, key) {
                 /*
                  * @description : 检查是否存在键
                  * @parameter*  : {Object} obj, 待检查对象
@@ -506,56 +562,96 @@
                  */
                 return obj.hasOwnProperty(key);
             };
-            P.hasValue = function (obj, value) {
+            hasValue = pastry.hasValue = function (obj, value) {
                 /*
                  * @description : 检查是否存在值
                  * @parameter*  : {Object} obj   , 待检查对象
                  * @parameter*  : {String} value , 值
                  * @syntax      : pastry.hasValue(obj, value)
                  */
-                return (P.indexOf(P.values(obj), value) > -1);
+                return (pastry.indexOf(pastry.values(obj), value) > -1);
             };
-            P.uniq = function (arr) {
+            pastry.uniq = function (arr) {
                 /*
                  * @description : 求集合
                  * @parameter*  : {Array} arr, 求集合数组
                  * @syntax      : pastry.uniq(arr Array);
                  */
                 var resultArr = [];
-                P.each(arr, function (element) {
-                    if (!P.hasValue(resultArr, element)) {
+                each(arr, function (element) {
+                    if (!hasValue(resultArr, element)) {
                         resultArr.push(element);
                     }
                 });
                 return resultArr;
             };
-            P.union = function (/*arr1, arr2 */) {
+            pastry.union = function (/*arr1, arr2 */) {
                 /*
                  * @description : 合集
                  * @parameter*  : {Array} arr1, 求合集数组
                  * @syntax      : pastry.union([arr1 Array, arr2 Array, ...]);
                  */
                 var resultArr = [],
-                    sourceArrs = P.toArray(arguments).slice();
-                P.each(sourceArrs, function (arr) {
+                    sourceArrs = toArray(arguments);
+                each(sourceArrs, function (arr) {
                     resultArr.concat(arr);
                 });
-                return P.uniq(resultArr);
+                return pastry.uniq(resultArr);
+            };
+            pastry.difference = function (arr) {
+                var rest = pastry.flatten(arrayFromSecondElement(arguments), true, true, []);
+                return pastry.filter(arr, function(value){
+                    return !hasValue(rest, value);
+                });
+            };
+            pastry.intersect = function (a, b) {
+                var result = [];
+                each(a, function (value) {
+                    if (hasValue(b, value)) {
+                        result.push(value);
+                    }
+                });
+                return result;
+            };
+            pastry.destroy = function (obj) {
+                /*
+                 * @description : 销毁对象
+                 * @parameter*  : {Object} obj, 待销毁对象
+                 * @syntax      : pastry.destroy(obj);
+                 */
+                for (var p in obj) {
+                    if (obj.hasOwnProperty(p)) {
+                        delete obj[p];
+                    }
+                }
+                obj.prototype = obj['__proto__'] = null;
+                obj = null;
+            };
+            pastry.clone = function (obj) {
+                /*
+                 * @description : 克隆对象
+                 * @parameter*  : {Object} obj, 待克隆对象
+                 * @syntax      : pastry.clone(obj);
+                 */
+                if (!isObject(obj)) {
+                    return obj;
+                }
+                return isArrayLike(obj) ? toArray(obj) : pastry.extend({}, obj);
             };
         // }
         // 函数相关 {
-            P.bind = FP.bind ?
+            pastry.bind = FP.bind ?
                 /*
                  * @description : 绑定函数运行上下文
                  * @parameter*  : {Function} func, 目标函数
                  * @parameter*  : {Object  } oThis, 上下文
                  * @syntax      : pastry.uuid(func Function, oThis Object);
                  */
-                function (func, oThis) {
-                    return func.bind(oThis, P.toArray(arguments).slice(2));
+                function (func) {
+                    return applyNativeFunction(FP.bind, func, arguments);
                 } : function (func, oThis) {
                     if (isFunction(oThis) && isFunction(func)) {
-                        var aArgs  = P.toArray(arguments).slice(2),
+                        var aArgs  = toArray(arguments).slice(2),
                             FNOP   = function () {},
                             fBound = function () {
                                 return func.apply(
@@ -563,8 +659,8 @@
                                     aArgs.concat(arguments)
                                 );
                             };
-                        FNOP[P]   = func[P];
-                        fBound[P] = new FNOP();
+                        FNOP[pastry]   = func[pastry];
+                        fBound[pastry] = new FNOP();
                         return fBound;
                     }
                 };
@@ -574,20 +670,20 @@
              * @description : debug 相关函数
              * @syntax      : pastry.[INFO|LOG|WARN|ERROR]
              */
-            P.each([
+            each([
                 'info',
                 'log',
                 'warn'
             ], function (type) {
-                P[type.toUpperCase()] = (typeof console === U) ? noop : P.bind(console[type], console);
+                pastry[type.toUpperCase()] = (typeof console === US) ? noop : pastry.bind(console[type], console);
             });
-            P.ERROR = function (err) {
-                P.WARN(err);
+            pastry.ERROR = function (err) {
+                pastry.WARN(err);
                 throw new Error(err);
             };
         // }
         // 其它 {
-            P.getAny = function (callbackList) {
+            pastry.getAny = function (callbackList) {
                 /*
                  * @description : 从一系列 callback 函数里按顺序尝试取值，并返回第一个可用值
                  * @parameter*  : {Array} callbackList, 回调函数列表
@@ -603,7 +699,7 @@
                 }
                 return returnValue;
             };
-            P.uuid = function (prefix) {
+            pastry.uuid = function (prefix) {
                 /*
                  * @description : 生成uuid
                  * @parameter   : {String} prefix, 前缀
@@ -627,47 +723,43 @@
          * @parameter   : {Boolean} override, 是否覆盖
          * @syntax      : pastry.mixin(obj Object[, override Boolean]);
          */
-        P.mixin = function (obj, override) {
-            P.each(obj, function (value, key) {
-                if (P[key] && !override) {
-                    P.ERROR('P.' + key + ' already exists');
+        pastry.mixin = function (obj, override) {
+            each(obj, function (value, key) {
+                if (pastry[key] && !override) {
+                    pastry.ERROR('pastry.' + key + ' already exists');
                 } else {
-                    P[key] = value;
+                    pastry[key] = value;
                 }
             });
         };
     // }
     // 输出全局变量 {
-        P.setGLOBAL = function (key, value) {
+        pastry.setGLOBAL = function (key, value) {
             /*
              * @description : 设置全局变量
              * @parameter   : {String} key, 变量名
              * @parameter   : {Any   } value, 值
              * @syntax      : pastry.setGLOBAL(key String, value Any);
              */
-            if (typeof exports !== U) {
+            if (typeof exports !== US) {
                 exports[key] = value;
             }
             GLOBAL[key] = value;
         };
-        P.each([
+        each([
             'P',
             'pastry',
             'PASTRY'
         ], function (alias) {
-            P.setGLOBAL(alias, P);
+            // set global names and alias
+            pastry.setGLOBAL(alias, pastry);
         });
 
-        if (typeof exports !== U) {
-            if (typeof module !== U && module.exports) {
-                module.exports = P;
+        if (typeof exports !== US) {
+            if (typeof module !== US && module.exports) {
+                module.exports = pastry;
             }
         }
-    // }
-    // 获取全局变量 {
-        P.getGLOBAL = function (key) {
-            return GLOBAL[key];
-        };
     // }
 }(this));
 
@@ -681,8 +773,7 @@
      * @description : event 模块，包括全局和局部的
      */
 
-    var
-        pastry = GLOBAL.pastry,
+    var pastry = GLOBAL.pastry,
 
         // defination of event function {
             event = function (target) {
@@ -728,8 +819,12 @@
                      */
                     var args = pastry.toArray(arguments),
                         list = events[args.shift()] || [];
-                    pastry.each(list, function (event) {
-                        event.callback.apply(event.context, args);
+                    pastry.each(list, function (evt) {
+                        if (!evt.callback) {
+                            pastry.LOG(evt, list);
+                            pastry.ERROR('event callback is not defined');
+                        }
+                        evt.callback.apply(evt.context, args);
                     });
                     return target;
                 };
@@ -770,7 +865,7 @@ var define;
              * @description: 模块构造函数
              */
             var mod = this;
-            mod.init(meta);
+            mod.initialise(meta);
             return mod;
         },
 
@@ -788,16 +883,37 @@ var define;
     event(Module); // 加上事件相关函数: on(), off(), emit(), trigger()
 
     Module.prototype = {
-        init: function (meta) {
+        initialise: function (meta) {
             /*
              * @description: 初始化
              */
-            var mod = this;
+            var mod = this,
+                id,
+                uri,
+                relativeUri;
             pastry.extend(mod, meta);
-            Module.emit('module-inited', mod);
-            moduleByUri[mod.uri] = mod;
-            moduleByUri[mod.id]  = mod;
-            queueByUri[mod.uri]  = mod;
+            Module.emit('module-initialised', mod);
+            if (uri = mod.uri) {
+                if (!moduleByUri[uri]) {
+                    moduleByUri[uri] = mod;
+                }
+                if (!queueByUri[uri]) {
+                    queueByUri[uri] = mod;
+                }
+            }
+            if (id = mod.id) {
+                if (!moduleByUri[id]) {
+                    moduleByUri[id] = mod;
+                }
+            }
+            if (relativeUri = mod.relativeUri) {
+                if (!moduleByUri[relativeUri]) {
+                    moduleByUri[relativeUri] = mod;
+                }
+                if (!queueByUri[relativeUri]) {
+                    queueByUri[mod.relativeUri] = mod;
+                }
+            }
             return mod;
         },
         processDeps: function () {
@@ -809,23 +925,30 @@ var define;
             var mod           = this,
                 depModExports = [];
             if ('exports' in mod) {
+                delete queueByUri[mod.uri];
+                delete queueByUri[mod.relativeUri];
                 return mod;
             }
 
             if (pastry.every(mod.deps, function (uri) {
                 return !!executedByUri[uri];
             })) {
-                var modFactory = mod.factory,
-                    modUri     = mod.uri,
-                    modId      = mod.id;
+                var modFactory     = mod.factory,
+                    modUri         = mod.uri,
+                    modId          = mod.id,
+                    modRelativeUri = mod.relativeUri;
 
                 pastry.each(mod.deps, function (uri) {
                     depModExports.push(exportsByUri[uri]);
                 });
-                mod.exports = exportsByUri[modUri] = exportsByUri[modId] = pastry.isFunction(modFactory) ?
-                    modFactory.apply(undef, depModExports) : modFactory;
-                executedByUri[modUri] = true;
-                executedByUri[modId]  = true;
+                mod.exports =
+                    exportsByUri[modUri] =
+                    exportsByUri[modId] =
+                    exportsByUri[modRelativeUri] = pastry.isFunction(modFactory) ?
+                        modFactory.apply(undef, depModExports) : modFactory;
+                executedByUri[modUri] =
+                    executedByUri[modId] =
+                    executedByUri[modRelativeUri] = true;
                 delete queueByUri[modUri];
                 Module.emit('module-executed', mod);
             }
@@ -1097,6 +1220,78 @@ define('fmt/vsprintf', [
 
 /* global define */
 
+define('fmt/camelCase', [
+    'pastry'
+], function(
+    pastry
+) {
+    'use strict';
+    /*
+     * @author      : 绝云（wensen.lws）
+     * @description : description
+     * @reference   : https://github.com/substack/camelize/blob/master/index.js
+     */
+
+    function camelise (str) {
+        return str
+            .replace(/^[_.\- ]+/, '')
+            .replace(/[_.-](\w|$)/g, function (_, x) {
+                return pastry.uc(x);
+            });
+    }
+    function uncamelise (str, separator) {
+        separator = separator || '_'; // default separator: _
+
+        return str.replace(/([a-z])([A-Z])/g, function(_, a, b) {
+            return a + separator + pastry.lc(b);
+        });
+    }
+    function walk (obj, isUncamelise, separator) {
+        /*
+         * @NOTE: only the key strings will be transformed
+         */
+        if (!obj || !pastry.isObject(obj)) {
+            return obj;
+        }
+        if (!obj || pastry.isDate(obj) || pastry.isRegExp(obj)) {
+            return obj;
+        }
+        if (pastry.isArray(obj)) {
+            return pastry.map(obj, function (value) {
+                return walk(value, isUncamelise, separator);
+            });
+        }
+        return pastry.reduce(pastry.keys(obj), function (acc, key) {
+            var camel = isUncamelise ? uncamelise(key, separator) : camelise(key);
+            acc[camel] = walk(obj[key], isUncamelise, separator);
+            return acc;
+        }, {});
+    }
+
+    return pastry.camelCase = {
+        camelise: function (str) {
+            if (pastry.isString(str)) {
+                return camelise(str);
+            }
+            if (pastry.isObject(str)) {
+                return walk(str);
+            }
+            return str;
+        },
+        uncamelise: function (str, separator) {
+            if (pastry.isString(str)) {
+                return uncamelise(str, separator);
+            }
+            if (pastry.isObject(str)) {
+                return walk(str, true, separator);
+            }
+            return str;
+        }
+    };
+});
+
+/* global define */
+
 define('json', [
     'pastry',
     'fmt/date'
@@ -1252,104 +1447,134 @@ define('json', [
 
 /* global define */
 
-define('Class', [
+define('declare/c3mro', [
     'pastry'
 ], function(
     pastry
 ) {
     'use strict';
     /*
-     * @author      : 绝云
-     * @description : Class utils
+     * @author      : 绝云（wensen.lws）
+     * @description : description
      */
+    var indexOf = pastry.indexOf;
 
-    var
-        str_className   = '__className',
-        str_constructor = '__constructor',
-        Class = function () { };
+    function cloneArray (arr) {
+        return arr.slice(0);
+    }
+    function isGoodHead (head, rest) {
+        var isGood = true;
+        pastry.some(rest, function (lin) {
+            if (indexOf(lin, head) > 0) {
+                isGood = false;
+            }
+        });
 
-    Class[str_className] = 'Class';
-    Class.instanceof = function (instance, superClass) {
-        return instance instanceof superClass || (
-            instance[str_constructor] &&
-            instance[str_constructor][str_className] === superClass[str_className]
-        );
-    };
+        if (isGood) {
+            pastry.each(rest, function (lin) {
+                if (indexOf(lin, head) === 0) {
+                    lin.shift();
+                }
+            });
+        }
+        return isGood;
+    }
+    function eachHead (bases) {
+        var result = [],
+            badLinearization = 0;
 
-    Class.prototype = {
-        init: function (info) {
-            var instance = this;
-            pastry.extend(instance, info);
-            return instance;
-        },
-        destroy: function () {
-            var instance = this;
-            for (var p in instance) {
-                if (instance.hasOwnProperty(p)) {
-                    delete instance[p];
+        while (bases.length) {
+            var base = bases.shift();
+            if (!base.length) {
+                continue;
+            }
+
+            if (isGoodHead(base[0], bases)) {
+                result.push(base.shift());
+                badLinearization = 0;
+            } else {
+                badLinearization += 1;
+                if (badLinearization === bases.length) {
+                    pastry.ERROR('Bad Linearization');
                 }
             }
-            // instance.prototype = instance['__proto__'] = null;
-            // instance = null;
+            if (base.length) {
+                bases.push(base);
+            }
         }
-    };
+        return result;
+    }
 
-    return pastry.Class = Class;
+    return pastry.mroMerge = function () {
+        var bases = pastry.map(pastry.toArray(arguments), cloneArray);
+        return eachHead(bases);
+    };
 });
 
 /* global define */
 
 define('declare', [
     'pastry',
-    'Class'
+    'declare/c3mro'
 ], function(
     pastry,
-    Class
+    c3mroMerge
 ) {
     'use strict';
     /*
      * @author      : 绝云（wensen.lws）
      * @description : Class utils
      */
-    var undef,
 
-        str_class        = '__class',
-        NS               = str_class + '__',
-        str_className    = str_class + 'Name',
-        str_prototype    = 'prototype',
-        str_superClasses = '__superClasses',
-        str_constructor  = '__constructor',
+    return pastry.declare = function(/*name, superClasses, protoObj*/) {
+        var uberClass,
+            tempConstructor,
+            lin          = '_linearization',
+            args         = pastry.toArray(arguments),
+            name         = pastry.isString(args[0]) ? args.shift() : '',
+            superClasses = args.length > 1 ? args.shift() : [],
+            protoObj     = args[0] ? args.shift() : {},
+            bases        = [],
+            Tmp          = function () {},
+            hasCtor      = false,
+            ctor         = function () {};
 
-        declare = function (/*className, superClasses, props*/) {
-            var args          = pastry.toArray(arguments),
-                className     = pastry.isString(args[0]) ? args.shift() : undef,
-                superClasses  = args.length > 1 ? args.shift() : [],
-                props         = args[0],
-                constructor   = props && props.constructor ? props.constructor : function (info) {
-                    return this.init(info);
-                };
+        superClasses = pastry.isArray(superClasses) ? superClasses : [superClasses];
+        pastry.each(superClasses, function(clazz) {
+            clazz[lin] = clazz[lin] || [clazz];
+            bases.push(clazz[lin]);
+        });
 
-            constructor[str_prototype]    = {};
-            constructor[str_superClasses] = superClasses;
+        if (bases.length) {
+            bases.push(superClasses);
+            bases = c3mroMerge.apply(null, bases);
+        }
 
-            if (superClasses.length === 0) {
-                constructor[str_prototype] = Class[str_prototype];
-                constructor[str_superClasses] = [Class];
-            } else {
-                pastry.each(superClasses, function (superClass) {
-                    pastry.extend(constructor[str_prototype], superClass[str_prototype]);
-                });
+        tempConstructor = protoObj.constructor;
+        if (tempConstructor !== Object.prototype.constructor) {
+            hasCtor = true;
+            ctor = tempConstructor;
+        }
+
+        ctor[lin]    = [ctor].concat(bases);
+        ctor.parents = bases.slice(0);
+
+        protoObj.constructor = ctor;
+        while ((uberClass = bases.shift())) {
+            protoObj = pastry.extend({}, uberClass.prototype, protoObj);
+            Tmp.prototype = protoObj;
+            if (!hasCtor) {
+                protoObj.constructor = ctor;
             }
+            protoObj = new Tmp();
+        }
 
-            constructor[str_className] = className || pastry.uuid(NS);
+        ctor.className = name;
+        ctor.prototype = protoObj;
+        ctor.prototype.constructor = ctor;
 
-            pastry.extend(constructor[str_prototype], props);
-            constructor[str_prototype][str_class] = constructor[str_prototype][str_constructor] = constructor;
-
-            return constructor;
-        };
-
-    return pastry.declare = declare;
+        return ctor;
+    };
 });
 
 /* global define */
@@ -1520,7 +1745,7 @@ define('color/named', [
 
 /* global define */
 
-define('class/Color', [
+define('Color', [
     'pastry',
     'declare',
     'color/named'
@@ -1533,11 +1758,9 @@ define('class/Color', [
     /*
      * @author      : 绝云
      * @description : 颜色构造函数
-     * @TODO        : 构建基类，完成基础的继承／生命周期／事件／方法等封装
      * @note        : can be used in nodejs
      */
-    var
-        lc    = pastry.lc,
+    var lc    = pastry.lc,
         round = Math.round,
 
         initProps = {
@@ -1551,7 +1774,7 @@ define('class/Color', [
             var instance = this;
 
             if (color) {
-                instance.init(color);
+                instance.initialise(color);
             }
         },
 
@@ -1683,7 +1906,7 @@ define('class/Color', [
 
     classMaker = pastry.extend(initProps, {
         constructor: Color,
-        init: function (color) {
+        initialise: function (color) {
             var instance = this;
             if (pastry.isString(color)) {
                 Color.fromString(color, this);
@@ -1742,11 +1965,15 @@ define('class/Color', [
             var instance = this,
                 g = round((instance.r + instance.g + instance.b) / 3);
             return Color.makeGrey(g, instance.a);
+        },
+        destroy: function () {
+            pastry.destroy(this);
         }
     });
 
     return pastry.Color = declare('Color', classMaker);
 });
+
 /* global define */
 
 define('html/utils', [
@@ -1821,8 +2048,9 @@ define('template', [
             }[p1] || "\\" + p1;
         }
         if (p2) { // interpolation: {%=prop%}, or unescaped: {%#prop%}
+            p3 = pastry.trim(p3);
             if (p2 === "=") {
-                return "'+_e(typeof" + p3 + "==='undefined'?'':" + p3 + ")+'";
+                return "'+_e(" + p3 + ")+'";
             }
             return "'+(" + p3 + "==null?'':" + p3 + ")+'";
         }
@@ -1841,33 +2069,36 @@ define('template', [
 
     return pastry.template = template = {
         helper: helper,
-        compile: function (str/*, option*/) {
-            // option = pastry.extend({}, defaultOpitons, option);
+        compile: function (str) {
             if (!pastry.isString(str)) {
                 return str;
             }
 
             /*jshint -W054*/ // new Function()
-            return cache[str] || (cache[str] = new Function('obj', 'helper',
-                    "var _e=helper.escape," +
+            return cache[str] || (cache[str] = new Function('obj', 'helper', 'ne',
+                    "var _e=ne?function(s){return s;}:helper.escape," +
                         "print=function(s,e){" +
                             "_s+=e?(s==null?'':s):_e(s);" +
                         "};" +
+                    "obj=obj||{};" + // 当obj传空的时候
                     "with(obj){" +
                         // include helper {
                             // "include = function (s, d) {" +
                             //     "_s += tmpl(s, d);}" + "," +
                         // }
-                        "_s='" + str.replace(RE_parser, render) + "';" +
+                        "_s='" +
+                        str
+                            .replace(RE_parser, render)
+                            .replace(/\\n\s*/g, '') + // 要是存在回车符号，会引起多解释一个 #text 对象的 bug
+                        "';" +
                     "}" +
                     "return _s;"
                 )
             );
         },
-        render: function (str, data/*, option*/) {
-            // option = option || {};
-            // console.log(template.compile(str).toString());
-            return template.compile(str/*, option*/)(data, template.helper);
+        render: function (str, data, option) {
+            option = option || {};
+            return template.compile(str)(data, template.helper, option.ne);
         }
     };
 });

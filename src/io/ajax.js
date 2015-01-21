@@ -42,7 +42,9 @@ define('io/ajax', [
             type        = option.type   ? pastry.lc(option.type)             : 'xml',
             data        = option.data   ? querystring.stringify(option.data) : null,
             contentType = option.contentType,
-            isAsync     = option.isAsync;
+            isAsync     = true, // https://xhr.spec.whatwg.org/ 不设置成 true，新版 chrome 会发飙
+            username    = option.username,
+            password    = option.password;
 
         // add handlers {
             pastry.each([
@@ -79,12 +81,16 @@ define('io/ajax', [
             };
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) {
-                    if (xhr.isSuccess() && option.success) {
-                        var response = xhr.responseText;
-                        if (type === 'json') {
-                            response = pastry.getAny([function () { return JSON.parse(response); }]) || response;
+                    if (xhr.isSuccess()) {
+                        if (option.success) {
+                            var response = xhr.responseText;
+                            if (type === 'json') {
+                                response = pastry.getAny([
+                                    function () { return JSON.parse(response); }
+                                ]) || response;
+                            }
+                            xhr.onsuccess(response);
                         }
-                        xhr.onsuccess(response);
                     } else if (option.error) {
                         xhr.onerror(xhr.statusText);
                     }
@@ -96,19 +102,19 @@ define('io/ajax', [
                 if (data) {
                     uri += (pastry.hasSubString(uri, '?') ? '&' : '?') + data;
                 }
-                xhr.open(method, uri, isAsync);
+                xhr.open(method, uri, isAsync, username, password);
                 xhr.setRequestHeader(
-                        'Content-Type',
-                        contentType || 'text/plain;charset=UTF-8'
-                    );
+                    'Content-Type',
+                    contentType || 'text/plain;charset=UTF-8'
+                );
             } else if (method === 'POST') {
-                xhr.open(method, uri, isAsync);
+                xhr.open(method, uri, isAsync, username, password);
                 xhr.setRequestHeader(
-                        'Content-Type',
-                        contentType || 'application/x-www-form-urlencoded;charset=UTF-8'
-                    );
+                    'Content-Type',
+                    contentType || 'application/x-www-form-urlencoded;charset=UTF-8'
+                );
             } else {
-                xhr.open(method, uri, isAsync);
+                xhr.open(method, uri, isAsync, username, password);
             }
             xhr.send(data);
         // }

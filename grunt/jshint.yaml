@@ -1,0 +1,15 @@
+options:
+  jshintrc: .jshintrc
+
+files:
+  gruntfile:
+    - Gruntfile.js
+  bin:
+    - bin/js/*.js
+  json:
+    - doc/json/*.json
+    - package.json
+  src:
+    - <%= path.src %>/**/*.js
+  spec:
+    - spec/*.js

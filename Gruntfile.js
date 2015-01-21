@@ -1,148 +1,59 @@
-/* jshint strict: true, undef: true, unused: true */
-/* global module */
-
-var pastry = require('./dist/node-debug.js');
+var pastry = require('./dist/node-debug.js'),
+    exec = require('child_process').exec;
 
 module.exports = function (grunt) {
     'use strict';
-    var pkg  = grunt.file.readJSON('package.json'),
-        conf = {
-            browserModules : require('./data/js/browserModules.js'),
-            nodeModules    : require('./data/js/nodeModules.js')
-        },
-        banner = '/*! <%= pkg.name %> - v<%= pkg.version %> - ' +
-            '<%= grunt.template.today("yyyy-mm-dd") %> */';
 
-    pastry.extend(pkg, {
-        main    : pastry.sprintf(pkg.main   , pkg.version),
-        browser : pastry.sprintf(pkg.browser, pkg.version)
+    var pkg = grunt.file.readJSON('package.json');
+
+    grunt.registerTask('linkFontFiles', function () {
+        var target = 'release/' + pkg.version;
+        exec(
+            pastry.sprintf('echo %s | ./bin/sh/linkFontFiles.sh', target),
+            function (error, stdout, stderr) {
+                console.log(error, stdout, stderr);
+            }
+        );
     });
 
-    grunt.initConfig({
-        pkg: pkg,
+    grunt.registerTask('compileTemplatesAndBuild', function () {
+        exec('make', function (error, stdout, stderr) {
+            console.log(error, stdout, stderr);
+        });
+    });
 
-        dist: {
-            browser : 'dist/browser-debug.js',
-            node    : 'dist/node-debug.js',
-            css     : 'dist/debug.css'
-        },
+    grunt.registerTask('compileTemplates', function () {
+        exec('./bin/js/compileTemplate.js', function (error, stdout, stderr) {
+            console.log(error, stdout, stderr);
+        });
+    });
 
-        path: {
-            release: 'release'
-        },
+    require('time-grunt')(grunt);
 
-        clean: {
-            src: [
-                '<%= path.release %>'
-            ]
-        },
-
-        concat: {
-            options: {
-                separator    : '',
-                stripBanners : true,
-                banner       : banner
+    require('load-grunt-config')(grunt, {
+        init: true,
+        data: {
+            pkg        : pkg,
+            banner     : '/*! <%= pkg.name %> - v<%= pkg.version %> */' + grunt.util.linefeed,
+            host       : '127.0.0.1',
+            port       : 9090,
+            livereload : 32599,
+            path: {
+                src     : 'src',
+                dist    : 'dist',
+                release : 'release'
             },
-            browserDebug: {
-                src  : conf.browserModules,
-                dest : '<%= dist.browser %>'
+            modules: {
+                amd     : require('./data/js/amdModules.js'),
+                node    : require('./data/js/nodeModules.js'),
+                browser : require('./data/js/browserModules.js')
             },
-            nodeDebug: {
-                src  : conf.nodeModules,
-                dest : '<%= dist.node %>'
-            },
-        },
-
-        cssmin: {
-            release: {
-                files: {
-                    'release/<%= pkg.version %>/pastry.min.css': '<%= dist.css %>'
-                }
-            }
-        },
-
-        jshint: {
-            options: {
-                jshintrc: '.jshintrc'
-            },
-            files: {
-                gruntfile: [
-                    'Gruntfile.js'
-                ],
-                bin: [
-                    'bin/js/*.js'
-                ],
-                json: [
-                    'doc/json/*.json',
-                    'package.json'
-                ],
-                src: [
-                    'src/**/*.js'
-                ],
-                spec: [
-                    'spec/*.js'
-                ]
-            }
-        },
-
-        jasmine: {
-            src: '<%= dist.node %>',
-            options: {
-                specs: 'test/jasmine/**/*.spec.js'
-            }
-        },
-
-        less: {
-            development: {
-                files: {
-                    '<%= dist.css %>' : 'src/ui/less/main.less'
-                }
-            }
-        },
-
-        uglify: {
-            options: {
-                banner: banner
-            },
-            release: {
-                files: {
-                    '<%= pkg.browser %>' : '<%= dist.browser %>',
-                    '<%= pkg.main %>'    : '<%= dist.node %>'
-                }
+            dist: {
+                amd     : '<%= path.src %>/amd-debug.js',
+                node    : '<%= path.dist %>/node-debug.js',
+                browser : '<%= path.dist %>/browser-debug.js',
+                css     : '<%= path.dist %>/debug.css'
             }
         }
     });
-
-    pastry.each([
-        'clean',
-        'concat',
-        'cssmin',
-        'jasmine',
-        'jshint',
-        'less',
-        'uglify'
-    ], function (task) {
-        grunt.loadNpmTasks('grunt-contrib-' + task);
-    });
-
-    grunt.registerTask('default', [
-        'jshint',
-        'concat',
-        'jasmine',
-        'less'
-    ]);
-    grunt.registerTask('release', [
-        'jshint',
-        'concat',
-        'jasmine',
-        'uglify',
-        'less',
-        'cssmin'
-
-    ]);
-    grunt.registerTask('travis', [
-        'jshint',
-        'jasmine'
-    ]);
 };
-

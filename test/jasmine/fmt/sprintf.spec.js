@@ -11,7 +11,6 @@ require([
     'use strict';
 
     describe('fmt/sprintf->sprintf()', function () {
-
         it('simple placeholders', function () {
             expect(sprintf("%%"      )).toBe("%"  );
             expect(sprintf("%b", 2   )).toBe("10" );

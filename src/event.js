@@ -9,8 +9,7 @@
      * @description : event 模块，包括全局和局部的
      */
 
-    var
-        pastry = GLOBAL.pastry,
+    var pastry = GLOBAL.pastry,
 
         // defination of event function {
             event = function (target) {
@@ -56,8 +55,12 @@
                      */
                     var args = pastry.toArray(arguments),
                         list = events[args.shift()] || [];
-                    pastry.each(list, function (event) {
-                        event.callback.apply(event.context, args);
+                    pastry.each(list, function (evt) {
+                        if (!evt.callback) {
+                            pastry.LOG(evt, list);
+                            pastry.ERROR('event callback is not defined');
+                        }
+                        evt.callback.apply(evt.context, args);
                     });
                     return target;
                 };

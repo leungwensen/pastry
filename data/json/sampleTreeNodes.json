@@ -1,0 +1,1481 @@
+[
+  {
+    "name": "flare",
+    "id": 0
+  },
+  {
+    "parentId": 0,
+    "name": "analytics",
+    "id": 1
+  },
+  {
+    "parentId": 1,
+    "name": "cluster",
+    "id": 2
+  },
+  {
+    "parentId": 2,
+    "name": "AgglomerativeCluster",
+    "size": 3938,
+    "id": 3
+  },
+  {
+    "parentId": 2,
+    "name": "CommunityStructure",
+    "size": 3812,
+    "id": 4
+  },
+  {
+    "parentId": 2,
+    "name": "HierarchicalCluster",
+    "size": 6714,
+    "id": 5
+  },
+  {
+    "parentId": 2,
+    "name": "MergeEdge",
+    "size": 743,
+    "id": 6
+  },
+  {
+    "parentId": 1,
+    "name": "graph",
+    "id": 7
+  },
+  {
+    "parentId": 7,
+    "name": "BetweennessCentrality",
+    "size": 3534,
+    "id": 8
+  },
+  {
+    "parentId": 7,
+    "name": "LinkDistance",
+    "size": 5731,
+    "id": 9
+  },
+  {
+    "parentId": 7,
+    "name": "MaxFlowMinCut",
+    "size": 7840,
+    "id": 10
+  },
+  {
+    "parentId": 7,
+    "name": "ShortestPaths",
+    "size": 5914,
+    "id": 11
+  },
+  {
+    "parentId": 7,
+    "name": "SpanningTree",
+    "size": 3416,
+    "id": 12
+  },
+  {
+    "parentId": 1,
+    "name": "optimization",
+    "id": 13
+  },
+  {
+    "parentId": 13,
+    "name": "AspectRatioBanker",
+    "size": 7074,
+    "id": 14
+  },
+  {
+    "parentId": 0,
+    "name": "animate",
+    "id": 15
+  },
+  {
+    "parentId": 15,
+    "name": "Easing",
+    "size": 17010,
+    "id": 16
+  },
+  {
+    "parentId": 15,
+    "name": "FunctionSequence",
+    "size": 5842,
+    "id": 17
+  },
+  {
+    "parentId": 15,
+    "name": "interpolate",
+    "id": 18
+  },
+  {
+    "parentId": 18,
+    "name": "ArrayInterpolator",
+    "size": 1983,
+    "id": 19
+  },
+  {
+    "parentId": 18,
+    "name": "ColorInterpolator",
+    "size": 2047,
+    "id": 20
+  },
+  {
+    "parentId": 18,
+    "name": "DateInterpolator",
+    "size": 1375,
+    "id": 21
+  },
+  {
+    "parentId": 18,
+    "name": "Interpolator",
+    "size": 8746,
+    "id": 22
+  },
+  {
+    "parentId": 18,
+    "name": "MatrixInterpolator",
+    "size": 2202,
+    "id": 23
+  },
+  {
+    "parentId": 18,
+    "name": "NumberInterpolator",
+    "size": 1382,
+    "id": 24
+  },
+  {
+    "parentId": 18,
+    "name": "ObjectInterpolator",
+    "size": 1629,
+    "id": 25
+  },
+  {
+    "parentId": 18,
+    "name": "PointInterpolator",
+    "size": 1675,
+    "id": 26
+  },
+  {
+    "parentId": 18,
+    "name": "RectangleInterpolator",
+    "size": 2042,
+    "id": 27
+  },
+  {
+    "parentId": 15,
+    "name": "ISchedulable",
+    "size": 1041,
+    "id": 28
+  },
+  {
+    "parentId": 15,
+    "name": "Parallel",
+    "size": 5176,
+    "id": 29
+  },
+  {
+    "parentId": 15,
+    "name": "Pause",
+    "size": 449,
+    "id": 30
+  },
+  {
+    "parentId": 15,
+    "name": "Scheduler",
+    "size": 5593,
+    "id": 31
+  },
+  {
+    "parentId": 15,
+    "name": "Sequence",
+    "size": 5534,
+    "id": 32
+  },
+  {
+    "parentId": 15,
+    "name": "Transition",
+    "size": 9201,
+    "id": 33
+  },
+  {
+    "parentId": 15,
+    "name": "Transitioner",
+    "size": 19975,
+    "id": 34
+  },
+  {
+    "parentId": 15,
+    "name": "TransitionEvent",
+    "size": 1116,
+    "id": 35
+  },
+  {
+    "parentId": 15,
+    "name": "Tween",
+    "size": 6006,
+    "id": 36
+  },
+  {
+    "parentId": 0,
+    "name": "data",
+    "id": 37
+  },
+  {
+    "parentId": 37,
+    "name": "converters",
+    "id": 38
+  },
+  {
+    "parentId": 38,
+    "name": "Converters",
+    "size": 721,
+    "id": 39
+  },
+  {
+    "parentId": 38,
+    "name": "DelimitedTextConverter",
+    "size": 4294,
+    "id": 40
+  },
+  {
+    "parentId": 38,
+    "name": "GraphMLConverter",
+    "size": 9800,
+    "id": 41
+  },
+  {
+    "parentId": 38,
+    "name": "IDataConverter",
+    "size": 1314,
+    "id": 42
+  },
+  {
+    "parentId": 38,
+    "name": "JSONConverter",
+    "size": 2220,
+    "id": 43
+  },
+  {
+    "parentId": 37,
+    "name": "DataField",
+    "size": 1759,
+    "id": 44
+  },
+  {
+    "parentId": 37,
+    "name": "DataSchema",
+    "size": 2165,
+    "id": 45
+  },
+  {
+    "parentId": 37,
+    "name": "DataSet",
+    "size": 586,
+    "id": 46
+  },
+  {
+    "parentId": 37,
+    "name": "DataSource",
+    "size": 3331,
+    "id": 47
+  },
+  {
+    "parentId": 37,
+    "name": "DataTable",
+    "size": 772,
+    "id": 48
+  },
+  {
+    "parentId": 37,
+    "name": "DataUtil",
+    "size": 3322,
+    "id": 49
+  },
+  {
+    "parentId": 0,
+    "name": "display",
+    "id": 50
+  },
+  {
+    "parentId": 50,
+    "name": "DirtySprite",
+    "size": 8833,
+    "id": 51
+  },
+  {
+    "parentId": 50,
+    "name": "LineSprite",
+    "size": 1732,
+    "id": 52
+  },
+  {
+    "parentId": 50,
+    "name": "RectSprite",
+    "size": 3623,
+    "id": 53
+  },
+  {
+    "parentId": 50,
+    "name": "TextSprite",
+    "size": 10066,
+    "id": 54
+  },
+  {
+    "parentId": 0,
+    "name": "flex",
+    "id": 55
+  },
+  {
+    "parentId": 55,
+    "name": "FlareVis",
+    "size": 4116,
+    "id": 56
+  },
+  {
+    "parentId": 0,
+    "name": "physics",
+    "id": 57
+  },
+  {
+    "parentId": 57,
+    "name": "DragForce",
+    "size": 1082,
+    "id": 58
+  },
+  {
+    "parentId": 57,
+    "name": "GravityForce",
+    "size": 1336,
+    "id": 59
+  },
+  {
+    "parentId": 57,
+    "name": "IForce",
+    "size": 319,
+    "id": 60
+  },
+  {
+    "parentId": 57,
+    "name": "NBodyForce",
+    "size": 10498,
+    "id": 61
+  },
+  {
+    "parentId": 57,
+    "name": "Particle",
+    "size": 2822,
+    "id": 62
+  },
+  {
+    "parentId": 57,
+    "name": "Simulation",
+    "size": 9983,
+    "id": 63
+  },
+  {
+    "parentId": 57,
+    "name": "Spring",
+    "size": 2213,
+    "id": 64
+  },
+  {
+    "parentId": 57,
+    "name": "SpringForce",
+    "size": 1681,
+    "id": 65
+  },
+  {
+    "parentId": 0,
+    "name": "query",
+    "id": 66
+  },
+  {
+    "parentId": 66,
+    "name": "AggregateExpression",
+    "size": 1616,
+    "id": 67
+  },
+  {
+    "parentId": 66,
+    "name": "And",
+    "size": 1027,
+    "id": 68
+  },
+  {
+    "parentId": 66,
+    "name": "Arithmetic",
+    "size": 3891,
+    "id": 69
+  },
+  {
+    "parentId": 66,
+    "name": "Average",
+    "size": 891,
+    "id": 70
+  },
+  {
+    "parentId": 66,
+    "name": "BinaryExpression",
+    "size": 2893,
+    "id": 71
+  },
+  {
+    "parentId": 66,
+    "name": "Comparison",
+    "size": 5103,
+    "id": 72
+  },
+  {
+    "parentId": 66,
+    "name": "CompositeExpression",
+    "size": 3677,
+    "id": 73
+  },
+  {
+    "parentId": 66,
+    "name": "Count",
+    "size": 781,
+    "id": 74
+  },
+  {
+    "parentId": 66,
+    "name": "DateUtil",
+    "size": 4141,
+    "id": 75
+  },
+  {
+    "parentId": 66,
+    "name": "Distinct",
+    "size": 933,
+    "id": 76
+  },
+  {
+    "parentId": 66,
+    "name": "Expression",
+    "size": 5130,
+    "id": 77
+  },
+  {
+    "parentId": 66,
+    "name": "ExpressionIterator",
+    "size": 3617,
+    "id": 78
+  },
+  {
+    "parentId": 66,
+    "name": "Fn",
+    "size": 3240,
+    "id": 79
+  },
+  {
+    "parentId": 66,
+    "name": "If",
+    "size": 2732,
+    "id": 80
+  },
+  {
+    "parentId": 66,
+    "name": "IsA",
+    "size": 2039,
+    "id": 81
+  },
+  {
+    "parentId": 66,
+    "name": "Literal",
+    "size": 1214,
+    "id": 82
+  },
+  {
+    "parentId": 66,
+    "name": "Match",
+    "size": 3748,
+    "id": 83
+  },
+  {
+    "parentId": 66,
+    "name": "Maximum",
+    "size": 843,
+    "id": 84
+  },
+  {
+    "parentId": 66,
+    "name": "methods",
+    "id": 85
+  },
+  {
+    "parentId": 85,
+    "name": "add",
+    "size": 593,
+    "id": 86
+  },
+  {
+    "parentId": 85,
+    "name": "and",
+    "size": 330,
+    "id": 87
+  },
+  {
+    "parentId": 85,
+    "name": "average",
+    "size": 287,
+    "id": 88
+  },
+  {
+    "parentId": 85,
+    "name": "count",
+    "size": 277,
+    "id": 89
+  },
+  {
+    "parentId": 85,
+    "name": "distinct",
+    "size": 292,
+    "id": 90
+  },
+  {
+    "parentId": 85,
+    "name": "div",
+    "size": 595,
+    "id": 91
+  },
+  {
+    "parentId": 85,
+    "name": "eq",
+    "size": 594,
+    "id": 92
+  },
+  {
+    "parentId": 85,
+    "name": "fn",
+    "size": 460,
+    "id": 93
+  },
+  {
+    "parentId": 85,
+    "name": "gt",
+    "size": 603,
+    "id": 94
+  },
+  {
+    "parentId": 85,
+    "name": "gte",
+    "size": 625,
+    "id": 95
+  },
+  {
+    "parentId": 85,
+    "name": "iff",
+    "size": 748,
+    "id": 96
+  },
+  {
+    "parentId": 85,
+    "name": "isa",
+    "size": 461,
+    "id": 97
+  },
+  {
+    "parentId": 85,
+    "name": "lt",
+    "size": 597,
+    "id": 98
+  },
+  {
+    "parentId": 85,
+    "name": "lte",
+    "size": 619,
+    "id": 99
+  },
+  {
+    "parentId": 85,
+    "name": "max",
+    "size": 283,
+    "id": 100
+  },
+  {
+    "parentId": 85,
+    "name": "min",
+    "size": 283,
+    "id": 101
+  },
+  {
+    "parentId": 85,
+    "name": "mod",
+    "size": 591,
+    "id": 102
+  },
+  {
+    "parentId": 85,
+    "name": "mul",
+    "size": 603,
+    "id": 103
+  },
+  {
+    "parentId": 85,
+    "name": "neq",
+    "size": 599,
+    "id": 104
+  },
+  {
+    "parentId": 85,
+    "name": "not",
+    "size": 386,
+    "id": 105
+  },
+  {
+    "parentId": 85,
+    "name": "or",
+    "size": 323,
+    "id": 106
+  },
+  {
+    "parentId": 85,
+    "name": "orderby",
+    "size": 307,
+    "id": 107
+  },
+  {
+    "parentId": 85,
+    "name": "range",
+    "size": 772,
+    "id": 108
+  },
+  {
+    "parentId": 85,
+    "name": "select",
+    "size": 296,
+    "id": 109
+  },
+  {
+    "parentId": 85,
+    "name": "stddev",
+    "size": 363,
+    "id": 110
+  },
+  {
+    "parentId": 85,
+    "name": "sub",
+    "size": 600,
+    "id": 111
+  },
+  {
+    "parentId": 85,
+    "name": "sum",
+    "size": 280,
+    "id": 112
+  },
+  {
+    "parentId": 85,
+    "name": "update",
+    "size": 307,
+    "id": 113
+  },
+  {
+    "parentId": 85,
+    "name": "variance",
+    "size": 335,
+    "id": 114
+  },
+  {
+    "parentId": 85,
+    "name": "where",
+    "size": 299,
+    "id": 115
+  },
+  {
+    "parentId": 85,
+    "name": "xor",
+    "size": 354,
+    "id": 116
+  },
+  {
+    "parentId": 85,
+    "name": "_",
+    "size": 264,
+    "id": 117
+  },
+  {
+    "parentId": 66,
+    "name": "Minimum",
+    "size": 843,
+    "id": 118
+  },
+  {
+    "parentId": 66,
+    "name": "Not",
+    "size": 1554,
+    "id": 119
+  },
+  {
+    "parentId": 66,
+    "name": "Or",
+    "size": 970,
+    "id": 120
+  },
+  {
+    "parentId": 66,
+    "name": "Query",
+    "size": 13896,
+    "id": 121
+  },
+  {
+    "parentId": 66,
+    "name": "Range",
+    "size": 1594,
+    "id": 122
+  },
+  {
+    "parentId": 66,
+    "name": "StringUtil",
+    "size": 4130,
+    "id": 123
+  },
+  {
+    "parentId": 66,
+    "name": "Sum",
+    "size": 791,
+    "id": 124
+  },
+  {
+    "parentId": 66,
+    "name": "Variable",
+    "size": 1124,
+    "id": 125
+  },
+  {
+    "parentId": 66,
+    "name": "Variance",
+    "size": 1876,
+    "id": 126
+  },
+  {
+    "parentId": 66,
+    "name": "Xor",
+    "size": 1101,
+    "id": 127
+  },
+  {
+    "parentId": 0,
+    "name": "scale",
+    "id": 128
+  },
+  {
+    "parentId": 128,
+    "name": "IScaleMap",
+    "size": 2105,
+    "id": 129
+  },
+  {
+    "parentId": 128,
+    "name": "LinearScale",
+    "size": 1316,
+    "id": 130
+  },
+  {
+    "parentId": 128,
+    "name": "LogScale",
+    "size": 3151,
+    "id": 131
+  },
+  {
+    "parentId": 128,
+    "name": "OrdinalScale",
+    "size": 3770,
+    "id": 132
+  },
+  {
+    "parentId": 128,
+    "name": "QuantileScale",
+    "size": 2435,
+    "id": 133
+  },
+  {
+    "parentId": 128,
+    "name": "QuantitativeScale",
+    "size": 4839,
+    "id": 134
+  },
+  {
+    "parentId": 128,
+    "name": "RootScale",
+    "size": 1756,
+    "id": 135
+  },
+  {
+    "parentId": 128,
+    "name": "Scale",
+    "size": 4268,
+    "id": 136
+  },
+  {
+    "parentId": 128,
+    "name": "ScaleType",
+    "size": 1821,
+    "id": 137
+  },
+  {
+    "parentId": 128,
+    "name": "TimeScale",
+    "size": 5833,
+    "id": 138
+  },
+  {
+    "parentId": 0,
+    "name": "util",
+    "id": 139
+  },
+  {
+    "parentId": 139,
+    "name": "Arrays",
+    "size": 8258,
+    "id": 140
+  },
+  {
+    "parentId": 139,
+    "name": "Colors",
+    "size": 10001,
+    "id": 141
+  },
+  {
+    "parentId": 139,
+    "name": "Dates",
+    "size": 8217,
+    "id": 142
+  },
+  {
+    "parentId": 139,
+    "name": "Displays",
+    "size": 12555,
+    "id": 143
+  },
+  {
+    "parentId": 139,
+    "name": "Filter",
+    "size": 2324,
+    "id": 144
+  },
+  {
+    "parentId": 139,
+    "name": "Geometry",
+    "size": 10993,
+    "id": 145
+  },
+  {
+    "parentId": 139,
+    "name": "heap",
+    "id": 146
+  },
+  {
+    "parentId": 146,
+    "name": "FibonacciHeap",
+    "size": 9354,
+    "id": 147
+  },
+  {
+    "parentId": 146,
+    "name": "HeapNode",
+    "size": 1233,
+    "id": 148
+  },
+  {
+    "parentId": 139,
+    "name": "IEvaluable",
+    "size": 335,
+    "id": 149
+  },
+  {
+    "parentId": 139,
+    "name": "IPredicate",
+    "size": 383,
+    "id": 150
+  },
+  {
+    "parentId": 139,
+    "name": "IValueProxy",
+    "size": 874,
+    "id": 151
+  },
+  {
+    "parentId": 139,
+    "name": "math",
+    "id": 152
+  },
+  {
+    "parentId": 152,
+    "name": "DenseMatrix",
+    "size": 3165,
+    "id": 153
+  },
+  {
+    "parentId": 152,
+    "name": "IMatrix",
+    "size": 2815,
+    "id": 154
+  },
+  {
+    "parentId": 152,
+    "name": "SparseMatrix",
+    "size": 3366,
+    "id": 155
+  },
+  {
+    "parentId": 139,
+    "name": "Maths",
+    "size": 17705,
+    "id": 156
+  },
+  {
+    "parentId": 139,
+    "name": "Orientation",
+    "size": 1486,
+    "id": 157
+  },
+  {
+    "parentId": 139,
+    "name": "palette",
+    "id": 158
+  },
+  {
+    "parentId": 158,
+    "name": "ColorPalette",
+    "size": 6367,
+    "id": 159
+  },
+  {
+    "parentId": 158,
+    "name": "Palette",
+    "size": 1229,
+    "id": 160
+  },
+  {
+    "parentId": 158,
+    "name": "ShapePalette",
+    "size": 2059,
+    "id": 161
+  },
+  {
+    "parentId": 158,
+    "name": "SizePalette",
+    "size": 2291,
+    "id": 162
+  },
+  {
+    "parentId": 139,
+    "name": "Property",
+    "size": 5559,
+    "id": 163
+  },
+  {
+    "parentId": 139,
+    "name": "Shapes",
+    "size": 19118,
+    "id": 164
+  },
+  {
+    "parentId": 139,
+    "name": "Sort",
+    "size": 6887,
+    "id": 165
+  },
+  {
+    "parentId": 139,
+    "name": "Stats",
+    "size": 6557,
+    "id": 166
+  },
+  {
+    "parentId": 139,
+    "name": "Strings",
+    "size": 22026,
+    "id": 167
+  },
+  {
+    "parentId": 0,
+    "name": "vis",
+    "id": 168
+  },
+  {
+    "parentId": 168,
+    "name": "axis",
+    "id": 169
+  },
+  {
+    "parentId": 169,
+    "name": "Axes",
+    "size": 1302,
+    "id": 170
+  },
+  {
+    "parentId": 169,
+    "name": "Axis",
+    "size": 24593,
+    "id": 171
+  },
+  {
+    "parentId": 169,
+    "name": "AxisGridLine",
+    "size": 652,
+    "id": 172
+  },
+  {
+    "parentId": 169,
+    "name": "AxisLabel",
+    "size": 636,
+    "id": 173
+  },
+  {
+    "parentId": 169,
+    "name": "CartesianAxes",
+    "size": 6703,
+    "id": 174
+  },
+  {
+    "parentId": 168,
+    "name": "controls",
+    "id": 175
+  },
+  {
+    "parentId": 175,
+    "name": "AnchorControl",
+    "size": 2138,
+    "id": 176
+  },
+  {
+    "parentId": 175,
+    "name": "ClickControl",
+    "size": 3824,
+    "id": 177
+  },
+  {
+    "parentId": 175,
+    "name": "Control",
+    "size": 1353,
+    "id": 178
+  },
+  {
+    "parentId": 175,
+    "name": "ControlList",
+    "size": 4665,
+    "id": 179
+  },
+  {
+    "parentId": 175,
+    "name": "DragControl",
+    "size": 2649,
+    "id": 180
+  },
+  {
+    "parentId": 175,
+    "name": "ExpandControl",
+    "size": 2832,
+    "id": 181
+  },
+  {
+    "parentId": 175,
+    "name": "HoverControl",
+    "size": 4896,
+    "id": 182
+  },
+  {
+    "parentId": 175,
+    "name": "IControl",
+    "size": 763,
+    "id": 183
+  },
+  {
+    "parentId": 175,
+    "name": "PanZoomControl",
+    "size": 5222,
+    "id": 184
+  },
+  {
+    "parentId": 175,
+    "name": "SelectionControl",
+    "size": 7862,
+    "id": 185
+  },
+  {
+    "parentId": 175,
+    "name": "TooltipControl",
+    "size": 8435,
+    "id": 186
+  },
+  {
+    "parentId": 168,
+    "name": "data",
+    "id": 187
+  },
+  {
+    "parentId": 187,
+    "name": "Data",
+    "size": 20544,
+    "id": 188
+  },
+  {
+    "parentId": 187,
+    "name": "DataList",
+    "size": 19788,
+    "id": 189
+  },
+  {
+    "parentId": 187,
+    "name": "DataSprite",
+    "size": 10349,
+    "id": 190
+  },
+  {
+    "parentId": 187,
+    "name": "EdgeSprite",
+    "size": 3301,
+    "id": 191
+  },
+  {
+    "parentId": 187,
+    "name": "NodeSprite",
+    "size": 19382,
+    "id": 192
+  },
+  {
+    "parentId": 187,
+    "name": "render",
+    "id": 193
+  },
+  {
+    "parentId": 193,
+    "name": "ArrowType",
+    "size": 698,
+    "id": 194
+  },
+  {
+    "parentId": 193,
+    "name": "EdgeRenderer",
+    "size": 5569,
+    "id": 195
+  },
+  {
+    "parentId": 193,
+    "name": "IRenderer",
+    "size": 353,
+    "id": 196
+  },
+  {
+    "parentId": 193,
+    "name": "ShapeRenderer",
+    "size": 2247,
+    "id": 197
+  },
+  {
+    "parentId": 187,
+    "name": "ScaleBinding",
+    "size": 11275,
+    "id": 198
+  },
+  {
+    "parentId": 187,
+    "name": "Tree",
+    "size": 7147,
+    "id": 199
+  },
+  {
+    "parentId": 187,
+    "name": "TreeBuilder",
+    "size": 9930,
+    "id": 200
+  },
+  {
+    "parentId": 168,
+    "name": "events",
+    "id": 201
+  },
+  {
+    "parentId": 201,
+    "name": "DataEvent",
+    "size": 2313,
+    "id": 202
+  },
+  {
+    "parentId": 201,
+    "name": "SelectionEvent",
+    "size": 1880,
+    "id": 203
+  },
+  {
+    "parentId": 201,
+    "name": "TooltipEvent",
+    "size": 1701,
+    "id": 204
+  },
+  {
+    "parentId": 201,
+    "name": "VisualizationEvent",
+    "size": 1117,
+    "id": 205
+  },
+  {
+    "parentId": 168,
+    "name": "legend",
+    "id": 206
+  },
+  {
+    "parentId": 206,
+    "name": "Legend",
+    "size": 20859,
+    "id": 207
+  },
+  {
+    "parentId": 206,
+    "name": "LegendItem",
+    "size": 4614,
+    "id": 208
+  },
+  {
+    "parentId": 206,
+    "name": "LegendRange",
+    "size": 10530,
+    "id": 209
+  },
+  {
+    "parentId": 168,
+    "name": "operator",
+    "id": 210
+  },
+  {
+    "parentId": 210,
+    "name": "distortion",
+    "id": 211
+  },
+  {
+    "parentId": 211,
+    "name": "BifocalDistortion",
+    "size": 4461,
+    "id": 212
+  },
+  {
+    "parentId": 211,
+    "name": "Distortion",
+    "size": 6314,
+    "id": 213
+  },
+  {
+    "parentId": 211,
+    "name": "FisheyeDistortion",
+    "size": 3444,
+    "id": 214
+  },
+  {
+    "parentId": 210,
+    "name": "encoder",
+    "id": 215
+  },
+  {
+    "parentId": 215,
+    "name": "ColorEncoder",
+    "size": 3179,
+    "id": 216
+  },
+  {
+    "parentId": 215,
+    "name": "Encoder",
+    "size": 4060,
+    "id": 217
+  },
+  {
+    "parentId": 215,
+    "name": "PropertyEncoder",
+    "size": 4138,
+    "id": 218
+  },
+  {
+    "parentId": 215,
+    "name": "ShapeEncoder",
+    "size": 1690,
+    "id": 219
+  },
+  {
+    "parentId": 215,
+    "name": "SizeEncoder",
+    "size": 1830,
+    "id": 220
+  },
+  {
+    "parentId": 210,
+    "name": "filter",
+    "id": 221
+  },
+  {
+    "parentId": 221,
+    "name": "FisheyeTreeFilter",
+    "size": 5219,
+    "id": 222
+  },
+  {
+    "parentId": 221,
+    "name": "GraphDistanceFilter",
+    "size": 3165,
+    "id": 223
+  },
+  {
+    "parentId": 221,
+    "name": "VisibilityFilter",
+    "size": 3509,
+    "id": 224
+  },
+  {
+    "parentId": 210,
+    "name": "IOperator",
+    "size": 1286,
+    "id": 225
+  },
+  {
+    "parentId": 210,
+    "name": "label",
+    "id": 226
+  },
+  {
+    "parentId": 226,
+    "name": "Labeler",
+    "size": 9956,
+    "id": 227
+  },
+  {
+    "parentId": 226,
+    "name": "RadialLabeler",
+    "size": 3899,
+    "id": 228
+  },
+  {
+    "parentId": 226,
+    "name": "StackedAreaLabeler",
+    "size": 3202,
+    "id": 229
+  },
+  {
+    "parentId": 210,
+    "name": "layout",
+    "id": 230
+  },
+  {
+    "parentId": 230,
+    "name": "AxisLayout",
+    "size": 6725,
+    "id": 231
+  },
+  {
+    "parentId": 230,
+    "name": "BundledEdgeRouter",
+    "size": 3727,
+    "id": 232
+  },
+  {
+    "parentId": 230,
+    "name": "CircleLayout",
+    "size": 9317,
+    "id": 233
+  },
+  {
+    "parentId": 230,
+    "name": "CirclePackingLayout",
+    "size": 12003,
+    "id": 234
+  },
+  {
+    "parentId": 230,
+    "name": "DendrogramLayout",
+    "size": 4853,
+    "id": 235
+  },
+  {
+    "parentId": 230,
+    "name": "ForceDirectedLayout",
+    "size": 8411,
+    "id": 236
+  },
+  {
+    "parentId": 230,
+    "name": "IcicleTreeLayout",
+    "size": 4864,
+    "id": 237
+  },
+  {
+    "parentId": 230,
+    "name": "IndentedTreeLayout",
+    "size": 3174,
+    "id": 238
+  },
+  {
+    "parentId": 230,
+    "name": "Layout",
+    "size": 7881,
+    "id": 239
+  },
+  {
+    "parentId": 230,
+    "name": "NodeLinkTreeLayout",
+    "size": 12870,
+    "id": 240
+  },
+  {
+    "parentId": 230,
+    "name": "PieLayout",
+    "size": 2728,
+    "id": 241
+  },
+  {
+    "parentId": 230,
+    "name": "RadialTreeLayout",
+    "size": 12348,
+    "id": 242
+  },
+  {
+    "parentId": 230,
+    "name": "RandomLayout",
+    "size": 870,
+    "id": 243
+  },
+  {
+    "parentId": 230,
+    "name": "StackedAreaLayout",
+    "size": 9121,
+    "id": 244
+  },
+  {
+    "parentId": 230,
+    "name": "TreeMapLayout",
+    "size": 9191,
+    "id": 245
+  },
+  {
+    "parentId": 210,
+    "name": "Operator",
+    "size": 2490,
+    "id": 246
+  },
+  {
+    "parentId": 210,
+    "name": "OperatorList",
+    "size": 5248,
+    "id": 247
+  },
+  {
+    "parentId": 210,
+    "name": "OperatorSequence",
+    "size": 4190,
+    "id": 248
+  },
+  {
+    "parentId": 210,
+    "name": "OperatorSwitch",
+    "size": 2581,
+    "id": 249
+  },
+  {
+    "parentId": 210,
+    "name": "SortOperator",
+    "size": 2023,
+    "id": 250
+  },
+  {
+    "parentId": 168,
+    "name": "Visualization",
+    "size": 16540,
+    "id": 251
+  }
+]

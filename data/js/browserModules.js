@@ -5,7 +5,7 @@
 
 module.exports = [
     // core {
-        "src/core.js",
+        "src/pastry.js",
     // }
     // event {
         "src/event.js",
@@ -15,23 +15,23 @@ module.exports = [
         "src/module/path.js",
         "src/module/request.js",
         "src/module/loader.js",
-        "src/module/config.js",
     // }
     // formatting {
         "src/fmt/date.js",
         "src/fmt/sprintf.js",
         "src/fmt/vsprintf.js",
+        "src/fmt/camelCase.js",
     // }
     // json shim {
         "src/json.js",
     // }
-    // Class & declare {
-        "src/Class.js",
+    // declare {
+        "src/declare/c3mro.js",
         "src/declare.js",
     // }
     // color utils {
         "src/color/named.js",
-        "src/class/Color.js",
+        "src/Color.js",
     // }
     // querystring {
         "src/querystring.js",
@@ -44,11 +44,12 @@ module.exports = [
         "src/dom/query.js",
         "src/dom/ready.js",
         "src/dom/construct.js",
-        "src/dom/style.js",
-        "src/dom/attr.js",
         "src/dom/class.js",
         "src/dom/data.js",
+        "src/dom/style.js",
+        "src/dom/attr.js",
         "src/dom/event.js",
+        "src/dom/hotkey.js",
     // }
     // ajax, etc. {
         "src/io/ajax.js",
@@ -60,9 +61,30 @@ module.exports = [
         "src/template.js",
     // }
     // UI {
-        // popup {
+        // component {
+            "src/Component.js",
         // }
-        // dialog {
+        // notify {
+            "src/ui/notify/template/wrapper.js",
+            "src/ui/notify/template/message.js",
+            "src/ui/Notify.js",
+        // }
+        // collapse {
+            "src/ui/collapse/template/wrapper.js",
+            "src/ui/collapse/template/section.js",
+            "src/ui/Collapse.js",
+        // }
+        // tree {
+            "src/ui/tree/template/wrapper.js",
+            "src/ui/tree/template/node.js",
+            "src/ui/tree/node/event.js",
+            "src/ui/tree/event.js",
+            "src/ui/tree/Node.js",
+            "src/ui/Tree.js",
+        // }
+        // tootip {
+            "src/ui/tooltip/template/wrapper.js",
+            "src/ui/Tooltip.js",
         // }
     // }
 ];

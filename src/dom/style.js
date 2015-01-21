@@ -4,11 +4,13 @@
 define('dom/style', [
     'pastry',
     'bom/utils',
+    'dom/data',
     'dom/utils',
     'dom/query'
 ], function(
     pastry,
     bomUtils,
+    domData,
     domUtils,
     domQuery
 ) {
@@ -45,6 +47,52 @@ define('dom/style', [
         }catch(e){
             return f ? {} : null;
         }
+    }
+    function isHidden (element) {
+        return domStyle.get(element, 'display') === 'none' ||
+            domUtils.contains(element.ownerDocument, element);
+    }
+    function showHide (elements, show) {
+        var display, hidden,
+            values = [];
+
+        pastry.each(elements, function (elem, index) {
+            if (elem.style) {
+                values[index] = domData.get(elem, 'olddisplay');
+                display = elem.style.display;
+                if (show) {
+                    // Reset the inline display of this element to learn if it is
+                    // being hidden by cascaded rules or not
+                    if ( !values[index] && display === 'none' ) {
+                        elem.style.display = '';
+                    }
+
+                    // Set elements which have been overridden with display: none
+                    // in a stylesheet to whatever the default browser style is
+                    // for such an element
+                    if (elem.style.display === '' && isHidden(elem)) {
+                        values[index] = domData.set(elem, 'olddisplay', domStyle.get(elem, 'display'));
+                    }
+                } else {
+                    hidden = isHidden(elem);
+
+                    if ( display !== 'none' || !hidden ) {
+                        domData.set(elem, 'olddisplay', hidden ? display : domStyle.get(elem, 'display'));
+                    }
+                }
+            }
+        });
+
+        // Set the display of most of the elements in a second loop
+        // to avoid the constant reflow
+        pastry.each(elements, function (elem, index) {
+            if (elem.style) {
+                if (!show || elem.style.display === 'none' || elem.style.display === '') {
+                    elem.style.display = show ? values[index] || '' : 'none';
+                }
+            }
+        });
+        return elements;
     }
     function toStyleValue (node, type, value) {
         type = pastry.lc(type);
@@ -105,8 +153,8 @@ define('dom/style', [
                 af(node, 1).Enabled = true;
             }
 
-            if(node.tagName.toLowerCase() === 'tr'){
-                for(var td = node.firstChild; td; td = td.nextSibling){
+            if (node.tagName.toLowerCase() === 'tr') {
+                for (var td = node.firstChild; td; td = td.nextSibling) {
                     if(td.tagName.toLowerCase() === 'td'){
                         setOpacity(td, opacity);
                     }
@@ -115,26 +163,32 @@ define('dom/style', [
             return opacity;
         };
     } else {
-        getOpacity = function(node){
+        getOpacity = function (node) {
             return getComputedStyle(node).opacity;
         };
-        setOpacity = function(node, opacity){
+        setOpacity = function (node, opacity) {
             return node.style.opacity = opacity;
         };
     }
-
 
     // getComputedStyle {
         if (bomUtils.isWebkit) {
             getComputedStyle = function (node) {
                 var style;
                 if (node.nodeType === 1) {
-                    var dv = node.ownerDocument.defaultView;
+                    var dv = node.ownerDocument.defaultView,
+                        oldDisplay;
                     style = dv.getComputedStyle(node, null);
                     if (!style && node.style) {
+                        /*
+                         * early version safari (2.0?) has this bug: when element is display:none,
+                         * getComputedStyle returns null
+                         */
+                        oldDisplay = node.style.display;
                         node.style.display = '';
                         style = dv.getComputedStyle(node, null);
                     }
+                    node.style.display = oldDisplay; // and we should change it back.
                 }
                 return style || {};
             };
@@ -152,40 +206,40 @@ define('dom/style', [
     // toPixel {
         if (ieVersion) {
             toPixel = function(element, avalue){
-                if(!avalue){
+                if (!avalue) {
                     return 0;
                 }
                 // on IE7, medium is usually 4 pixels
-                if(avalue === 'medium'){
+                if (avalue === 'medium') {
                     return 4;
                 }
                 // style values can be floats, client code may
                 // want to round this value for integer pixels.
-                if(avalue.slice && avalue.slice(-2) === 'px'){
+                if (avalue.slice && avalue.slice(-2) === 'px') {
                     return parseFloat(avalue);
                 }
-                var s = element.style,
+                var s  = element.style,
                     rs = element.runtimeStyle,
                     cs = element.currentStyle,
-                    sLeft = s.left,
+                    sLeft  = s.left,
                     rsLeft = rs.left;
                 rs.left = cs.left;
-                try{
+                try {
                     // 'avalue' may be incompatible with style.left, which can cause IE to throw
                     // this has been observed for border widths using 'thin', 'medium', 'thick' constants
                     // those particular constants could be trapped by a lookup
                     // but perhaps there are more
                     s.left = avalue;
                     avalue = s.pixelLeft;
-                }catch(e){
+                } catch(e) {
                     avalue = 0;
                 }
-                s.left = sLeft;
+                s.left  = sLeft;
                 rs.left = rsLeft;
                 return avalue;
             };
         } else {
-            toPixel = function(element, value){
+            toPixel = function (element, value) {
                 return parseFloat(value) || 0;
             };
         }
@@ -220,6 +274,18 @@ define('dom/style', [
                 domStyle.set(node, x, name[x]);
             }
             return domStyle.getComputedStyle(n);
+        },
+
+        show: function (node) {
+            showHide(domQuery.all(node), true);
+        },
+
+        hide: function (node) {
+            showHide(domQuery.all(node), false);
+        },
+
+        toggle: function (node) {
+            return domStyle.get(node, 'opacity') ? domStyle.hide(node) : domStyle.show(node);
         }
     };
 });

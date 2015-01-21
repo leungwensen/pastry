@@ -17,6 +17,12 @@ define('dom/utils', [
         testDiv = doc.createElement('div');
 
     return pastry.domUtils = {
+        hasTextContent : 'textContent' in testDiv,
+        hasClassList   : 'classList'   in testDiv,
+        hasDataSet     : 'dataset'     in testDiv,
+        isQuirks       : pastry.lc(doc.compatMode) === 'backcompat' || doc.documentMode === 5, // 怪异模式
+        testDiv        : testDiv,
+
         contains: 'compareDocumentPosition' in html ?
             function (element, container) {
                 return (container.compareDocumentPosition(element) & 16) === 16;
@@ -33,10 +39,6 @@ define('dom/utils', [
                 typeof element === 'object' &&
                 (t = element.nodeType) && (t === 1 || t === 9);
         },
-        isQuirks       : pastry.lc(doc.compatMode) === 'backcompat' || doc.documentMode === 5, // 怪异模式
-        hasTextContent : 'textContent' in testDiv,
-        hasClassList   : 'classList'   in testDiv,
-        hasDataSet     : 'dataset'     in testDiv,
     };
 });
 

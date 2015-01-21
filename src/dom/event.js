@@ -3,10 +3,12 @@
 
 define('dom/event', [
     'pastry',
-    'dom/query'
+    'dom/query',
+    'dom/utils'
 ], function(
     pastry,
-    domQuery
+    domQuery,
+    domUtils
 ) {
     'use strict';
     /*
@@ -49,13 +51,16 @@ define('dom/event', [
     addEvent.guid = 1;
 
     function removeEvent(element, type, handler) {
+        var delegateWrapper = handler._delegateWrapper;
         element = domQuery.one(element);
         if (element.removeEventListener) {
             element.removeEventListener(type, handler, false);
+            element.removeEventListener(type, delegateWrapper, false);
         } else {
             // delete the event handler from the hash table
             if (element.events && element.events[type]) {
                 delete element.events[type][handler.$$guid];
+                delete element.events[type][delegateWrapper.$$guid];
             }
         }
     }
@@ -81,7 +86,7 @@ define('dom/event', [
 
     function fixEvent(event) {
         // add W3C standard event methods
-        event.preventDefault = fixEvent.preventDefault;
+        event.preventDefault  = fixEvent.preventDefault;
         event.stopPropagation = fixEvent.stopPropagation;
         return event;
     }
@@ -92,9 +97,48 @@ define('dom/event', [
         this.cancelBubble = true;
     };
 
+    function delegate (element, type, selector, handler, capture, once) {
+        if (pastry.isFunction(selector)) {
+            addEvent(element, type, selector);
+            return;
+        }
+        element = domQuery.one(element); // delegation is only for one element
+        if (!domUtils.isNode(element)) {
+            pastry.ERROR('cannot bind events to non-elements: ' + element);
+        }
+        function wrapper (e) {
+            // if this event has a delegateTarget, then we add it to the event
+            // object (so that handlers may have a reference to the delegator
+            // element) and fire the callback
+            if (e.delegateTarget = _getDelegateTarget(element, e.target, selector)) {
+                if (once === true) {
+                    removeEvent(element, type, wrapper);
+                }
+                handler.call(element, e);
+            }
+        }
+        handler._delegateWrapper = wrapper;
+        addEvent(element, type, wrapper, capture || false);
+        return handler;
+    }
+    function _getDelegateTarget (element, target, selector) {
+        while (target && target !== element) {
+            if (domQuery.match(target, selector)) {
+                return target;
+            }
+            target = target.parentElement;
+        }
+        return null;
+    }
+
+    function once (element, type, selector, callback, capture) {
+        delegate(element, type, selector, callback, capture, true);
+    }
+
     return pastry.domEvent = {
-        on  : addEvent,
-        off : removeEvent
+        on   : delegate,
+        once : once,
+        off  : removeEvent
     };
 });
 

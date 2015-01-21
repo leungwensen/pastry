@@ -1,0 +1,4 @@
+release:
+  files:
+    '<%= path.release %>/<%= pkg.version %>/pastry.min.css': '<%= dist.css %>'
+    '<%= path.dist %>/font/style.min.css': '<%= path.dist %>/font/style.css'

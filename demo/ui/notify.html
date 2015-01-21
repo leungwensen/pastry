@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>notify</title>
+    <link rel="stylesheet" href="../../dist/debug.css">
+    <link rel="stylesheet" href="../../dist/font/style.css">
+</head>
+<body>
+<script src="../../src/amd-debug.js"></script>
+<script>
+    require([
+        'ui/Notify'
+    ], function (
+        Notify
+    ) {
+        var notify = new Notify();
+        notify.log({
+            'text': 'hello, world'
+        });
+    });
+</script>
+</body>
+</html>

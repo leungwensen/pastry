@@ -63,6 +63,7 @@ define('dom/construct', [
         toDom: function (frag) {
             frag += '';
 
+
             var match  = frag.match(RE_tag),
                 tag    = match ? pastry.lc(match[1]) : '',
                 master = masterDiv, // 每次拷贝缓存好的 div，否则会引入问题
@@ -71,7 +72,7 @@ define('dom/construct', [
             if (match && tagWrap[tag]) {
                 wrap = tagWrap[tag];
                 master.innerHTML = wrap.pre + frag + wrap.post;
-                for(i = wrap.length; i; --i){
+                for (i = wrap.length; i; --i) {
                     master = master.firstChild;
                 }
             } else {
@@ -118,9 +119,11 @@ define('dom/construct', [
                     case 'first':
                         if (refNode.firstChild) {
                             insertBefore(node, refNode.firstChild);
+                        } else {
+                            refNode.appendChild(node);
                         }
                         break;
-                    default:
+                    default: // 'last' or others
                         refNode.appendChild(node);
                 }
             }

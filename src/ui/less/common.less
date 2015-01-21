@@ -1,0 +1,64 @@
+// 自定义{
+    .error-border{
+        border: 1px solid red;
+    }
+
+    .clear-radius{
+        border-radius: 0!important;
+    }
+
+    .red{
+        color: #f15e5e;
+    }
+
+    .green{
+        color: #2ecc71;
+    }
+
+    .blue{
+        color: #289de9;
+    }
+
+    .yellow{
+        color: #fdb53f;
+    }
+
+    .gray{
+        color: #999;
+    }
+
+    [class^="icon-"], [class*=" icon-"]{
+        font-size: 16px;
+    }
+// }
+.clearfix{
+    &:after{
+        clear:both;
+        display:block;
+        content:'';
+    }
+}
+
+.ellipsis{
+  overflow      : hidden;
+  white-space   : nowrap;
+  text-overflow : ellipsis;
+}
+
+.scroll-y{
+    overflow   : hidden;
+    overflow-y : auto;
+}
+
+.inline-block {
+    display: inline-block;
+}
+
+.nonselect{
+    -webkit-user-select: none;  /* Chrome all / Safari all */
+    -moz-user-select: none;     /* Firefox all */
+    -ms-user-select: none;      /* IE 10+ */
+    /* No support for these yet, use at own risk */
+    -o-user-select: none;
+    user-select: none;
+}

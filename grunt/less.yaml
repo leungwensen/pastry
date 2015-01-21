@@ -1,0 +1,3 @@
+dev:
+  files:
+    '<%= dist.css %>' : '<%= path.src %>/ui/less/main.less'

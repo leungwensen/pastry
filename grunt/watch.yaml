@@ -1,0 +1,34 @@
+options:
+  spawn: false
+  livereload: <%= livereload %>
+
+templates:
+  files:
+    - src/ui/**/*.html
+    - src/ui/**/*.ztmpl
+  tasks:
+    - compileTemplates
+
+src-ui:
+  files:
+    - src/ui/**/*.js
+  tasks:
+
+style:
+  files:
+    - src/ui/**/*.less
+  tasks:
+    - less
+
+ui-less:
+  files:
+    - <%= path.src %>/ui/**/*.less
+  tasks:
+    - less
+
+demo:
+  files:
+    - demo/**/*.js
+    - demo/**/*.css
+    - demo/**/*.html
+  tasks:

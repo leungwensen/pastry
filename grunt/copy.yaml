@@ -1,0 +1,6 @@
+fonts:
+  expand : true
+  cwd    : <%= path.src %>/ui
+  src    : font/**
+  dest   : <%= path.dist %>
+  filter : isFile

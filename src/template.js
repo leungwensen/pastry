@@ -29,8 +29,9 @@ define('template', [
             }[p1] || "\\" + p1;
         }
         if (p2) { // interpolation: {%=prop%}, or unescaped: {%#prop%}
+            p3 = pastry.trim(p3);
             if (p2 === "=") {
-                return "'+_e(typeof" + p3 + "==='undefined'?'':" + p3 + ")+'";
+                return "'+_e(" + p3 + ")+'";
             }
             return "'+(" + p3 + "==null?'':" + p3 + ")+'";
         }
@@ -49,33 +50,36 @@ define('template', [
 
     return pastry.template = template = {
         helper: helper,
-        compile: function (str/*, option*/) {
-            // option = pastry.extend({}, defaultOpitons, option);
+        compile: function (str) {
             if (!pastry.isString(str)) {
                 return str;
             }
 
             /*jshint -W054*/ // new Function()
-            return cache[str] || (cache[str] = new Function('obj', 'helper',
-                    "var _e=helper.escape," +
+            return cache[str] || (cache[str] = new Function('obj', 'helper', 'ne',
+                    "var _e=ne?function(s){return s;}:helper.escape," +
                         "print=function(s,e){" +
                             "_s+=e?(s==null?'':s):_e(s);" +
                         "};" +
+                    "obj=obj||{};" + // 当obj传空的时候
                     "with(obj){" +
                         // include helper {
                             // "include = function (s, d) {" +
                             //     "_s += tmpl(s, d);}" + "," +
                         // }
-                        "_s='" + str.replace(RE_parser, render) + "';" +
+                        "_s='" +
+                        str
+                            .replace(RE_parser, render)
+                            .replace(/\\n\s*/g, '') + // 要是存在回车符号，会引起多解释一个 #text 对象的 bug
+                        "';" +
                     "}" +
                     "return _s;"
                 )
             );
         },
-        render: function (str, data/*, option*/) {
-            // option = option || {};
-            // console.log(template.compile(str).toString());
-            return template.compile(str/*, option*/)(data, template.helper);
+        render: function (str, data, option) {
+            option = option || {};
+            return template.compile(str)(data, template.helper, option.ne);
         }
     };
 });

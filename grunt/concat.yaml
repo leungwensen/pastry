@@ -1,0 +1,16 @@
+options:
+  separator    : ''
+  stripBanners : true
+  banner       : <%= banner %>
+
+amd:
+  src : <%= modules.amd %>
+  dest: <%= dist.amd %>
+
+node:
+  src : <%= modules.node %>
+  dest: <%= dist.node %>
+
+browser:
+  src : <%= modules.browser %>
+  dest: <%= dist.browser %>

@@ -17,6 +17,7 @@ define('bom/utils', [
         platform  = nav.platform,
         plugins   = nav.plugins,
         versions  = {},
+        detectedPlatform,
         detectedPlugins;
 
     function toInt (value, base) {
@@ -142,18 +143,25 @@ define('bom/utils', [
         return result;
     }
 
-    detectedPlugins = detectPlugin(plugins);
+    detectedPlugins  = detectPlugin(plugins);
+    detectedPlatform = detectPlatform(platform) || detectPlatform(userAgent) || 'unknown';
 
     pastry.extend(versions, detectVersion(userAgent), detectedPlugins);
 
     return {
         host      : location.host,
-        platform  : detectPlatform(platform) || detectPlatform(userAgent) || 'unknown',
+        platform  : detectPlatform,
         plugins   : detectedPlugins,
         userAgent : userAgent,
         versions  : versions,
         isWebkit  : !!versions.webkit,
         isIE      : !!versions.msie,
+        isApple   : (
+            detectedPlatform.mac    ||
+            detectedPlatform.ipad   ||
+            detectedPlatform.ipod   ||
+            detectedPlatform.iphone
+        )
     };
 });
 

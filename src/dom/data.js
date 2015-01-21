@@ -3,12 +3,10 @@
 
 define('dom/data', [
     'pastry',
-    'dom/attr',
     'dom/utils',
     'dom/query'
 ], function(
     pastry,
-    domAttr,
     domUtils,
     domQuery
 ) {
@@ -29,14 +27,14 @@ define('dom/data', [
             if (hasDataSet) {
                 return node[dataSetStr][name];
             }
-            return domAttr.get(node, dataPrefix + name);
+            return node[dataPrefix + name];
         },
         set: function (node, name, value) {
             node = domQuery.one(node);
             if (hasDataSet) {
                 node[dataSetStr][name] = value;
             } else {
-                domAttr.set(node, dataPrefix + name, value);
+                node[dataPrefix + name] = value;
             }
         }
     };
