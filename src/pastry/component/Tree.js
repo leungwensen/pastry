@@ -9,7 +9,7 @@ define('pastry/component/Tree', [
     'pastry/dom/data',
     'pastry/dom/event',
     'pastry/dom/query',
-    'pastry/component/treeNode',
+    'pastry/component/TreeNode',
     'pastry/event/base',
     'pastry/template/tree'
 ], function(

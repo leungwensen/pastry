@@ -4686,6 +4686,11 @@ define('pastry/component/Tooltip', [
 });
 
 
+/* jshint ignore:start */
+define("pastry/template/treeNode", ["pastry/pastry","pastry/html/utils"], function (helper) {return function(obj, ne){
+var _e=ne?function(s){return s;}:helper.escape,print=function(s,e){_s+=e?(s==null?'':s):_e(s);};obj=obj||{};with(obj){_s='<tr class="tree-node '; if (isSelected) { _s+='selected'; } _s+='" data-id="'+_e(id)+'"><td><span class="tree-node-indenter" style="margin-left: '+_e(indent)+'px;">'; if (isBranch) { _s+='<span class="tree-node-expander icon '+_e(expanderIconClass)+'" data-id="'+_e(id)+'"></span>'; } _s+='</span>'; if (hasCheckbox) { _s+='<label class="tree-node-checkbox checkbox-inline"><input type="checkbox" value="'+_e(id)+'"></label>'; } _s+='<span class="tree-node-icon icon '+_e(iconClass)+'"></span><span class="tree-node-label">'+_e(label)+'</span></td>'; if (extraColumns) { _s+=''; helper.each(extraColumns, function (col) { _s+='<td>'+_e(obj[col.key])+'</td>'; }); _s+=''; } _s+='</tr>';}return _s;
+}});
+/* jshint ignore:end */;
 /* jshint strict: true, undef: true, unused: true */
 /* global define */
 
@@ -5145,8 +5150,6 @@ define('pastry/component/TreeNode', [
 });
 
 
-define("pastry/component/treeNode", function(){});
-
 /* jshint ignore:start */
 define("pastry/template/tree", ["pastry/pastry","pastry/html/utils"], function (helper) {return function(obj, ne){
 var _e=ne?function(s){return s;}:helper.escape,print=function(s,e){_s+=e?(s==null?'':s):_e(s);};obj=obj||{};with(obj){_s='<table class="tree-wrapper table table-hover" id="'+_e(id)+'">'; if (hasHead) { _s+='<thead><tr><th>'+_e(treeColumnName)+'</th>'; helper.each(extraColumns, function (col) { _s+='<th>'+_e(col.label)+'</th>'; }); _s+='</tr></thead>'; } _s+='<tbody></tbody></table>';}return _s;
@@ -5163,7 +5166,7 @@ define('pastry/component/Tree', [
     'pastry/dom/data',
     'pastry/dom/event',
     'pastry/dom/query',
-    'pastry/component/treeNode',
+    'pastry/component/TreeNode',
     'pastry/event/base',
     'pastry/template/tree'
 ], function(
