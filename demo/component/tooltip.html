@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>component/Tooltip</title>
+<style>
+    body {
+    }
+    div.group {
+        width            : auto;
+        height           : 30px;
+        background-color : red;
+        position         : absolute;
+        top              : 0;
+        bottom           : 0;
+        left             : 0;
+        right            : 0;
+        margin           : auto;
+        padding          : 0 auto;
+    }
+</style>
+</head>
+<body>
+<div class="group">
+    <button class="button" data-tooltip="button1">button</button>
+    <button class="button" data-tooltip="button2">button</button>
+    <button class="button" data-tooltip="button3">button</button>
+</div>
+<script src="../../src/amd-loader.js"></script>
+<script>
+    require([
+        'pastry/dom/data',
+        'pastry/dom/event',
+        'pastry/dom/query',
+        'pastry/component/Tooltip'
+    ], function (
+        domData,
+        domEvent,
+        domQuery,
+        Tooltip
+    ) {
+        var tooltip = new Tooltip();
+        // $('.button').hover(function () {
+        //     var $self = $(this);
+        //     tooltip.show($self.data('tooltip'), this);
+        // });
+        // $('.button').focusout(function () {
+        //     tooltip.hide();
+        // });
+        domEvent.on('.group', 'click', '.button', function (e) {
+            var btn = e.delegateTarget;
+            if (tooltip.isShown) {
+                tooltip.hide();
+            } else {
+                tooltip.show(domData.get(btn, 'tooltip'), btn, { });
+            }
+        });
+    });
+</script>
+</body>
+</html>
+

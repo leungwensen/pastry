@@ -2,8 +2,8 @@
 /* global describe, it, expect */
 
 require([
-    'pastry',
-    'fmt/camelCase'
+    'pastry/pastry',
+    'pastry/fmt/camelCase'
 ], function (
     pastry,
     camelCase

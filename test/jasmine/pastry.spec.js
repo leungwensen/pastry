@@ -2,8 +2,10 @@
 /* global describe, it, expect, beforeEach */
 
 require([
-    'pastry'
-], function (pastry) {
+    'pastry/pastry'
+], function (
+    pastry
+) {
     'use strict';
 
     var noop = function () { };

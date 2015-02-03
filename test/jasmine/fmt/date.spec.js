@@ -1,8 +1,8 @@
 /* jshint strict: true, undef: true, unused: true */
 /* global describe, it, expect */
 require([
-    'pastry',
-    'fmt/date'
+    'pastry/pastry',
+    'pastry/fmt/date'
 ], function (
     pastry,
     fmtDate

@@ -1,26 +1,9 @@
-var pastry = require('./dist/node-debug.js'),
-    exec = require('child_process').exec;
+var exec = require('child_process').exec;
 
 module.exports = function (grunt) {
     'use strict';
 
     var pkg = grunt.file.readJSON('package.json');
-
-    grunt.registerTask('linkFontFiles', function () {
-        var target = 'release/' + pkg.version;
-        exec(
-            pastry.sprintf('echo %s | ./bin/sh/linkFontFiles.sh', target),
-            function (error, stdout, stderr) {
-                console.log(error, stdout, stderr);
-            }
-        );
-    });
-
-    grunt.registerTask('compileTemplatesAndBuild', function () {
-        exec('make', function (error, stdout, stderr) {
-            console.log(error, stdout, stderr);
-        });
-    });
 
     grunt.registerTask('compileTemplates', function () {
         exec('./bin/js/compileTemplate.js', function (error, stdout, stderr) {
@@ -34,25 +17,65 @@ module.exports = function (grunt) {
         init: true,
         data: {
             pkg        : pkg,
-            banner     : '/*! <%= pkg.name %> - v<%= pkg.version %> */' + grunt.util.linefeed,
+            banner     : '/*! <%= pkg.name %> - v<%= pkg.version %> */',
             host       : '127.0.0.1',
             port       : 9090,
             livereload : 32599,
+
             path: {
-                src     : 'src',
-                dist    : 'dist',
-                release : 'release'
+                build : 'build',
+                dist  : 'dist/<%= pkg.version %>',
+                src   : 'src',
+                test  : 'test'
             },
-            modules: {
-                amd     : require('./data/js/amdModules.js'),
-                node    : require('./data/js/nodeModules.js'),
-                browser : require('./data/js/browserModules.js')
+
+            rjsOption: {
+                paths: {
+                    'pastry/pastry'     : 'empty:',
+                    'pastry/event/base' : 'empty:',
+                    'pastry/Module'     : 'empty:'
+                },
+                wrap: {
+                    startFile: [
+                        '<%= path.src %>/pastry/pastry.js',
+                        '<%= path.src %>/pastry/event/base.js',
+                        '<%= path.src %>/pastry/module/define.js'
+                    ]
+                }
             },
+
+            build: {
+                amd        : '<%= path.src %>/amd-loader.js',
+                nodejs     : '<%= path.build %>/nodejs.js',
+                components : '<%= path.build %>/components.js',
+                css: {
+                    '<%= path.build %>/pastry.css'        : '<%= path.src %>/pastry/theme/main.less',
+                    '<%= path.build %>/theme/default.css' : '<%= path.src %>/pastry/theme/default.less',
+                },
+                font: {
+                    expand : true,
+                    cwd    : '<%= path.src %>/pastry/theme/',
+                    src    : 'font/**',
+                    dest   : '<%= path.build %>/',
+                }
+            },
+
             dist: {
-                amd     : '<%= path.src %>/amd-debug.js',
-                node    : '<%= path.dist %>/node-debug.js',
-                browser : '<%= path.dist %>/browser-debug.js',
-                css     : '<%= path.dist %>/debug.css'
+                js: {
+                   '<%= path.dist %>/pastry.components.min.js' : '<%= build.components %>',
+                   '<%= path.dist %>/pastry.amd.min.js'        : '<%= build.nodejs %>',
+                   '<%= path.dist %>/pastry.nodejs.min.js'     : '<%= build.amd %>'
+                },
+                css: {
+                   '<%= path.dist %>/pastry.min.css'        : '<%= path.build %>/pastry.css',
+                   '<%= path.dist %>/theme/default.min.css' : '<%= path.build %>/theme/default.css',
+                },
+                font: {
+                    expand : true,
+                    cwd    : '<%= path.src %>/pastry/theme/',
+                    src    : 'font/**',
+                    dest   : '<%= path.dist %>/',
+                }
             }
         }
     });

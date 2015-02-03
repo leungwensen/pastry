@@ -5,14 +5,14 @@
     <title>io/ajax</title>
 </head>
 <body>
-<script src="../../dist/browser-debug.js"></script>
+<script src="../../src/amd-loader.js"></script>
 <script>
     require([
-        'io/ajax'
+        'pastry/io/ajax'
     ], function (
         ajax
     ) {
-        ajax('../../src/io/ajax.js', {
+        ajax('../../src/pastry/io/ajax.js', {
             data: {
                 foo: 'bar',
                 hoo: 'haa'

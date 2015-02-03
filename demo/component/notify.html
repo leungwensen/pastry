@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>component/Notify</title>
+</head>
+<body>
+<script src="../../src/amd-loader.js"></script>
+<script>
+    require([
+        'pastry/component/Notify'
+    ], function (
+        Notify
+    ) {
+        var notify = new Notify();
+        notify.log({
+            'text': 'hello, world'
+        });
+    });
+</script>
+</body>
+</html>

@@ -9,7 +9,7 @@
 
 var
     fs   = require('fs'),
-    pastry = require('../../dist/node-debug.js');
+    pastry = require('../../build/nodejs.js');
 
 function walkFiles (path, processFile) {
     var dirList = fs.readdirSync(path),

@@ -1,3 +1,4 @@
-dev:
-  files:
-    '<%= dist.css %>' : '<%= path.src %>/ui/less/main.less'
+
+build:
+  files: '<%= build.css %>'
+

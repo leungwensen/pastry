@@ -1,12 +1,12 @@
 options:
-  debug: true
-  keepalive: false
-  open: http://<%= host %>:<%= port %>
-  port: <%= port %>
-  hostname: <%= host %>
-  livereload: <%= livereload %>
-  base: ''
+  debug      : true
+  keepalive  : false
+  open       : http://<%= host %>:<%= port %>
+  port       : <%= port %>
+  hostname   : <%= host %>
+  livereload : <%= livereload %>
+  base       : ''
 
-demo-ui:
+demo:
   options:
-    open: http://<%= host %>:<%= port %>/demo/ui
+    open: http://<%= host %>:<%= port %>/demo

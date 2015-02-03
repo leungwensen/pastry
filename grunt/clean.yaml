@@ -1,2 +1,2 @@
-release:
-   - <%= path.release %>
+dist:
+   - dist

@@ -2,8 +2,8 @@
 /* global describe, it, expect */
 
 require([
-    'pastry',
-    'fmt/sprintf'
+    'pastry/pastry',
+    'pastry/fmt/sprintf'
 ], function (
     pastry,
     sprintf

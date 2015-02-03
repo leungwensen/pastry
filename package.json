@@ -4,10 +4,7 @@
     "title"       : "pastry",
     "description" : "easing SPA(single page application) development.",
     "homepage"    : "https://github.com/leungwensen/pastry",
-    "browser"     : "release/<%= pkg.version %>/pastry.min.js",
-    "amd"         : "release/<%= pkg.version %>/pastry.amd.min.js",
-    "main"        : "release/<%= pkg.version %>/pastry.node.min.js",
-    "version"     : "0.3.150121",
+    "version"     : "0.3.150203",
 
     "author": {
         "description" : "team of pastry",
@@ -23,26 +20,26 @@
     },
 
     "devDependencies" : {
-        "assert"                : "*",
-        "browserstack-runner"   : "*",
-        "commander"             : "*",
-        "graphviz"              : "*",
-        "grunt"                 : "*",
-        "time-grunt"            : "*",
-        "load-grunt-config"     : "*",
-        "grunt-contrib-clean"   : "*",
-        "grunt-contrib-concat"  : "*",
-        "grunt-contrib-connect" : "*",
-        "grunt-contrib-copy"    : "*",
-        "grunt-contrib-cssmin"  : "*",
-        "grunt-contrib-jasmine" : "*",
-        "grunt-contrib-jshint"  : "*",
-        "grunt-contrib-less"    : "*",
-        "grunt-contrib-uglify"  : "*",
-        "grunt-contrib-watch"   : "*",
-        "grunt-html-validation" : "*",
-        "grunt-jekyll"          : "*"
-
+        "assert"                  : "*",
+        "browserstack-runner"     : "*",
+        "commander"               : "*",
+        "graphviz"                : "*",
+        "grunt"                   : "*",
+        "grunt-contrib-clean"     : "*",
+        "grunt-contrib-concat"    : "*",
+        "grunt-contrib-connect"   : "*",
+        "grunt-contrib-copy"      : "*",
+        "grunt-contrib-cssmin"    : "*",
+        "grunt-contrib-jasmine"   : "*",
+        "grunt-contrib-jshint"    : "*",
+        "grunt-contrib-less"      : "*",
+        "grunt-contrib-requirejs" : "*",
+        "grunt-contrib-uglify"    : "*",
+        "grunt-contrib-watch"     : "*",
+        "grunt-html-validation"   : "*",
+        "grunt-jekyll"            : "*",
+        "load-grunt-config"       : "*",
+        "time-grunt"              : "*"
     },
 
     "engines" : {

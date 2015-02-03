@@ -1,0 +1,34 @@
+
+amd:
+  options:
+    name      : all-amd-loader-modules
+    baseUrl   : <%= path.src %>
+    out       : <%= build.amd %>
+    optimize  : none
+    useStrict : true
+    paths     : <%= rjsOption.paths %>
+    wrap:
+      startFile: <%= rjsOption.wrap.startFile %>
+
+nodejs:
+  options:
+    name      : all-nodejs-modules
+    baseUrl   : <%= path.src %>
+    out       : <%= build.nodejs %>
+    optimize  : none
+    useStrict : true
+    paths     : <%= rjsOption.paths %>
+    wrap:
+      startFile: <%= rjsOption.wrap.startFile %>
+
+components:
+  options:
+    name      : all-components-modules
+    baseUrl   : <%= path.src %>
+    out       : <%= build.components %>
+    optimize  : none
+    useStrict : true
+    paths     : <%= rjsOption.paths %>
+    wrap:
+      startFile: <%= rjsOption.wrap.startFile %>
+

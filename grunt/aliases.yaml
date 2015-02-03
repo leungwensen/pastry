@@ -1,28 +1,29 @@
-dev:
+
+build:
   - jshint
   - compileTemplates
-  - concat
-  - copy
+  - requirejs
   - jasmine
   - less
+  - copy:build
 
-release:
-  - dev
-  - linkFontFiles
+dist:
+  - build
+  - clean
+  - copy:dist
   - uglify
   - cssmin
 
 travis:
   - jshint
+  - compileTemplates
+  - requirejs
   - jasmine
 
 demo:
-  - connect:demo-ui
+  - connect:demo
   - watch
 
 default:
-  - jshint
-  - concat
-  - copy
-  - jasmine
-  - less
+  - build
+
