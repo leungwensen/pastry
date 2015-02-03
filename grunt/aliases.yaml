@@ -27,3 +27,9 @@ demo:
 default:
   - build
 
+dev:
+  - build
+
+release:
+  - dist
+
