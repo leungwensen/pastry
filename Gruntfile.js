@@ -45,16 +45,18 @@ module.exports = function (grunt) {
             },
 
             build: {
+                core       : '<%= path.src %>/pastry/pastry.js',
                 amd        : '<%= path.src %>/amd-loader.js',
                 nodejs     : '<%= path.build %>/nodejs.js',
                 components : '<%= path.build %>/components.js',
                 css: {
-                    '<%= path.build %>/pastry.css'        : '<%= path.src %>/pastry/theme/main.less',
-                    '<%= path.build %>/theme/default.css' : '<%= path.src %>/pastry/theme/default.less',
+                    '<%= path.build %>/pastry.css'        : '<%= path.src %>/pastry/stylesheet/pastry.less',
+                    '<%= path.build %>/components.css'    : '<%= path.src %>/pastry/stylesheet/components.less',
+                    '<%= path.build %>/theme/default.css' : '<%= path.src %>/pastry/stylesheet/theme/default.less',
                 },
                 font: {
                     expand : true,
-                    cwd    : '<%= path.src %>/pastry/theme/',
+                    cwd    : '<%= path.src %>/pastry/stylesheet/',
                     src    : 'font/**',
                     dest   : '<%= path.build %>/',
                 }
@@ -64,15 +66,17 @@ module.exports = function (grunt) {
                 js: {
                    '<%= path.dist %>/pastry.components.min.js' : '<%= build.components %>',
                    '<%= path.dist %>/pastry.amd.min.js'        : '<%= build.nodejs %>',
+                   '<%= path.dist %>/pastry.min.js'            : '<%= build.core %>',
                    '<%= path.dist %>/pastry.nodejs.min.js'     : '<%= build.amd %>'
                 },
                 css: {
-                   '<%= path.dist %>/pastry.min.css'        : '<%= path.build %>/pastry.css',
-                   '<%= path.dist %>/theme/default.min.css' : '<%= path.build %>/theme/default.css',
+                   '<%= path.dist %>/pastry.min.css'               : '<%= path.build %>/pastry.css',
+                   '<%= path.dist %>/pastry.components.min.css'    : '<%= path.build %>/components.css',
+                   '<%= path.dist %>/pastry.theme-default.min.css' : '<%= path.build %>/theme/default.css',
                 },
                 font: {
                     expand : true,
-                    cwd    : '<%= path.src %>/pastry/theme/',
+                    cwd    : '<%= path.src %>/pastry/stylesheet/',
                     src    : 'font/**',
                     dest   : '<%= path.dist %>/',
                 }

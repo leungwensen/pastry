@@ -1,34 +1,18 @@
+
 options:
   spawn: false
   livereload: <%= livereload %>
 
 templates:
   files:
-    - src/ui/**/*.html
-    - src/ui/**/*.ztmpl
+    - src/pastry/template/*.html
+    - src/pastry/template/*.ptmpl
   tasks:
     - compileTemplates
 
-src-ui:
+stylesheet:
   files:
-    - src/ui/**/*.js
-  tasks:
-
-style:
-  files:
-    - src/ui/**/*.less
+    - src/pastry/stylesheet/**/*.less
   tasks:
     - less
 
-ui-less:
-  files:
-    - <%= path.src %>/ui/**/*.less
-  tasks:
-    - less
-
-demo:
-  files:
-    - demo/**/*.js
-    - demo/**/*.css
-    - demo/**/*.html
-  tasks:

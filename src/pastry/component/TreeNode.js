@@ -30,11 +30,11 @@ define('pastry/component/TreeNode', [
     var INDENT_LENGTH = 16, // indent for one level
 
         NODE_SELECTED_CLASS          = 'selected',
-        BRANCH_ICON_CLASS            = 'icon-folder',
-        BRANCH_EXPANDED_ICON_CLASS   = 'icon-folder-open',
-        LEAF_ICON_CLASS              = 'icon-file',
-        EXPANDER_ICON_CLASS          = 'icon-arrow-right',
-        EXPANDER_EXPANDED_ICON_CLASS = 'icon-arrow-down',
+        BRANCH_ICON_CLASS            = 'fa fa-folder',
+        BRANCH_EXPANDED_ICON_CLASS   = 'fa fa-folder-open',
+        LEAF_ICON_CLASS              = 'fa fa-file',
+        EXPANDER_ICON_CLASS          = 'fa fa-arrow-right',
+        EXPANDER_EXPANDED_ICON_CLASS = 'fa fa-arrow-down',
 
         extend  = pastry.extend,
         indexOf = pastry.indexOf,

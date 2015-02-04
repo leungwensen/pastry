@@ -2,7 +2,7 @@
     <td>
         <span class="tree-node-indenter" style="margin-left: {%= indent %}px;">
             {% if (isBranch) { %}
-                <span class="tree-node-expander icon {%= expanderIconClass %}" data-id="{%= id %}"></span>
+                <span class="tree-node-expander {%= expanderIconClass %}" data-id="{%= id %}"></span>
             {% } %}
         </span>
         {% if (hasCheckbox) { %}
@@ -10,7 +10,7 @@
                 <input type="checkbox" value="{%= id %}">
             </label>
         {% } %}
-        <span class="tree-node-icon icon {%= iconClass %}"></span>
+        <span class="tree-node-icon {%= iconClass %}"></span>
         <span class="tree-node-label">{%= label %}</span>
     </td>
     {% if (extraColumns) { %}

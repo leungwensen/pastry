@@ -4688,7 +4688,7 @@ define('pastry/component/Tooltip', [
 
 /* jshint ignore:start */
 define("pastry/template/treeNode", ["pastry/pastry","pastry/html/utils"], function (helper) {return function(obj, ne){
-var _e=ne?function(s){return s;}:helper.escape,print=function(s,e){_s+=e?(s==null?'':s):_e(s);};obj=obj||{};with(obj){_s='<tr class="tree-node '; if (isSelected) { _s+='selected'; } _s+='" data-id="'+_e(id)+'"><td><span class="tree-node-indenter" style="margin-left: '+_e(indent)+'px;">'; if (isBranch) { _s+='<span class="tree-node-expander icon '+_e(expanderIconClass)+'" data-id="'+_e(id)+'"></span>'; } _s+='</span>'; if (hasCheckbox) { _s+='<label class="tree-node-checkbox checkbox-inline"><input type="checkbox" value="'+_e(id)+'"></label>'; } _s+='<span class="tree-node-icon icon '+_e(iconClass)+'"></span><span class="tree-node-label">'+_e(label)+'</span></td>'; if (extraColumns) { _s+=''; helper.each(extraColumns, function (col) { _s+='<td>'+_e(obj[col.key])+'</td>'; }); _s+=''; } _s+='</tr>';}return _s;
+var _e=ne?function(s){return s;}:helper.escape,print=function(s,e){_s+=e?(s==null?'':s):_e(s);};obj=obj||{};with(obj){_s='<tr class="tree-node '; if (isSelected) { _s+='selected'; } _s+='" data-id="'+_e(id)+'"><td><span class="tree-node-indenter" style="margin-left: '+_e(indent)+'px;">'; if (isBranch) { _s+='<span class="tree-node-expander '+_e(expanderIconClass)+'" data-id="'+_e(id)+'"></span>'; } _s+='</span>'; if (hasCheckbox) { _s+='<label class="tree-node-checkbox checkbox-inline"><input type="checkbox" value="'+_e(id)+'"></label>'; } _s+='<span class="tree-node-icon '+_e(iconClass)+'"></span><span class="tree-node-label">'+_e(label)+'</span></td>'; if (extraColumns) { _s+=''; helper.each(extraColumns, function (col) { _s+='<td>'+_e(obj[col.key])+'</td>'; }); _s+=''; } _s+='</tr>';}return _s;
 }});
 /* jshint ignore:end */;
 /* jshint strict: true, undef: true, unused: true */
@@ -4723,11 +4723,11 @@ define('pastry/component/TreeNode', [
     var INDENT_LENGTH = 16, // indent for one level
 
         NODE_SELECTED_CLASS          = 'selected',
-        BRANCH_ICON_CLASS            = 'icon-folder',
-        BRANCH_EXPANDED_ICON_CLASS   = 'icon-folder-open',
-        LEAF_ICON_CLASS              = 'icon-file',
-        EXPANDER_ICON_CLASS          = 'icon-arrow-right',
-        EXPANDER_EXPANDED_ICON_CLASS = 'icon-arrow-down',
+        BRANCH_ICON_CLASS            = 'fa fa-folder',
+        BRANCH_EXPANDED_ICON_CLASS   = 'fa fa-folder-open',
+        LEAF_ICON_CLASS              = 'fa fa-file',
+        EXPANDER_ICON_CLASS          = 'fa fa-arrow-right',
+        EXPANDER_EXPANDED_ICON_CLASS = 'fa fa-arrow-down',
 
         extend  = pastry.extend,
         indexOf = pastry.indexOf,
