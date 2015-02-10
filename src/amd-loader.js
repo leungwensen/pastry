@@ -1013,7 +1013,7 @@ var define;
         define('pastry/pastry', function () {
             return pastry;
         });
-        define('pastry/event/base', function () {
+        define('pastry/base/event', function () {
             return pastry.event;
         });
     // }

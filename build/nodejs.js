@@ -1013,7 +1013,7 @@ var define;
         define('pastry/pastry', function () {
             return pastry;
         });
-        define('pastry/event/base', function () {
+        define('pastry/base/event', function () {
             return pastry.event;
         });
     // }
@@ -1612,7 +1612,7 @@ define('pastry/color/hexByName', [
 /* jshint strict: true, undef: true, unused: true */
 /* global define */
 
-define('pastry/color/Base', [
+define('pastry/base/Color', [
     'pastry/pastry',
     'pastry/class/declare',
     'pastry/color/hexByName'
@@ -2143,7 +2143,7 @@ define('all-nodejs-modules',[
         'pastry/fmt/camelCase',
     // }
     // Color {
-        'pastry/color/Base',
+        'pastry/base/Color',
     // }
     // parsers {
         'pastry/parser/json',

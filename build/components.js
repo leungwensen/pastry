@@ -1013,7 +1013,7 @@ var define;
         define('pastry/pastry', function () {
             return pastry;
         });
-        define('pastry/event/base', function () {
+        define('pastry/base/event', function () {
             return pastry.event;
         });
     // }
@@ -1948,7 +1948,7 @@ define('pastry/color/hexByName', [
 /* jshint strict: true, undef: true, unused: true */
 /* global define */
 
-define('pastry/color/Base', [
+define('pastry/base/Color', [
     'pastry/pastry',
     'pastry/class/declare',
     'pastry/color/hexByName'
@@ -3774,7 +3774,7 @@ define('pastry/dom/style', [
 /* jshint strict: true, undef: true, unused: true */
 /* global define, document */
 
-define('pastry/component/Base', [
+define('pastry/base/Component', [
     'pastry/pastry',
     'pastry/class/declare',
     'pastry/dom/construct',
@@ -4128,7 +4128,7 @@ var _e=ne?function(s){return s;}:helper.escape,print=function(s,e){_s+=e?(s==nul
 define('pastry/component/Collapse', [
     'pastry/pastry',
     'pastry/class/declare',
-    'pastry/component/Base',
+    'pastry/base/Component',
     'pastry/dom/class',
     'pastry/dom/construct',
     'pastry/dom/event',
@@ -4156,7 +4156,7 @@ define('pastry/component/Collapse', [
 
     var
         NS         = '__collapse__',
-        NS_SECTION = '__collapse.section__',
+        NS_SECTION = '__collapse_section__',
         Section = declare('CollapseSection', [Component], {
             constructor: function (option) {
                 var instance = this;
@@ -4357,7 +4357,7 @@ var _e=ne?function(s){return s;}:helper.escape,print=function(s,e){_s+=e?(s==nul
 define('pastry/component/Notify', [
     'pastry/pastry',
     'pastry/class/declare',
-    'pastry/component/Base',
+    'pastry/base/Component',
     'pastry/dom/construct',
     'pastry/dom/event',
     'pastry/template/notify',
@@ -4499,7 +4499,7 @@ var _e=ne?function(s){return s;}:helper.escape,print=function(s,e){_s+=e?(s==nul
 define('pastry/component/Tooltip', [
     'pastry/pastry',
     'pastry/class/declare',
-    'pastry/component/Base',
+    'pastry/base/Component',
     'pastry/dom/class',
     'pastry/dom/construct',
     'pastry/dom/query',
@@ -4688,7 +4688,7 @@ define('pastry/component/Tooltip', [
 
 /* jshint ignore:start */
 define("pastry/template/treeNode", ["pastry/pastry","pastry/html/utils"], function (helper) {return function(obj, ne){
-var _e=ne?function(s){return s;}:helper.escape,print=function(s,e){_s+=e?(s==null?'':s):_e(s);};obj=obj||{};with(obj){_s='<tr class="tree-node '; if (isSelected) { _s+='selected'; } _s+='" data-id="'+_e(id)+'"><td><span class="tree-node-indenter" style="margin-left: '+_e(indent)+'px;">'; if (isBranch) { _s+='<span class="tree-node-expander '+_e(expanderIconClass)+'" data-id="'+_e(id)+'"></span>'; } _s+='</span>'; if (hasCheckbox) { _s+='<label class="tree-node-checkbox checkbox-inline"><input type="checkbox" value="'+_e(id)+'"></label>'; } _s+='<span class="tree-node-icon '+_e(iconClass)+'"></span><span class="tree-node-label">'+_e(label)+'</span></td>'; if (extraColumns) { _s+=''; helper.each(extraColumns, function (col) { _s+='<td>'+_e(obj[col.key])+'</td>'; }); _s+=''; } _s+='</tr>';}return _s;
+var _e=ne?function(s){return s;}:helper.escape,print=function(s,e){_s+=e?(s==null?'':s):_e(s);};obj=obj||{};with(obj){_s='<tr class="tree-node '; if (isSelected) { _s+='selected'; } _s+='" data-id="'+_e(id)+'"><td><span class="tree-node-indenter" style="margin-left: '+_e(indent)+'px;">'; if (isBranch) { _s+=''; if (hasExpanderIcon) { _s+='<span class="tree-node-expander '+_e(expanderIconClass)+'" data-id="'+_e(id)+'"></span>'; } else { _s+='<span class="tree-node-expander" data-id="'+_e(id)+'">'+_e(expanderText)+'</span>'; } _s+=''; } _s+='</span>'; if (hasCheckbox) { _s+='<label class="tree-node-checkbox checkbox-inline"><input type="checkbox" value="'+_e(id)+'"></label>'; } _s+=''; if (hasIcon) { _s+='<span class="tree-node-icon '+_e(iconClass)+'"></span>'; } _s+='<span class="tree-node-label">'+_e(label)+'</span></td>'; if (extraColumns) { _s+=''; helper.each(extraColumns, function (col) { _s+='<td>'+_e(obj[col.key])+'</td>'; }); _s+=''; } _s+='</tr>';}return _s;
 }});
 /* jshint ignore:end */;
 /* jshint strict: true, undef: true, unused: true */
@@ -4697,12 +4697,12 @@ var _e=ne?function(s){return s;}:helper.escape,print=function(s,e){_s+=e?(s==nul
 define('pastry/component/TreeNode', [
     'pastry/pastry',
     'pastry/class/declare',
-    'pastry/component/Base',
+    'pastry/base/Component',
     'pastry/dom/class',
     'pastry/dom/construct',
     'pastry/dom/query',
     'pastry/dom/style',
-    'pastry/event/base',
+    'pastry/base/event',
     'pastry/template/treeNode'
 ], function(
     pastry,
@@ -4722,18 +4722,31 @@ define('pastry/component/TreeNode', [
      */
     var INDENT_LENGTH = 16, // indent for one level
 
-        NODE_SELECTED_CLASS          = 'selected',
-        BRANCH_ICON_CLASS            = 'fa fa-folder',
-        BRANCH_EXPANDED_ICON_CLASS   = 'fa fa-folder-open',
-        LEAF_ICON_CLASS              = 'fa fa-file',
-        EXPANDER_ICON_CLASS          = 'fa fa-arrow-right',
-        EXPANDER_EXPANDED_ICON_CLASS = 'fa fa-arrow-down',
+        NODE_SELECTED_CLASS = 'selected',
 
-        extend  = pastry.extend,
-        indexOf = pastry.indexOf,
-        remove  = pastry.remove,
+        // icon {
+            BRANCH_ICON_CLASS          = 'fa fa-folder',
+            BRANCH_EXPANDED_ICON_CLASS = 'fa fa-folder-open',
+            LEAF_ICON_CLASS            = 'fa fa-file',
+        // }
+
+        // expander {
+            // EXPANDER_ICON_CLASS          = 'fa fa-arrow-right',
+            // EXPANDER_EXPANDED_ICON_CLASS = 'fa fa-arrow-down',
+            EXPANDER_ICON_CLASS          = 'fa fa-plus-square-o',
+            EXPANDER_EXPANDED_ICON_CLASS = 'fa fa-minus-square-o',
+            // EXPANDER_TEXT          = '&#9658;',
+            // EXPANDER_EXPANDED_TEXT = '&#9660;',
+            EXPANDER_TEXT          = '&blacktriangleright;',
+            EXPANDER_EXPANDED_TEXT = '&blacktriangledown;',
+        // }
+
         each    = pastry.each,
         every   = pastry.every,
+        extend  = pastry.extend,
+        hasKey  = pastry.hasKey,
+        indexOf = pastry.indexOf,
+        remove  = pastry.remove,
 
         TreeNode = declare('ui/tree/Node', [Component], {
             constructor: function (data) {
@@ -4750,6 +4763,7 @@ define('pastry/component/TreeNode', [
                             isExpanded   : true  , // expanded
                             isExpandable : false , // expandable
                             isSelected   : false , // selected
+                            isChecked    : false , // checked
                             isFocused    : false , // focused
                             isLoaded     : false , // loaded
                         // }
@@ -4765,6 +4779,16 @@ define('pastry/component/TreeNode', [
                             parent   : null
                         // }
                     }, data);
+
+                    each([
+                        'hasIcon',
+                        'hasExpanderIcon',
+                        'hasCheckbox'
+                    ], function (extraAttr) {
+                        if (!hasKey(node, extraAttr)) {
+                            node[extraAttr] = node.tree[extraAttr] || false;
+                        }
+                    });
                 // }
                 // bind events {
                     // instance events {
@@ -4782,13 +4806,13 @@ define('pastry/component/TreeNode', [
                 return node;
             },
             // attributes {
-                hasCheckbox       : false , // checkbox
                 id                : null  ,
                 label             : null  , // label
                 indent            : 0     , // indent of the node
                 parentId          : null  ,
                 iconClass         : null  ,
                 expanderIconClass : null  ,
+                expanderText      : null  ,
             // }
             // private methods {
                 _setLabel: function () {
@@ -4812,22 +4836,24 @@ define('pastry/component/TreeNode', [
                     var node = this,
                         iconClass;
 
-                    if (node.getIconClass) {
-                        iconClass = node.getIconClass();
-                    } else if (node.tree.getIconClass) {
-                        iconClass = node.tree.getIconClass(node);
-                    } else {
-                        if (node.isBranch) {
-                            iconClass = node.isExpanded ?
-                                BRANCH_EXPANDED_ICON_CLASS : BRANCH_ICON_CLASS;
+                    if (node.hasIcon) {
+                        if (node.getIconClass) {
+                            iconClass = node.getIconClass();
+                        } else if (node.tree.getIconClass) {
+                            iconClass = node.tree.getIconClass(node);
                         } else {
-                            iconClass = LEAF_ICON_CLASS;
+                            if (node.isBranch) {
+                                iconClass = node.isExpanded ?
+                                    BRANCH_EXPANDED_ICON_CLASS : BRANCH_ICON_CLASS;
+                            } else {
+                                iconClass = LEAF_ICON_CLASS;
+                            }
                         }
-                    }
-                    node.iconClass = iconClass;
-                    if (node.iconElement) {
-                        domClass.clear(node.iconElement);
-                        domClass.add(node.iconElement, 'tree-node-icon icon ' + iconClass);
+                        node.iconClass = iconClass;
+                        if (node.iconElement) {
+                            domClass.clear(node.iconElement);
+                            domClass.add(node.iconElement, 'tree-node-icon ' + iconClass);
+                        }
                     }
                     return node;
                 },
@@ -4843,7 +4869,7 @@ define('pastry/component/TreeNode', [
                     var node = this,
                         expanderIconClass;
 
-                    if (node.isExpandable) {
+                    if (node.isExpandable && node.hasExpanderIcon) {
                         if (node.getExpanderIconClass) {
                             expanderIconClass = node.getExpanderIconClass();
                         } else if (node.tree.getExpanderIconClass) {
@@ -4855,7 +4881,27 @@ define('pastry/component/TreeNode', [
                         node.expanderIconClass = expanderIconClass;
                         if (node.expanderElement) {
                             domClass.clear(node.expanderElement);
-                            domClass.add(node.expanderElement, 'tree-node-expander icon ' + expanderIconClass);
+                            domClass.add(node.expanderElement, 'tree-node-expander ' + expanderIconClass);
+                        }
+                    }
+                    return node;
+                },
+                _setExpanderText: function () {
+                    var node = this,
+                        expanderText;
+
+                    if (node.isExpandable && !node.hasExpanderIcon) {
+                        if (node.getExpanderText) {
+                            expanderText = node.getExpanderText();
+                        } else if (node.tree.getExpanderText) {
+                            expanderText = node.tree.getExpanderText(node);
+                        } else {
+                            expanderText = node.isExpanded ?
+                                EXPANDER_EXPANDED_TEXT : EXPANDER_TEXT;
+                        }
+                        node.expanderText = expanderText;
+                        if (node.expanderElement) {
+                            node.expanderElement.innerHTML = expanderText;
                         }
                     }
                     return node;
@@ -4903,6 +4949,7 @@ define('pastry/component/TreeNode', [
                         ._setIconClass()
                         ._setSelectedClass()
                         ._setExpanderIconClass()
+                        ._setExpanderText()
                         ._setIndent();
                 },
                 _canMoveTo: function (target) {
@@ -5143,6 +5190,7 @@ define('pastry/component/TreeNode', [
                 onDblclicked  : function () { },
                 onExpanded    : function () { },
                 onSelected    : function () { },
+                // onChecked     : function () { },
             // }
         });
 
@@ -5161,13 +5209,13 @@ var _e=ne?function(s){return s;}:helper.escape,print=function(s,e){_s+=e?(s==nul
 define('pastry/component/Tree', [
     'pastry/pastry',
     'pastry/class/declare',
-    'pastry/component/Base',
+    'pastry/base/Component',
     'pastry/dom/construct',
     'pastry/dom/data',
     'pastry/dom/event',
     'pastry/dom/query',
     'pastry/component/TreeNode',
-    'pastry/event/base',
+    'pastry/base/event',
     'pastry/template/tree'
 ], function(
     pastry,
@@ -5469,7 +5517,7 @@ define('all-components-modules',[
         'pastry/fmt/camelCase',
     // }
     // Color {
-        'pastry/color/Base',
+        'pastry/base/Color',
     // }
     // parsers {
         'pastry/parser/json',
