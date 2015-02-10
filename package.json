@@ -4,7 +4,7 @@
     "title"       : "pastry",
     "description" : "easing SPA(single page application) development.",
     "homepage"    : "https://github.com/leungwensen/pastry",
-    "version"     : "0.3.150203",
+    "version"     : "0.3.20150210",
 
     "author": {
         "description" : "team of pastry",

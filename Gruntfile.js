@@ -1,9 +1,9 @@
-var exec = require('child_process').exec;
 
 module.exports = function (grunt) {
     'use strict';
 
-    var pkg = grunt.file.readJSON('package.json');
+    var exec = require('child_process').exec,
+        pkg  = grunt.file.readJSON('package.json');
 
     grunt.registerTask('compileTemplates', function () {
         exec('./bin/js/compileTemplate.js', function (error, stdout, stderr) {
@@ -32,13 +32,13 @@ module.exports = function (grunt) {
             rjsOption: {
                 paths: {
                     'pastry/pastry'     : 'empty:',
-                    'pastry/event/base' : 'empty:',
+                    'pastry/base/event' : 'empty:',
                     'pastry/Module'     : 'empty:'
                 },
                 wrap: {
                     startFile: [
                         '<%= path.src %>/pastry/pastry.js',
-                        '<%= path.src %>/pastry/event/base.js',
+                        '<%= path.src %>/pastry/base/event.js',
                         '<%= path.src %>/pastry/module/define.js'
                     ]
                 }
