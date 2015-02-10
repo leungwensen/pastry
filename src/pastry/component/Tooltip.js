@@ -4,7 +4,7 @@
 define('pastry/component/Tooltip', [
     'pastry/pastry',
     'pastry/class/declare',
-    'pastry/component/Base',
+    'pastry/base/Component',
     'pastry/dom/class',
     'pastry/dom/construct',
     'pastry/dom/query',

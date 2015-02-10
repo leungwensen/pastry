@@ -4,12 +4,12 @@
 define('pastry/component/TreeNode', [
     'pastry/pastry',
     'pastry/class/declare',
-    'pastry/component/Base',
+    'pastry/base/Component',
     'pastry/dom/class',
     'pastry/dom/construct',
     'pastry/dom/query',
     'pastry/dom/style',
-    'pastry/event/base',
+    'pastry/base/event',
     'pastry/template/treeNode'
 ], function(
     pastry,
@@ -29,18 +29,31 @@ define('pastry/component/TreeNode', [
      */
     var INDENT_LENGTH = 16, // indent for one level
 
-        NODE_SELECTED_CLASS          = 'selected',
-        BRANCH_ICON_CLASS            = 'fa fa-folder',
-        BRANCH_EXPANDED_ICON_CLASS   = 'fa fa-folder-open',
-        LEAF_ICON_CLASS              = 'fa fa-file',
-        EXPANDER_ICON_CLASS          = 'fa fa-arrow-right',
-        EXPANDER_EXPANDED_ICON_CLASS = 'fa fa-arrow-down',
+        NODE_SELECTED_CLASS = 'selected',
 
-        extend  = pastry.extend,
-        indexOf = pastry.indexOf,
-        remove  = pastry.remove,
+        // icon {
+            BRANCH_ICON_CLASS          = 'fa fa-folder',
+            BRANCH_EXPANDED_ICON_CLASS = 'fa fa-folder-open',
+            LEAF_ICON_CLASS            = 'fa fa-file',
+        // }
+
+        // expander {
+            // EXPANDER_ICON_CLASS          = 'fa fa-arrow-right',
+            // EXPANDER_EXPANDED_ICON_CLASS = 'fa fa-arrow-down',
+            EXPANDER_ICON_CLASS          = 'fa fa-plus-square-o',
+            EXPANDER_EXPANDED_ICON_CLASS = 'fa fa-minus-square-o',
+            // EXPANDER_TEXT          = '&#9658;',
+            // EXPANDER_EXPANDED_TEXT = '&#9660;',
+            EXPANDER_TEXT          = '&blacktriangleright;',
+            EXPANDER_EXPANDED_TEXT = '&blacktriangledown;',
+        // }
+
         each    = pastry.each,
         every   = pastry.every,
+        extend  = pastry.extend,
+        hasKey  = pastry.hasKey,
+        indexOf = pastry.indexOf,
+        remove  = pastry.remove,
 
         TreeNode = declare('ui/tree/Node', [Component], {
             constructor: function (data) {
@@ -57,6 +70,7 @@ define('pastry/component/TreeNode', [
                             isExpanded   : true  , // expanded
                             isExpandable : false , // expandable
                             isSelected   : false , // selected
+                            isChecked    : false , // checked
                             isFocused    : false , // focused
                             isLoaded     : false , // loaded
                         // }
@@ -72,6 +86,16 @@ define('pastry/component/TreeNode', [
                             parent   : null
                         // }
                     }, data);
+
+                    each([
+                        'hasIcon',
+                        'hasExpanderIcon',
+                        'hasCheckbox'
+                    ], function (extraAttr) {
+                        if (!hasKey(node, extraAttr)) {
+                            node[extraAttr] = node.tree[extraAttr] || false;
+                        }
+                    });
                 // }
                 // bind events {
                     // instance events {
@@ -89,13 +113,13 @@ define('pastry/component/TreeNode', [
                 return node;
             },
             // attributes {
-                hasCheckbox       : false , // checkbox
                 id                : null  ,
                 label             : null  , // label
                 indent            : 0     , // indent of the node
                 parentId          : null  ,
                 iconClass         : null  ,
                 expanderIconClass : null  ,
+                expanderText      : null  ,
             // }
             // private methods {
                 _setLabel: function () {
@@ -119,22 +143,24 @@ define('pastry/component/TreeNode', [
                     var node = this,
                         iconClass;
 
-                    if (node.getIconClass) {
-                        iconClass = node.getIconClass();
-                    } else if (node.tree.getIconClass) {
-                        iconClass = node.tree.getIconClass(node);
-                    } else {
-                        if (node.isBranch) {
-                            iconClass = node.isExpanded ?
-                                BRANCH_EXPANDED_ICON_CLASS : BRANCH_ICON_CLASS;
+                    if (node.hasIcon) {
+                        if (node.getIconClass) {
+                            iconClass = node.getIconClass();
+                        } else if (node.tree.getIconClass) {
+                            iconClass = node.tree.getIconClass(node);
                         } else {
-                            iconClass = LEAF_ICON_CLASS;
+                            if (node.isBranch) {
+                                iconClass = node.isExpanded ?
+                                    BRANCH_EXPANDED_ICON_CLASS : BRANCH_ICON_CLASS;
+                            } else {
+                                iconClass = LEAF_ICON_CLASS;
+                            }
                         }
-                    }
-                    node.iconClass = iconClass;
-                    if (node.iconElement) {
-                        domClass.clear(node.iconElement);
-                        domClass.add(node.iconElement, 'tree-node-icon icon ' + iconClass);
+                        node.iconClass = iconClass;
+                        if (node.iconElement) {
+                            domClass.clear(node.iconElement);
+                            domClass.add(node.iconElement, 'tree-node-icon ' + iconClass);
+                        }
                     }
                     return node;
                 },
@@ -150,7 +176,7 @@ define('pastry/component/TreeNode', [
                     var node = this,
                         expanderIconClass;
 
-                    if (node.isExpandable) {
+                    if (node.isExpandable && node.hasExpanderIcon) {
                         if (node.getExpanderIconClass) {
                             expanderIconClass = node.getExpanderIconClass();
                         } else if (node.tree.getExpanderIconClass) {
@@ -162,7 +188,27 @@ define('pastry/component/TreeNode', [
                         node.expanderIconClass = expanderIconClass;
                         if (node.expanderElement) {
                             domClass.clear(node.expanderElement);
-                            domClass.add(node.expanderElement, 'tree-node-expander icon ' + expanderIconClass);
+                            domClass.add(node.expanderElement, 'tree-node-expander ' + expanderIconClass);
+                        }
+                    }
+                    return node;
+                },
+                _setExpanderText: function () {
+                    var node = this,
+                        expanderText;
+
+                    if (node.isExpandable && !node.hasExpanderIcon) {
+                        if (node.getExpanderText) {
+                            expanderText = node.getExpanderText();
+                        } else if (node.tree.getExpanderText) {
+                            expanderText = node.tree.getExpanderText(node);
+                        } else {
+                            expanderText = node.isExpanded ?
+                                EXPANDER_EXPANDED_TEXT : EXPANDER_TEXT;
+                        }
+                        node.expanderText = expanderText;
+                        if (node.expanderElement) {
+                            node.expanderElement.innerHTML = expanderText;
                         }
                     }
                     return node;
@@ -210,6 +256,7 @@ define('pastry/component/TreeNode', [
                         ._setIconClass()
                         ._setSelectedClass()
                         ._setExpanderIconClass()
+                        ._setExpanderText()
                         ._setIndent();
                 },
                 _canMoveTo: function (target) {
@@ -450,6 +497,7 @@ define('pastry/component/TreeNode', [
                 onDblclicked  : function () { },
                 onExpanded    : function () { },
                 onSelected    : function () { },
+                // onChecked     : function () { },
             // }
         });
 

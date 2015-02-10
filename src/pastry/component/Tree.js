@@ -4,13 +4,13 @@
 define('pastry/component/Tree', [
     'pastry/pastry',
     'pastry/class/declare',
-    'pastry/component/Base',
+    'pastry/base/Component',
     'pastry/dom/construct',
     'pastry/dom/data',
     'pastry/dom/event',
     'pastry/dom/query',
     'pastry/component/TreeNode',
-    'pastry/event/base',
+    'pastry/base/event',
     'pastry/template/tree'
 ], function(
     pastry,

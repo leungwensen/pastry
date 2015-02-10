@@ -4,7 +4,7 @@
 define('pastry/component/Notify', [
     'pastry/pastry',
     'pastry/class/declare',
-    'pastry/component/Base',
+    'pastry/base/Component',
     'pastry/dom/construct',
     'pastry/dom/event',
     'pastry/template/notify',

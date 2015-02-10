@@ -4,7 +4,7 @@
 define('pastry/component/Collapse', [
     'pastry/pastry',
     'pastry/class/declare',
-    'pastry/component/Base',
+    'pastry/base/Component',
     'pastry/dom/class',
     'pastry/dom/construct',
     'pastry/dom/event',
@@ -32,7 +32,7 @@ define('pastry/component/Collapse', [
 
     var
         NS         = '__collapse__',
-        NS_SECTION = '__collapse.section__',
+        NS_SECTION = '__collapse_section__',
         Section = declare('CollapseSection', [Component], {
             constructor: function (option) {
                 var instance = this;
