@@ -1,7 +1,7 @@
 /* jshint strict: true, undef: true, unused: true */
 /* global define */
 
-define('pastry/color/Base', [
+define('pastry/base/Color', [
     'pastry/pastry',
     'pastry/class/declare',
     'pastry/color/hexByName'

@@ -1,7 +1,7 @@
 /* jshint strict: true, undef: true, unused: true */
 /* global define, document */
 
-define('pastry/component/Base', [
+define('pastry/base/Component', [
     'pastry/pastry',
     'pastry/class/declare',
     'pastry/dom/construct',
