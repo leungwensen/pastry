@@ -2469,6 +2469,615 @@ define('pastry/parser/template', [
 
 
 /* jshint strict: true, undef: true, unused: true */
+/* global define, location, navigator, ActiveXObject */
+
+define('pastry/bom/utils', [
+    'pastry/pastry'
+], function (
+    pastry
+) {
+    'use strict';
+    /*
+     * @author      : 绝云 (wensen.lws@alibaba-inc.com)
+     * @description : 记录各种浏览器相关的版本号
+     * @note        : browser only
+     */
+    var nav       = navigator || {},
+        userAgent = nav.userAgent,
+        platform  = nav.platform,
+        plugins   = nav.plugins,
+        versions  = {},
+        detectedPlatform,
+        detectedPlugins;
+
+    function toInt (value, base) {
+        return parseInt(value, base || 10);
+    }
+    function setVerInt (versions, key, strVal) {
+        versions[key] = toInt(strVal);
+    }
+    function setVer (versions, str, reg) {
+        var matched = str.match(reg);
+        if (matched) {
+            setVerInt(versions, matched[0].match(/\w*/)[0], matched[1] || 0);
+        }
+    }
+    function detectPlatform (str) {
+        /*
+         * @description : detect platform
+         * @param       : {string} platformStr, platform defined string.
+         * @syntax      : detectPlatform(platformStr)
+         * @return      : {string} platform. (mac|windows|linux...)
+         */
+        if (!str) {
+            return;
+        }
+        var result = pastry.lc(str).match(/mac|win|linux|ipad|ipod|iphone|android/);
+        return pastry.isArray(result) ? result[0] : result;
+    }
+    function detectPlugin (arr) {
+        /*
+         * @description : detect plugins (now flash only)
+         * @param       : {array } plugins, plugin list
+         * @syntax      : detectPlugin(plugins)
+         * @return      : {object} { 'flash' : 0|xx }
+         */
+
+        return {
+            flash: (function () {
+                var flash,
+                    v      = 0,
+                    startV = 13;
+                if (arr && arr.length) {
+                    flash = arr['Shockwave Flash'];
+                    if (flash && flash.description) {
+                        v = flash.description.match(/\b(\d+)\.\d+\b/)[1] || v;
+                    }
+                } else {
+                    while (startV --) {
+                        try {
+                            new ActiveXObject('ShockwaveFlash.ShockwaveFlash.' + startV);
+                            v = startV;
+                            break;
+                        } catch(e) {}
+                    }
+                }
+                return toInt(v);
+            }())
+        };
+    }
+    function detectVersion (str) {
+        /*
+         * @description : detect versions
+         * @param       : {string} userAgent, window.navigator.userAgent
+         * @syntax      : detectVerion(userAgent)
+         * @return      : {object} { 'flash' : 0|xx }
+         */
+
+        if (!str) {
+            return;
+        }
+        str = pastry.lc(str);
+        var ieVer,
+            matched,
+            result = {};
+
+        // browser result {
+            pastry.each([
+                /msie ([\d.]+)/     ,
+                /firefox\/([\d.]+)/ ,
+                /chrome\/([\d.]+)/  ,
+                /crios\/([\d.]+)/   ,
+                /opera.([\d.]+)/    ,
+                /adobeair\/([\d.]+)/
+            ], function (reg) {
+                setVer(result, str, reg);
+            });
+        // }
+        // chrome {
+            if (result.crios) {
+                result.chrome = result.crios;
+            }
+        // }
+        // safari {
+            matched = str.match(/version\/([\d.]+).*safari/);
+            if (matched) {
+                setVerInt(result, 'safari', matched[1] || 0);
+            }
+        // }
+        // safari mobile {
+            matched = str.match(/version\/([\d.]+).*mobile.*safari/);
+            if (matched) {
+                setVerInt(result, 'mobilesafari', matched[1] || 0);
+            }
+        // }
+        // engine result {
+            pastry.each([
+                /trident\/([\d.]+)/     ,
+                /gecko\/([\d.]+)/       ,
+                /applewebkit\/([\d.]+)/ ,
+                /webkit\/([\d.]+)/      , // 单独存储 webkit 字段
+                /presto\/([\d.]+)/
+            ], function (reg) {
+                setVer(result, str, reg);
+            });
+            // IE {
+                ieVer = result.msie;
+                if (ieVer === 6) {
+                    result.trident = 4;
+                } else if (ieVer === 7 || ieVer === 8) {
+                    result.trident = 5;
+                }
+            // }
+        // }
+        return result;
+    }
+
+    detectedPlugins  = detectPlugin(plugins);
+    detectedPlatform = detectPlatform(platform) || detectPlatform(userAgent) || 'unknown';
+
+    pastry.extend(versions, detectVersion(userAgent), detectedPlugins);
+
+    return {
+        host      : location.host,
+        platform  : detectPlatform,
+        plugins   : detectedPlugins,
+        userAgent : userAgent,
+        versions  : versions,
+        isWebkit  : !!versions.webkit,
+        isIE      : !!versions.msie,
+        isApple   : (
+            detectedPlatform.mac    ||
+            detectedPlatform.ipad   ||
+            detectedPlatform.ipod   ||
+            detectedPlatform.iphone
+        )
+    };
+});
+
+
+/* jshint strict: true, undef: true, unused: true */
+/* global define, document, window */
+
+define('pastry/dom/utils', [
+    'pastry/pastry'
+], function(
+    pastry
+) {
+    'use strict';
+    /*
+     * @author      : 绝云（wensen.lws）
+     * @description : utils for dom operations
+     * @note        : browser only
+     */
+    var doc     = document,
+        html    = doc.documentElement,
+        testDiv = doc.createElement('div');
+
+    return {
+        hasTextContent : 'textContent' in testDiv,
+        hasClassList   : 'classList'   in testDiv,
+        hasDataSet     : 'dataset'     in testDiv,
+        isQuirks       : pastry.lc(doc.compatMode) === 'backcompat' || doc.documentMode === 5, // 怪异模式
+        testDiv        : testDiv,
+
+        contains: 'compareDocumentPosition' in html ?
+            function (element, container) {
+                return (container.compareDocumentPosition(element) & 16) === 16;
+            } :
+            function (element, container) {
+                container = (container === doc || container === window) ?
+                    html : container;
+                return container !== element &&
+                    container.contains(element);
+            },
+        isNode: function (element) {
+            var t;
+            return element &&
+                typeof element === 'object' &&
+                (t = element.nodeType) && (t === 1 || t === 9);
+        },
+    };
+});
+
+
+/* jshint strict: true, undef: true, unused: true */
+/* global define, document, window */
+
+define('pastry/dom/query', [
+    'pastry/pastry',
+    'pastry/dom/utils'
+], function(
+    pastry,
+    domUtils
+) {
+    'use strict';
+    /*
+     * @author      : 绝云（wensen.lws）
+     * @description : selector
+     * @note        : browser only
+     * @note        : MODERN browsers only
+     */
+    var // utils {
+            toArray   = pastry.toArray,
+            arrayLike = pastry.isArrayLike,
+            isString  = pastry.isString,
+            isNode    = domUtils.isNode,
+            contains  = domUtils.contains,
+            testDiv   = domUtils.testDiv,
+        // }
+        // matchesSelector {
+            matchesSelector = testDiv.matches ||
+                testDiv.webkitMatchesSelector ||
+                testDiv.mozMatchesSelector    ||
+                testDiv.msMatchesSelector     ||
+                testDiv.oMatchesSelector,
+            hasMatchesSelector = matchesSelector && matchesSelector.call(testDiv, 'div'),
+        // }
+
+        doc = document,
+        win = window,
+        nodeTypeStr   = 'nodeType',
+        re_quick      = /^(?:#([\w-]+)|(\w+)|\.([\w-]+))$/, // 匹配快速选择器
+        result        = {};
+
+    function normalizeRoot (root) {
+        if (!root) {
+            return doc;
+        }
+        if (isString(root)) {
+            return query(root)[0];
+        }
+        if (!root[nodeTypeStr] && arrayLike(root)) {
+            return root[0];
+        }
+        return root;
+    }
+    function query (selector, optRoot) {
+        /*
+         * description: 选择器
+         */
+        var root = normalizeRoot(optRoot),
+            match;
+
+        if (!root || !selector) {
+            return [];
+        }
+        if (selector === win || isNode(selector)) {
+            return !optRoot || (selector !== win && isNode(root) && contains(selector, root)) ?
+                [selector] : [];
+        }
+        if (selector.nodeType === 11) { // document fragment
+            return pastry.toArray(selector.childNodes);
+        }
+        if (selector && arrayLike(selector)) {
+            return pastry.flatten(selector);
+        }
+
+        // 简单查询使用快速查询方法 {
+            if (isString(selector) && (match = re_quick.exec(selector))) {
+                if (match[1]) {
+                    return [root.getElementById(match[1])];
+                } else if (match[2] ) {
+                    return toArray(root.getElementsByTagName(match[2]));
+                } else if (match[3]) {
+                    return toArray(root.getElementsByClassName(match[3]));
+                }
+            }
+        // }
+        if (selector && (selector.document || (selector[nodeTypeStr] && selector[nodeTypeStr] === 9))) {
+            return !optRoot ? [selector] : [];
+        }
+        return toArray((root).querySelectorAll(selector));
+    }
+    function queryOne (selector, optRoot) {
+        return query(selector, optRoot)[0];
+    }
+
+    function match (element, selector) {
+        /*
+         * @matches selector
+         */
+        if (hasMatchesSelector) {
+            return matchesSelector.call(element, selector);
+        }
+        var parentElem = element.parentNode,
+            nodes;
+
+        // if the element is an orphan, and the browser doesn't support matching
+        // orphans, append it to a documentFragment
+        if (!parentElem && !hasMatchesSelector) {
+            parentElem = document.createDocumentFragment();
+            parentElem.appendChild(element);
+        }
+            // from the parent element's context, get all nodes that match the selector
+        nodes = query(selector, parentElem);
+
+        // since support for `matches()` is missing, we need to check to see if
+        // any of the nodes returned by our query match the given element
+        return pastry.some(nodes, function (node) {
+            return node === element;
+        });
+    }
+
+    // 封装 api {
+        return pastry.extend(result, {
+            all   : query,
+            one   : queryOne,
+            match : match
+        });
+    // }
+});
+
+
+/* jshint strict: true, undef: true, unused: true */
+/* global define */
+
+define('pastry/dom/class', [
+    'pastry/pastry',
+    'pastry/dom/utils',
+    'pastry/dom/query'
+], function(
+    pastry,
+    domUtils,
+    domQuery
+) {
+    'use strict';
+    /*
+     * @author      : 绝云（wensen.lws）
+     * @description : dom classList related
+     * @note        : if ClassList is supported, use ClassList
+     */
+    var RE_spaces    = /\s+/,
+        className    = 'className',
+        spaceStr     = ' ',
+        hasClassList = domUtils.hasClassList,
+        tmpArray     = [''],
+        domClass;
+
+    function str2array (str) {
+        if (pastry.isString(str)) {
+            if (str && !RE_spaces.test(str)) {
+                tmpArray[0] = str;
+                return tmpArray;
+            }
+            var arr = str.split(RE_spaces);
+            if (arr.length && !arr[0]) {
+                arr.shift();
+            }
+            if (arr.length && !arr[arr.length - 1]) {
+                arr.pop();
+            }
+            return arr;
+        }
+        if (!str) {
+            return [];
+        }
+        return pastry.filter(str, function (x) {
+            return x;
+        });
+    }
+    function fillSpace (str) {
+        return spaceStr + str + spaceStr;
+    }
+
+    return domClass = {
+        contains: function (node, classStr) {
+            node     = domQuery.one(node);
+            classStr = pastry.trim(classStr);
+            if (hasClassList) {
+                return node.classList.contains(classStr);
+            }
+            return fillSpace(node[className]).indexOf(fillSpace(classStr)) >= 0;
+        },
+        add: function (node, classStr) {
+            node     = domQuery.one(node);
+            classStr = str2array(classStr);
+            if (hasClassList) {
+                pastry.each(classStr, function (c) {
+                    node.classList.add(c);
+                });
+            } else {
+                var oldClassName = node[className],
+                    oldLen, newLen;
+                oldClassName = oldClassName ? fillSpace(oldClassName) : spaceStr;
+                oldLen = oldClassName.length;
+                pastry.each(classStr, function (c) {
+                    if (c && oldClassName.indexOf(fillSpace(c)) < 0) {
+                        oldClassName += c + spaceStr;
+                    }
+                });
+                newLen = oldClassName.length;
+                if (oldLen < newLen) {
+                    node[className] = oldClassName.substr(1, newLen - 2);
+                }
+            }
+        },
+        remove: function (node, classStr) {
+            node     = domQuery.one(node);
+            classStr = str2array(classStr);
+            if (hasClassList) {
+                pastry.each(classStr, function (c) {
+                    node.classList.remove(c);
+                });
+            } else {
+                var cls = fillSpace(node[className]);
+                pastry.each(classStr, function (c) {
+                    cls = cls.replace(fillSpace(c), spaceStr);
+                });
+                cls = pastry.trim(cls);
+                if (node[className] !== cls) {
+                    node[className] = cls;
+                }
+            }
+        },
+        clear: function (node) {
+            node = domQuery.one(node);
+            node[className] = '';
+        },
+        toggle: function (node, classStr) {
+            node     = domQuery.one(node);
+            classStr = str2array(classStr);
+            if (hasClassList) {
+                pastry.each(classStr, function (c) {
+                    node.classList.toggle(c);
+                });
+            } else {
+                pastry.each(classStr, function (c) {
+                    domClass[domClass.contains(node, c) ? 'remove' : 'add'](node, c);
+                });
+            }
+        }
+    };
+});
+
+
+/* jshint strict: true, undef: true, unused: true */
+/* global define, document, window */
+
+define('pastry/dom/event', [
+    'pastry/pastry',
+    'pastry/dom/query',
+    'pastry/dom/utils'
+], function(
+    pastry,
+    domQuery,
+    domUtils
+) {
+    'use strict';
+    /*
+     * @author      : 绝云（wensen.lws）
+     * @description : event firing
+     * @reference   : http://dean.edwards.name/weblog/2005/10/add-event/
+     */
+    var doc = document,
+        win = window;
+
+    function addEvent(element, type, handler) {
+        element = domQuery.one(element);
+        if (element.addEventListener) {
+            element.addEventListener(type, handler, false);
+        } else {
+            // assign each event handler a unique ID
+            if (!handler.$$guid) {
+                handler.$$guid = addEvent.guid++;
+            }
+            // create a hash table of event types for the element
+            if (!element.events) {
+                element.events = {};
+            }
+            // create a hash table of event handlers for each element/event pair
+            var handlers = element.events[type];
+            if (!handlers) {
+                handlers = element.events[type] = {};
+                // store the existing event handler (if there is one)
+                if (element['on' + type]) {
+                    handlers[0] = element["on" + type];
+                }
+            }
+            // store the event handler in the hash table
+            handlers[handler.$$guid] = handler;
+            // assign a global event handler to do all the work
+            element['on' + type] = handleEvent;
+        }
+    }
+    // a counter used to create unique IDs
+    addEvent.guid = 1;
+
+    function removeEvent(element, type, handler) {
+        var delegateWrapper = handler._delegateWrapper;
+        element = domQuery.one(element);
+        if (element.removeEventListener) {
+            element.removeEventListener(type, handler, false);
+            element.removeEventListener(type, delegateWrapper, false);
+        } else {
+            // delete the event handler from the hash table
+            if (element.events && element.events[type]) {
+                delete element.events[type][handler.$$guid];
+                delete element.events[type][delegateWrapper.$$guid];
+            }
+        }
+    }
+
+    function handleEvent(event) {
+        /* jshint validthis:true */
+        var returnValue = true,
+            elem        = this;
+        // grab the event object (IE uses a global event object)
+        event = event ||
+            fixEvent((doc.parentWindow || win).event);
+        // get a reference to the hash table of event handlers
+        var handlers = elem.events[event.type];
+        // execute each event handler
+        for (var i in handlers) {
+            elem.$$handleEvent = handlers[i];
+            if (elem.$$handleEvent(event) === false) {
+                returnValue = false;
+            }
+        }
+        return returnValue;
+    }
+
+    function fixEvent(event) {
+        // add W3C standard event methods
+        event.preventDefault  = fixEvent.preventDefault;
+        event.stopPropagation = fixEvent.stopPropagation;
+        return event;
+    }
+    fixEvent.preventDefault = function() {
+        this.returnValue = false;
+    };
+    fixEvent.stopPropagation = function() {
+        this.cancelBubble = true;
+    };
+
+    function delegate (element, type, selector, handler, capture, once) {
+        if (pastry.isFunction(selector)) {
+            addEvent(element, type, selector);
+            return;
+        }
+        element = domQuery.one(element); // delegation is only for one element
+        if (!domUtils.isNode(element)) {
+            pastry.ERROR('cannot bind events to non-elements: ' + element);
+        }
+        function wrapper (e) {
+            // if this event has a delegateTarget, then we add it to the event
+            // object (so that handlers may have a reference to the delegator
+            // element) and fire the callback
+            if (e.delegateTarget = _getDelegateTarget(element, e.target, selector)) {
+                if (once === true) {
+                    removeEvent(element, type, wrapper);
+                }
+                handler.call(element, e);
+            }
+        }
+        handler._delegateWrapper = wrapper;
+        addEvent(element, type, wrapper, capture || false);
+        return handler;
+    }
+    function _getDelegateTarget (element, target, selector) {
+        while (target && target !== element) {
+            if (domQuery.match(target, selector)) {
+                return target;
+            }
+            target = target.parentElement;
+        }
+        return null;
+    }
+
+    function once (element, type, selector, callback, capture) {
+        delegate(element, type, selector, callback, capture, true);
+    }
+
+    return {
+        on   : delegate,
+        once : once,
+        off  : removeEvent
+    };
+});
+
+
+/* jshint strict: true, undef: true, unused: true */
 /* global define, document */
 
 define('pastry/dom/hotkey', [
@@ -2912,350 +3521,6 @@ define('pastry/dom/hotkey', [
         },
         handleKey: _handleKey
     };
-});
-
-
-define("pastry/dom/hotkey.js", function(){});
-
-/* jshint strict: true, undef: true, unused: true */
-/* global define, location, navigator, ActiveXObject */
-
-define('pastry/bom/utils', [
-    'pastry/pastry'
-], function (
-    pastry
-) {
-    'use strict';
-    /*
-     * @author      : 绝云 (wensen.lws@alibaba-inc.com)
-     * @description : 记录各种浏览器相关的版本号
-     * @note        : browser only
-     */
-    var nav       = navigator || {},
-        userAgent = nav.userAgent,
-        platform  = nav.platform,
-        plugins   = nav.plugins,
-        versions  = {},
-        detectedPlatform,
-        detectedPlugins;
-
-    function toInt (value, base) {
-        return parseInt(value, base || 10);
-    }
-    function setVerInt (versions, key, strVal) {
-        versions[key] = toInt(strVal);
-    }
-    function setVer (versions, str, reg) {
-        var matched = str.match(reg);
-        if (matched) {
-            setVerInt(versions, matched[0].match(/\w*/)[0], matched[1] || 0);
-        }
-    }
-    function detectPlatform (str) {
-        /*
-         * @description : detect platform
-         * @param       : {string} platformStr, platform defined string.
-         * @syntax      : detectPlatform(platformStr)
-         * @return      : {string} platform. (mac|windows|linux...)
-         */
-        if (!str) {
-            return;
-        }
-        var result = pastry.lc(str).match(/mac|win|linux|ipad|ipod|iphone|android/);
-        return pastry.isArray(result) ? result[0] : result;
-    }
-    function detectPlugin (arr) {
-        /*
-         * @description : detect plugins (now flash only)
-         * @param       : {array } plugins, plugin list
-         * @syntax      : detectPlugin(plugins)
-         * @return      : {object} { 'flash' : 0|xx }
-         */
-
-        return {
-            flash: (function () {
-                var flash,
-                    v      = 0,
-                    startV = 13;
-                if (arr && arr.length) {
-                    flash = arr['Shockwave Flash'];
-                    if (flash && flash.description) {
-                        v = flash.description.match(/\b(\d+)\.\d+\b/)[1] || v;
-                    }
-                } else {
-                    while (startV --) {
-                        try {
-                            new ActiveXObject('ShockwaveFlash.ShockwaveFlash.' + startV);
-                            v = startV;
-                            break;
-                        } catch(e) {}
-                    }
-                }
-                return toInt(v);
-            }())
-        };
-    }
-    function detectVersion (str) {
-        /*
-         * @description : detect versions
-         * @param       : {string} userAgent, window.navigator.userAgent
-         * @syntax      : detectVerion(userAgent)
-         * @return      : {object} { 'flash' : 0|xx }
-         */
-
-        if (!str) {
-            return;
-        }
-        str = pastry.lc(str);
-        var ieVer,
-            matched,
-            result = {};
-
-        // browser result {
-            pastry.each([
-                /msie ([\d.]+)/     ,
-                /firefox\/([\d.]+)/ ,
-                /chrome\/([\d.]+)/  ,
-                /crios\/([\d.]+)/   ,
-                /opera.([\d.]+)/    ,
-                /adobeair\/([\d.]+)/
-            ], function (reg) {
-                setVer(result, str, reg);
-            });
-        // }
-        // chrome {
-            if (result.crios) {
-                result.chrome = result.crios;
-            }
-        // }
-        // safari {
-            matched = str.match(/version\/([\d.]+).*safari/);
-            if (matched) {
-                setVerInt(result, 'safari', matched[1] || 0);
-            }
-        // }
-        // safari mobile {
-            matched = str.match(/version\/([\d.]+).*mobile.*safari/);
-            if (matched) {
-                setVerInt(result, 'mobilesafari', matched[1] || 0);
-            }
-        // }
-        // engine result {
-            pastry.each([
-                /trident\/([\d.]+)/     ,
-                /gecko\/([\d.]+)/       ,
-                /applewebkit\/([\d.]+)/ ,
-                /webkit\/([\d.]+)/      , // 单独存储 webkit 字段
-                /presto\/([\d.]+)/
-            ], function (reg) {
-                setVer(result, str, reg);
-            });
-            // IE {
-                ieVer = result.msie;
-                if (ieVer === 6) {
-                    result.trident = 4;
-                } else if (ieVer === 7 || ieVer === 8) {
-                    result.trident = 5;
-                }
-            // }
-        // }
-        return result;
-    }
-
-    detectedPlugins  = detectPlugin(plugins);
-    detectedPlatform = detectPlatform(platform) || detectPlatform(userAgent) || 'unknown';
-
-    pastry.extend(versions, detectVersion(userAgent), detectedPlugins);
-
-    return {
-        host      : location.host,
-        platform  : detectPlatform,
-        plugins   : detectedPlugins,
-        userAgent : userAgent,
-        versions  : versions,
-        isWebkit  : !!versions.webkit,
-        isIE      : !!versions.msie,
-        isApple   : (
-            detectedPlatform.mac    ||
-            detectedPlatform.ipad   ||
-            detectedPlatform.ipod   ||
-            detectedPlatform.iphone
-        )
-    };
-});
-
-
-/* jshint strict: true, undef: true, unused: true */
-/* global define, document, window */
-
-define('pastry/dom/utils', [
-    'pastry/pastry'
-], function(
-    pastry
-) {
-    'use strict';
-    /*
-     * @author      : 绝云（wensen.lws）
-     * @description : utils for dom operations
-     * @note        : browser only
-     */
-    var doc     = document,
-        html    = doc.documentElement,
-        testDiv = doc.createElement('div');
-
-    return {
-        hasTextContent : 'textContent' in testDiv,
-        hasClassList   : 'classList'   in testDiv,
-        hasDataSet     : 'dataset'     in testDiv,
-        isQuirks       : pastry.lc(doc.compatMode) === 'backcompat' || doc.documentMode === 5, // 怪异模式
-        testDiv        : testDiv,
-
-        contains: 'compareDocumentPosition' in html ?
-            function (element, container) {
-                return (container.compareDocumentPosition(element) & 16) === 16;
-            } :
-            function (element, container) {
-                container = (container === doc || container === window) ?
-                    html : container;
-                return container !== element &&
-                    container.contains(element);
-            },
-        isNode: function (element) {
-            var t;
-            return element &&
-                typeof element === 'object' &&
-                (t = element.nodeType) && (t === 1 || t === 9);
-        },
-    };
-});
-
-
-/* jshint strict: true, undef: true, unused: true */
-/* global define, document, window */
-
-define('pastry/dom/query', [
-    'pastry/pastry',
-    'pastry/dom/utils'
-], function(
-    pastry,
-    domUtils
-) {
-    'use strict';
-    /*
-     * @author      : 绝云（wensen.lws）
-     * @description : selector
-     * @note        : browser only
-     * @note        : MODERN browsers only
-     */
-    var // utils {
-            toArray   = pastry.toArray,
-            arrayLike = pastry.isArrayLike,
-            isString  = pastry.isString,
-            isNode    = domUtils.isNode,
-            contains  = domUtils.contains,
-            testDiv   = domUtils.testDiv,
-        // }
-        // matchesSelector {
-            matchesSelector = testDiv.matches ||
-                testDiv.webkitMatchesSelector ||
-                testDiv.mozMatchesSelector    ||
-                testDiv.msMatchesSelector     ||
-                testDiv.oMatchesSelector,
-            hasMatchesSelector = matchesSelector && matchesSelector.call(testDiv, 'div'),
-        // }
-
-        doc = document,
-        win = window,
-        nodeTypeStr   = 'nodeType',
-        re_quick      = /^(?:#([\w-]+)|(\w+)|\.([\w-]+))$/, // 匹配快速选择器
-        result        = {};
-
-    function normalizeRoot (root) {
-        if (!root) {
-            return doc;
-        }
-        if (isString(root)) {
-            return query(root)[0];
-        }
-        if (!root[nodeTypeStr] && arrayLike(root)) {
-            return root[0];
-        }
-        return root;
-    }
-    function query (selector, optRoot) {
-        /*
-         * description: 选择器
-         */
-        var root = normalizeRoot(optRoot),
-            match;
-
-        if (!root || !selector) {
-            return [];
-        }
-        if (selector === win || isNode(selector)) {
-            return !optRoot || (selector !== win && isNode(root) && contains(selector, root)) ?
-                [selector] : [];
-        }
-        if (selector.nodeType === 11) { // document fragment
-            return pastry.toArray(selector.childNodes);
-        }
-        if (selector && arrayLike(selector)) {
-            return pastry.flatten(selector);
-        }
-
-        // 简单查询使用快速查询方法 {
-            if (isString(selector) && (match = re_quick.exec(selector))) {
-                if (match[1]) {
-                    return [root.getElementById(match[1])];
-                } else if (match[2] ) {
-                    return toArray(root.getElementsByTagName(match[2]));
-                } else if (match[3]) {
-                    return toArray(root.getElementsByClassName(match[3]));
-                }
-            }
-        // }
-        if (selector && (selector.document || (selector[nodeTypeStr] && selector[nodeTypeStr] === 9))) {
-            return !optRoot ? [selector] : [];
-        }
-        return toArray((root).querySelectorAll(selector));
-    }
-    function queryOne (selector, optRoot) {
-        return query(selector, optRoot)[0];
-    }
-
-    function match (element, selector) {
-        /*
-         * @matches selector
-         */
-        if (hasMatchesSelector) {
-            return matchesSelector.call(element, selector);
-        }
-        var parentElem = element.parentNode,
-            nodes;
-
-        // if the element is an orphan, and the browser doesn't support matching
-        // orphans, append it to a documentFragment
-        if (!parentElem && !hasMatchesSelector) {
-            parentElem = document.createDocumentFragment();
-            parentElem.appendChild(element);
-        }
-            // from the parent element's context, get all nodes that match the selector
-        nodes = query(selector, parentElem);
-
-        // since support for `matches()` is missing, we need to check to see if
-        // any of the nodes returned by our query match the given element
-        return pastry.some(nodes, function (node) {
-            return node === element;
-        });
-    }
-
-    // 封装 api {
-        return pastry.extend(result, {
-            all   : query,
-            one   : queryOne,
-            match : match
-        });
-    // }
 });
 
 
@@ -3842,273 +4107,6 @@ define('pastry/base/Component', [
         });
 
     return Component;
-});
-
-
-/* jshint strict: true, undef: true, unused: true */
-/* global define */
-
-define('pastry/dom/class', [
-    'pastry/pastry',
-    'pastry/dom/utils',
-    'pastry/dom/query'
-], function(
-    pastry,
-    domUtils,
-    domQuery
-) {
-    'use strict';
-    /*
-     * @author      : 绝云（wensen.lws）
-     * @description : dom classList related
-     * @note        : if ClassList is supported, use ClassList
-     */
-    var RE_spaces    = /\s+/,
-        className    = 'className',
-        spaceStr     = ' ',
-        hasClassList = domUtils.hasClassList,
-        tmpArray     = [''],
-        domClass;
-
-    function str2array (str) {
-        if (pastry.isString(str)) {
-            if (str && !RE_spaces.test(str)) {
-                tmpArray[0] = str;
-                return tmpArray;
-            }
-            var arr = str.split(RE_spaces);
-            if (arr.length && !arr[0]) {
-                arr.shift();
-            }
-            if (arr.length && !arr[arr.length - 1]) {
-                arr.pop();
-            }
-            return arr;
-        }
-        if (!str) {
-            return [];
-        }
-        return pastry.filter(str, function (x) {
-            return x;
-        });
-    }
-    function fillSpace (str) {
-        return spaceStr + str + spaceStr;
-    }
-
-    return domClass = {
-        contains: function (node, classStr) {
-            node     = domQuery.one(node);
-            classStr = pastry.trim(classStr);
-            if (hasClassList) {
-                return node.classList.contains(classStr);
-            }
-            return fillSpace(node[className]).indexOf(fillSpace(classStr)) >= 0;
-        },
-        add: function (node, classStr) {
-            node     = domQuery.one(node);
-            classStr = str2array(classStr);
-            if (hasClassList) {
-                pastry.each(classStr, function (c) {
-                    node.classList.add(c);
-                });
-            } else {
-                var oldClassName = node[className],
-                    oldLen, newLen;
-                oldClassName = oldClassName ? fillSpace(oldClassName) : spaceStr;
-                oldLen = oldClassName.length;
-                pastry.each(classStr, function (c) {
-                    if (c && oldClassName.indexOf(fillSpace(c)) < 0) {
-                        oldClassName += c + spaceStr;
-                    }
-                });
-                newLen = oldClassName.length;
-                if (oldLen < newLen) {
-                    node[className] = oldClassName.substr(1, newLen - 2);
-                }
-            }
-        },
-        remove: function (node, classStr) {
-            node     = domQuery.one(node);
-            classStr = str2array(classStr);
-            if (hasClassList) {
-                pastry.each(classStr, function (c) {
-                    node.classList.remove(c);
-                });
-            } else {
-                var cls = fillSpace(node[className]);
-                pastry.each(classStr, function (c) {
-                    cls = cls.replace(fillSpace(c), spaceStr);
-                });
-                cls = pastry.trim(cls);
-                if (node[className] !== cls) {
-                    node[className] = cls;
-                }
-            }
-        },
-        clear: function (node) {
-            node = domQuery.one(node);
-            node[className] = '';
-        },
-        toggle: function (node, classStr) {
-            node     = domQuery.one(node);
-            classStr = str2array(classStr);
-            if (hasClassList) {
-                pastry.each(classStr, function (c) {
-                    node.classList.toggle(c);
-                });
-            } else {
-                pastry.each(classStr, function (c) {
-                    domClass[domClass.contains(node, c) ? 'remove' : 'add'](node, c);
-                });
-            }
-        }
-    };
-});
-
-
-/* jshint strict: true, undef: true, unused: true */
-/* global define, document, window */
-
-define('pastry/dom/event', [
-    'pastry/pastry',
-    'pastry/dom/query',
-    'pastry/dom/utils'
-], function(
-    pastry,
-    domQuery,
-    domUtils
-) {
-    'use strict';
-    /*
-     * @author      : 绝云（wensen.lws）
-     * @description : event firing
-     * @reference   : http://dean.edwards.name/weblog/2005/10/add-event/
-     */
-    var doc = document,
-        win = window;
-
-    function addEvent(element, type, handler) {
-        element = domQuery.one(element);
-        if (element.addEventListener) {
-            element.addEventListener(type, handler, false);
-        } else {
-            // assign each event handler a unique ID
-            if (!handler.$$guid) {
-                handler.$$guid = addEvent.guid++;
-            }
-            // create a hash table of event types for the element
-            if (!element.events) {
-                element.events = {};
-            }
-            // create a hash table of event handlers for each element/event pair
-            var handlers = element.events[type];
-            if (!handlers) {
-                handlers = element.events[type] = {};
-                // store the existing event handler (if there is one)
-                if (element['on' + type]) {
-                    handlers[0] = element["on" + type];
-                }
-            }
-            // store the event handler in the hash table
-            handlers[handler.$$guid] = handler;
-            // assign a global event handler to do all the work
-            element['on' + type] = handleEvent;
-        }
-    }
-    // a counter used to create unique IDs
-    addEvent.guid = 1;
-
-    function removeEvent(element, type, handler) {
-        var delegateWrapper = handler._delegateWrapper;
-        element = domQuery.one(element);
-        if (element.removeEventListener) {
-            element.removeEventListener(type, handler, false);
-            element.removeEventListener(type, delegateWrapper, false);
-        } else {
-            // delete the event handler from the hash table
-            if (element.events && element.events[type]) {
-                delete element.events[type][handler.$$guid];
-                delete element.events[type][delegateWrapper.$$guid];
-            }
-        }
-    }
-
-    function handleEvent(event) {
-        /* jshint validthis:true */
-        var returnValue = true,
-            elem        = this;
-        // grab the event object (IE uses a global event object)
-        event = event ||
-            fixEvent((doc.parentWindow || win).event);
-        // get a reference to the hash table of event handlers
-        var handlers = elem.events[event.type];
-        // execute each event handler
-        for (var i in handlers) {
-            elem.$$handleEvent = handlers[i];
-            if (elem.$$handleEvent(event) === false) {
-                returnValue = false;
-            }
-        }
-        return returnValue;
-    }
-
-    function fixEvent(event) {
-        // add W3C standard event methods
-        event.preventDefault  = fixEvent.preventDefault;
-        event.stopPropagation = fixEvent.stopPropagation;
-        return event;
-    }
-    fixEvent.preventDefault = function() {
-        this.returnValue = false;
-    };
-    fixEvent.stopPropagation = function() {
-        this.cancelBubble = true;
-    };
-
-    function delegate (element, type, selector, handler, capture, once) {
-        if (pastry.isFunction(selector)) {
-            addEvent(element, type, selector);
-            return;
-        }
-        element = domQuery.one(element); // delegation is only for one element
-        if (!domUtils.isNode(element)) {
-            pastry.ERROR('cannot bind events to non-elements: ' + element);
-        }
-        function wrapper (e) {
-            // if this event has a delegateTarget, then we add it to the event
-            // object (so that handlers may have a reference to the delegator
-            // element) and fire the callback
-            if (e.delegateTarget = _getDelegateTarget(element, e.target, selector)) {
-                if (once === true) {
-                    removeEvent(element, type, wrapper);
-                }
-                handler.call(element, e);
-            }
-        }
-        handler._delegateWrapper = wrapper;
-        addEvent(element, type, wrapper, capture || false);
-        return handler;
-    }
-    function _getDelegateTarget (element, target, selector) {
-        while (target && target !== element) {
-            if (domQuery.match(target, selector)) {
-                return target;
-            }
-            target = target.parentElement;
-        }
-        return null;
-    }
-
-    function once (element, type, selector, callback, capture) {
-        delegate(element, type, selector, callback, capture, true);
-    }
-
-    return {
-        on   : delegate,
-        once : once,
-        off  : removeEvent
-    };
 });
 
 
@@ -5527,7 +5525,7 @@ define('all-components-modules',[
         'pastry/html/utils',
     // }
     // dom {
-        'pastry/dom/hotkey.js',
+        'pastry/dom/hotkey',
     // }
     // all components {
         'pastry/component/Collapse',

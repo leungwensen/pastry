@@ -22,7 +22,7 @@ define([
         'pastry/html/utils',
     // }
     // dom {
-        'pastry/dom/hotkey.js',
+        'pastry/dom/hotkey',
     // }
     // all components {
         'pastry/component/Collapse',
