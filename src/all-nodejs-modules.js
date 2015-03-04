@@ -3,23 +3,23 @@
 
 define([
     // formatting {
-        'pastry/fmt/date',
-        'pastry/fmt/sprintf',
         'pastry/fmt/vsprintf',
         'pastry/fmt/camelCase',
     // }
     // Color {
-        'pastry/base/Color',
+        'pastry/Color',
     // }
-    // parsers {
-        'pastry/parser/json',
-        'pastry/parser/template',
+    // encoding {
+        'pastry/encoding/json',
+    // }
+    // text {
+        'pastry/text/template',
     // }
     // declare {
-        'pastry/class/declare',
+        'pastry/oop/declare',
     // }
-    // html utils {
-        'pastry/html/utils',
+    // html {
+        'pastry/html/escape',
     // }
 ], function() {
     /*

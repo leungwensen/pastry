@@ -1,7 +1,7 @@
 /* jshint strict: true, undef: true, unused: true */
 /* global define */
 
-define('pastry/html/utils', [
+define('pastry/html/escape', [
     'pastry/pastry'
 ], function(
     pastry

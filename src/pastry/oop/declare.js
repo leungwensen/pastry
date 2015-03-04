@@ -1,9 +1,9 @@
 /* jshint strict: true, undef: true, unused: true */
 /* global define */
 
-define('pastry/class/declare', [
+define('pastry/oop/declare', [
     'pastry/pastry',
-    'pastry/class/c3mro'
+    'pastry/oop/c3mro'
 ], function(
     pastry,
     c3mroMerge

@@ -1,9 +1,9 @@
 /* jshint strict: true, undef: true, unused: true */
 /* global define, document */
 
-define('pastry/base/Component', [
+define('pastry/ui/Component', [
     'pastry/pastry',
-    'pastry/class/declare',
+    'pastry/oop/declare',
     'pastry/dom/construct',
     'pastry/dom/query',
     'pastry/dom/style'

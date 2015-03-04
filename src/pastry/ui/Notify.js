@@ -1,10 +1,10 @@
 /* jshint strict: true, undef: true, unused: true */
 /* global define */
 
-define('pastry/component/Notify', [
+define('pastry/ui/Notify', [
     'pastry/pastry',
-    'pastry/class/declare',
-    'pastry/base/Component',
+    'pastry/oop/declare',
+    'pastry/ui/Component',
     'pastry/dom/construct',
     'pastry/dom/event',
     'pastry/template/notify',

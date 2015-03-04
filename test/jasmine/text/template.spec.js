@@ -3,7 +3,7 @@
 
 require([
     'pastry/pastry',
-    'pastry/parser/template'
+    'pastry/text/template'
 ], function (
     pastry,
     template

@@ -1,7 +1,7 @@
 /* jshint strict: true, undef: true, unused: true */
 /* global define, decodeURIComponent, encodeURIComponent */
 
-define('pastry/parser/querystring', [
+define('pastry/url/querystring', [
     'pastry/pastry'
 ], function (
     pastry

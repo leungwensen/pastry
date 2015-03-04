@@ -1013,7 +1013,7 @@ var define;
         define('pastry/pastry', function () {
             return pastry;
         });
-        define('pastry/base/event', function () {
+        define('pastry/event', function () {
             return pastry.event;
         });
     // }
@@ -1021,57 +1021,6 @@ var define;
         pastry.setGLOBAL('require' , require);
     // }
 }(this));
-
-/* jshint strict: true, undef: true, unused: true */
-/* global define */
-
-define('pastry/fmt/date', [
-    'pastry/pastry'
-], function (
-    pastry
-) {
-    'use strict';
-    /*
-     * @author      : 绝云(wensen.lws@alibaba-inc.com)
-     * @date        : 2014-10-07
-     * @description : fmt 模块 - date
-     */
-
-    function doubleDigit (n) {
-        return n < 10 ? '0' + n : n;
-    }
-    function lms (ms) {
-        var str = ms + '',
-            len = str.length;
-        return len === 3 ? str : len === 2 ? '0' + str : '00' + str;
-    }
-
-    return pastry.fmtDate = function (date, pattern) {
-        /*
-         * @reference   : https://github.com/dojo/dojo/blob/master/json.js#L105
-         * @description : return stringified date according to given pattern.
-         * @parameter*  : {date  } date, input Date object
-         * @parameter   : {string} pattern, defines pattern for stringify.
-         * @parameter   : {string} pattern, defines pattern for stringify.
-         * @return      : {string} result string.
-         * @syntax      : fmtDate(date, [pattern])
-         * @example     :
-         //    '{FullYear}-{Month}-{Date}T{Hours}:{Minutes}:{Seconds}.{Milliseconds}Z' => '2013-10-03T00:57::13.180Z'
-         */
-        if (pastry.isDate(date)) {
-            pattern = pattern || '{FullYear}-{Month}-{Date}T{Hours}:{Minutes}:{Seconds}Z';
-
-            return pattern.replace(/\{(\w+)\}/g, function (t, prop) {
-                var fullProp = 'get' + ((prop === 'Year') ? prop : ('UTC' + prop)),
-                    num = date[fullProp]() + ((prop === 'Month') ? 1 : 0);
-                return prop === 'Milliseconds' ? lms(num) : doubleDigit(num);
-            });
-        } else {
-            pastry.ERROR('not a Date instance');
-        }
-    };
-});
-
 
 /* jshint strict: true, undef: true, unused: true */
 /* global define */
@@ -1308,142 +1257,6 @@ define('pastry/fmt/camelCase', [
 /* jshint strict: true, undef: true, unused: true */
 /* global define */
 
-define('pastry/class/c3mro', [
-    'pastry/pastry'
-], function(
-    pastry
-) {
-    'use strict';
-    /*
-     * @author      : 绝云（wensen.lws）
-     * @description : description
-     */
-    var indexOf = pastry.indexOf;
-
-    function cloneArray (arr) {
-        return arr.slice(0);
-    }
-    function isGoodHead (head, rest) {
-        var isGood = true;
-        pastry.some(rest, function (lin) {
-            if (indexOf(lin, head) > 0) {
-                isGood = false;
-            }
-        });
-
-        if (isGood) {
-            pastry.each(rest, function (lin) {
-                if (indexOf(lin, head) === 0) {
-                    lin.shift();
-                }
-            });
-        }
-        return isGood;
-    }
-    function eachHead (bases) {
-        var result = [],
-            badLinearization = 0;
-
-        while (bases.length) {
-            var base = bases.shift();
-            if (!base.length) {
-                continue;
-            }
-
-            if (isGoodHead(base[0], bases)) {
-                result.push(base.shift());
-                badLinearization = 0;
-            } else {
-                badLinearization += 1;
-                if (badLinearization === bases.length) {
-                    pastry.ERROR('Bad Linearization');
-                }
-            }
-            if (base.length) {
-                bases.push(base);
-            }
-        }
-        return result;
-    }
-
-    return pastry.c3mroMerge = function () {
-        var bases = pastry.map(pastry.toArray(arguments), cloneArray);
-        return eachHead(bases);
-    };
-});
-
-
-/* jshint strict: true, undef: true, unused: true */
-/* global define */
-
-define('pastry/class/declare', [
-    'pastry/pastry',
-    'pastry/class/c3mro'
-], function(
-    pastry,
-    c3mroMerge
-) {
-    'use strict';
-    /*
-     * @author      : 绝云（wensen.lws）
-     * @description : Class utils
-     */
-
-    return pastry.declare = function(/*name, superClasses, protoObj*/) {
-        var uberClass,
-            tempConstructor,
-            lin          = '_linearization',
-            args         = pastry.toArray(arguments),
-            name         = pastry.isString(args[0]) ? args.shift() : '',
-            superClasses = args.length > 1 ? args.shift() : [],
-            protoObj     = args[0] ? args.shift() : {},
-            bases        = [],
-            Tmp          = function () {},
-            hasCtor      = false,
-            ctor         = function () {};
-
-        superClasses = pastry.isArray(superClasses) ? superClasses : [superClasses];
-        pastry.each(superClasses, function(clazz) {
-            clazz[lin] = clazz[lin] || [clazz];
-            bases.push(clazz[lin]);
-        });
-
-        if (bases.length) {
-            bases.push(superClasses);
-            bases = c3mroMerge.apply(null, bases);
-        }
-
-        tempConstructor = protoObj.constructor;
-        if (tempConstructor !== Object.prototype.constructor) {
-            hasCtor = true;
-            ctor = tempConstructor;
-        }
-
-        ctor[lin]    = [ctor].concat(bases);
-        ctor.parents = bases.slice(0);
-
-        protoObj.constructor = ctor;
-        while ((uberClass = bases.shift())) {
-            protoObj = pastry.extend({}, uberClass.prototype, protoObj);
-            Tmp.prototype = protoObj;
-            if (!hasCtor) {
-                protoObj.constructor = ctor;
-            }
-            protoObj = new Tmp();
-        }
-
-        ctor.className = name;
-        ctor.prototype = protoObj;
-        ctor.prototype.constructor = ctor;
-
-        return ctor;
-    };
-});
-
-
-/* jshint strict: true, undef: true, unused: true */
-/* global define */
-
 define('pastry/color/hexByName', [
 ], function(
 ) {
@@ -1612,14 +1425,150 @@ define('pastry/color/hexByName', [
 /* jshint strict: true, undef: true, unused: true */
 /* global define */
 
-define('pastry/base/Color', [
+define('pastry/oop/c3mro', [
+    'pastry/pastry'
+], function(
+    pastry
+) {
+    'use strict';
+    /*
+     * @author      : 绝云（wensen.lws）
+     * @description : description
+     */
+    var indexOf = pastry.indexOf;
+
+    function cloneArray (arr) {
+        return arr.slice(0);
+    }
+    function isGoodHead (head, rest) {
+        var isGood = true;
+        pastry.some(rest, function (lin) {
+            if (indexOf(lin, head) > 0) {
+                isGood = false;
+            }
+        });
+
+        if (isGood) {
+            pastry.each(rest, function (lin) {
+                if (indexOf(lin, head) === 0) {
+                    lin.shift();
+                }
+            });
+        }
+        return isGood;
+    }
+    function eachHead (bases) {
+        var result = [],
+            badLinearization = 0;
+
+        while (bases.length) {
+            var base = bases.shift();
+            if (!base.length) {
+                continue;
+            }
+
+            if (isGoodHead(base[0], bases)) {
+                result.push(base.shift());
+                badLinearization = 0;
+            } else {
+                badLinearization += 1;
+                if (badLinearization === bases.length) {
+                    pastry.ERROR('Bad Linearization');
+                }
+            }
+            if (base.length) {
+                bases.push(base);
+            }
+        }
+        return result;
+    }
+
+    return pastry.c3mroMerge = function () {
+        var bases = pastry.map(pastry.toArray(arguments), cloneArray);
+        return eachHead(bases);
+    };
+});
+
+
+/* jshint strict: true, undef: true, unused: true */
+/* global define */
+
+define('pastry/oop/declare', [
     'pastry/pastry',
-    'pastry/class/declare',
-    'pastry/color/hexByName'
+    'pastry/oop/c3mro'
 ], function(
     pastry,
-    declare,
-    hexByName
+    c3mroMerge
+) {
+    'use strict';
+    /*
+     * @author      : 绝云（wensen.lws）
+     * @description : Class utils
+     */
+
+    return pastry.declare = function(/*name, superClasses, protoObj*/) {
+        var uberClass,
+            tempConstructor,
+            lin          = '_linearization',
+            args         = pastry.toArray(arguments),
+            name         = pastry.isString(args[0]) ? args.shift() : '',
+            superClasses = args.length > 1 ? args.shift() : [],
+            protoObj     = args[0] ? args.shift() : {},
+            bases        = [],
+            Tmp          = function () {},
+            hasCtor      = false,
+            ctor         = function () {};
+
+        superClasses = pastry.isArray(superClasses) ? superClasses : [superClasses];
+        pastry.each(superClasses, function(clazz) {
+            clazz[lin] = clazz[lin] || [clazz];
+            bases.push(clazz[lin]);
+        });
+
+        if (bases.length) {
+            bases.push(superClasses);
+            bases = c3mroMerge.apply(null, bases);
+        }
+
+        tempConstructor = protoObj.constructor;
+        if (tempConstructor !== Object.prototype.constructor) {
+            hasCtor = true;
+            ctor = tempConstructor;
+        }
+
+        ctor[lin]    = [ctor].concat(bases);
+        ctor.parents = bases.slice(0);
+
+        protoObj.constructor = ctor;
+        while ((uberClass = bases.shift())) {
+            protoObj = pastry.extend({}, uberClass.prototype, protoObj);
+            Tmp.prototype = protoObj;
+            if (!hasCtor) {
+                protoObj.constructor = ctor;
+            }
+            protoObj = new Tmp();
+        }
+
+        ctor.className = name;
+        ctor.prototype = protoObj;
+        ctor.prototype.constructor = ctor;
+
+        return ctor;
+    };
+});
+
+
+/* jshint strict: true, undef: true, unused: true */
+/* global define */
+
+define('pastry/Color', [
+    'pastry/pastry',
+    'pastry/color/hexByName',
+    'pastry/oop/declare'
+], function(
+    pastry,
+    hexByName,
+    declare
 ) {
     'use strict';
     /*
@@ -1845,7 +1794,58 @@ define('pastry/base/Color', [
 /* jshint strict: true, undef: true, unused: true */
 /* global define */
 
-define('pastry/parser/json', [
+define('pastry/fmt/date', [
+    'pastry/pastry'
+], function (
+    pastry
+) {
+    'use strict';
+    /*
+     * @author      : 绝云(wensen.lws@alibaba-inc.com)
+     * @date        : 2014-10-07
+     * @description : fmt 模块 - date
+     */
+
+    function doubleDigit (n) {
+        return n < 10 ? '0' + n : n;
+    }
+    function lms (ms) {
+        var str = ms + '',
+            len = str.length;
+        return len === 3 ? str : len === 2 ? '0' + str : '00' + str;
+    }
+
+    return pastry.fmtDate = function (date, pattern) {
+        /*
+         * @reference   : https://github.com/dojo/dojo/blob/master/json.js#L105
+         * @description : return stringified date according to given pattern.
+         * @parameter*  : {date  } date, input Date object
+         * @parameter   : {string} pattern, defines pattern for stringify.
+         * @parameter   : {string} pattern, defines pattern for stringify.
+         * @return      : {string} result string.
+         * @syntax      : fmtDate(date, [pattern])
+         * @example     :
+         //    '{FullYear}-{Month}-{Date}T{Hours}:{Minutes}:{Seconds}.{Milliseconds}Z' => '2013-10-03T00:57::13.180Z'
+         */
+        if (pastry.isDate(date)) {
+            pattern = pattern || '{FullYear}-{Month}-{Date}T{Hours}:{Minutes}:{Seconds}Z';
+
+            return pattern.replace(/\{(\w+)\}/g, function (t, prop) {
+                var fullProp = 'get' + ((prop === 'Year') ? prop : ('UTC' + prop)),
+                    num = date[fullProp]() + ((prop === 'Month') ? 1 : 0);
+                return prop === 'Milliseconds' ? lms(num) : doubleDigit(num);
+            });
+        } else {
+            pastry.ERROR('not a Date instance');
+        }
+    };
+});
+
+
+/* jshint strict: true, undef: true, unused: true */
+/* global define */
+
+define('pastry/encoding/json', [
     'pastry/pastry',
     'pastry/fmt/date'
 ], function (
@@ -2002,7 +2002,7 @@ define('pastry/parser/json', [
 /* jshint strict: true, undef: true, unused: true */
 /* global define */
 
-define('pastry/html/utils', [
+define('pastry/html/escape', [
     'pastry/pastry'
 ], function(
     pastry
@@ -2048,12 +2048,12 @@ define('pastry/html/utils', [
 /* jshint strict: true, undef: true */
 /* global define */
 
-define('pastry/parser/template', [
+define('pastry/text/template', [
     'pastry/pastry',
-    'pastry/html/utils'
+    'pastry/html/escape'
 ], function(
     pastry,
-    htmlUtils
+    htmlEscape
 ) {
     'use strict';
     /*
@@ -2091,8 +2091,8 @@ define('pastry/parser/template', [
     }
 
     // add helpers to pastry to pass to compiled functions, can be extended {
-        // helper.escape = htmlUtils.escape;
-        pastry.extend(helper, htmlUtils);
+        // helper.escape = htmlEscape.escape;
+        pastry.extend(helper, htmlEscape);
     // }
 
     return pastry.template = template = {
@@ -2137,23 +2137,23 @@ define('pastry/parser/template', [
 
 define('all-nodejs-modules',[
     // formatting {
-        'pastry/fmt/date',
-        'pastry/fmt/sprintf',
         'pastry/fmt/vsprintf',
         'pastry/fmt/camelCase',
     // }
     // Color {
-        'pastry/base/Color',
+        'pastry/Color',
     // }
-    // parsers {
-        'pastry/parser/json',
-        'pastry/parser/template',
+    // encoding {
+        'pastry/encoding/json',
+    // }
+    // text {
+        'pastry/text/template',
     // }
     // declare {
-        'pastry/class/declare',
+        'pastry/oop/declare',
     // }
-    // html utils {
-        'pastry/html/utils',
+    // html {
+        'pastry/html/escape',
     // }
 ], function() {
     /*

@@ -4,7 +4,7 @@
 define('pastry/dom/form', [
     'pastry/pastry',
     'pastry/dom/query',
-    'pastry/parser/querystring'
+    'pastry/url/querystring'
 ], function(
     pastry,
     domQuery,

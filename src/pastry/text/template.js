@@ -1,12 +1,12 @@
 /* jshint strict: true, undef: true */
 /* global define */
 
-define('pastry/parser/template', [
+define('pastry/text/template', [
     'pastry/pastry',
-    'pastry/html/utils'
+    'pastry/html/escape'
 ], function(
     pastry,
-    htmlUtils
+    htmlEscape
 ) {
     'use strict';
     /*
@@ -44,8 +44,8 @@ define('pastry/parser/template', [
     }
 
     // add helpers to pastry to pass to compiled functions, can be extended {
-        // helper.escape = htmlUtils.escape;
-        pastry.extend(helper, htmlUtils);
+        // helper.escape = htmlEscape.escape;
+        pastry.extend(helper, htmlEscape);
     // }
 
     return pastry.template = template = {

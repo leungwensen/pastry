@@ -1,7 +1,7 @@
 /* jshint strict: true, undef: true, unused: true */
 /* global define */
 
-define('pastry/parser/json', [
+define('pastry/encoding/json', [
     'pastry/pastry',
     'pastry/fmt/date'
 ], function (

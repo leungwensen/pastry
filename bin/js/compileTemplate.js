@@ -36,7 +36,7 @@ function compileTemplates () {
                 moduleStr = '/* jshint ignore:start */\n' +
                     'define("%s", [' +
                         '"pastry/pastry",' +
-                        '"pastry/html/utils"' +
+                        '"pastry/html/escape"' +
                     '], function (' +
                         'helper' +
                     ') {' +

@@ -1,7 +1,7 @@
 /* jshint strict: true, undef: true, unused: true */
 /* global define */
 
-define('pastry/class/c3mro', [
+define('pastry/oop/c3mro', [
     'pastry/pastry'
 ], function(
     pastry

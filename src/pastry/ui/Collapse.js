@@ -1,10 +1,10 @@
 /* jshint strict: true, undef: true, unused: true */
 /* global define */
 
-define('pastry/component/Collapse', [
+define('pastry/ui/Collapse', [
     'pastry/pastry',
-    'pastry/class/declare',
-    'pastry/base/Component',
+    'pastry/oop/declare',
+    'pastry/ui/Component',
     'pastry/dom/class',
     'pastry/dom/construct',
     'pastry/dom/event',

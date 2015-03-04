@@ -4,8 +4,8 @@
 define('pastry/io/ajax', [
     'pastry/pastry',
     'pastry/bom/utils',
-    'pastry/parser/json',
-    'pastry/parser/querystring'
+    'pastry/encoding/json',
+    'pastry/url/querystring'
 ], function (
     pastry,
     bomUtils,
@@ -100,7 +100,7 @@ define('pastry/io/ajax', [
         // progress ajax {
             if (method === 'GET') {
                 if (data) {
-                    uri += (pastry.hasSubString(uri, '?') ? '&' : '?') + data;
+                    uri += (uri.indexOf('?') > -1 ? '&' : '?') + data;
                 }
                 xhr.open(method, uri, isAsync, username, password);
                 xhr.setRequestHeader(

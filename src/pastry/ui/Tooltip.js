@@ -1,10 +1,10 @@
 /* jshint strict: true, undef: true, unused: true */
 /* global define, document */
 
-define('pastry/component/Tooltip', [
+define('pastry/ui/Tooltip', [
     'pastry/pastry',
-    'pastry/class/declare',
-    'pastry/base/Component',
+    'pastry/oop/declare',
+    'pastry/ui/Component',
     'pastry/dom/class',
     'pastry/dom/construct',
     'pastry/dom/query',

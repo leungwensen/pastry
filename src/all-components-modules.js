@@ -6,29 +6,32 @@ define([
         'pastry/module/loader',
     // }
     // formatting {
-        'pastry/fmt/date',
-        'pastry/fmt/sprintf',
         'pastry/fmt/vsprintf',
         'pastry/fmt/camelCase',
     // }
     // Color {
-        'pastry/base/Color',
+        'pastry/Color',
     // }
-    // parsers {
-        'pastry/parser/json',
-        'pastry/parser/template',
+    // encoding {
+        'pastry/encoding/json',
     // }
-    // html utils {
-        'pastry/html/utils',
+    // text {
+        'pastry/text/template',
+    // }
+    // declare {
+        'pastry/oop/declare',
+    // }
+    // html {
+        'pastry/html/escape',
     // }
     // dom {
         'pastry/dom/hotkey',
     // }
-    // all components {
-        'pastry/component/Collapse',
-        'pastry/component/Notify',
-        'pastry/component/Tooltip',
-        'pastry/component/Tree',
+    // all ui components {
+        'pastry/ui/Collapse',
+        'pastry/ui/Notify',
+        'pastry/ui/Tooltip',
+        'pastry/ui/Tree',
     // }
 ], function() {
     /*

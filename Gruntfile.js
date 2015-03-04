@@ -31,14 +31,14 @@ module.exports = function (grunt) {
 
             rjsOption: {
                 paths: {
-                    'pastry/pastry'     : 'empty:',
-                    'pastry/base/event' : 'empty:',
-                    'pastry/Module'     : 'empty:'
+                    'pastry/pastry' : 'empty:',
+                    'pastry/event'  : 'empty:',
+                    'pastry/Module' : 'empty:'
                 },
                 wrap: {
                     startFile: [
                         '<%= path.src %>/pastry/pastry.js',
-                        '<%= path.src %>/pastry/base/event.js',
+                        '<%= path.src %>/pastry/event.js',
                         '<%= path.src %>/pastry/module/define.js'
                     ]
                 }

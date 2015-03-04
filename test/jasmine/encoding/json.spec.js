@@ -3,7 +3,7 @@
 
 require([
     'pastry/pastry',
-    'pastry/parser/json'
+    'pastry/encoding/json'
 ], function (
     pastry,
     JSON

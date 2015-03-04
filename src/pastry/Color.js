@@ -1,14 +1,14 @@
 /* jshint strict: true, undef: true, unused: true */
 /* global define */
 
-define('pastry/base/Color', [
+define('pastry/Color', [
     'pastry/pastry',
-    'pastry/class/declare',
-    'pastry/color/hexByName'
+    'pastry/color/hexByName',
+    'pastry/oop/declare'
 ], function(
     pastry,
-    declare,
-    hexByName
+    hexByName,
+    declare
 ) {
     'use strict';
     /*
