@@ -17,6 +17,13 @@ require([
                 thing: 'harry potter!'
             })).toBe("the girl jumps up sayin' `harry potter!`");
         });
+        it('syntax bugfix', function () {
+            expect(
+                template.parse("{%helper.each(buttons, function(button){%}")
+            ).toBe(
+                "';helper.each(buttons, function(button){ _s+='"
+            );
+        });
     });
 });
 
