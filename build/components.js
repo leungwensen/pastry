@@ -2399,10 +2399,13 @@ define('pastry/text/template', [
     var template,
         cache     = {},
         helper    = {},
-        RE_parser = /([\s'\\])(?!(?:[^{]|\{(?!%))*%\})|(?:\{%(=|#)([\s\S]+?)%\})|(\{%)|(%\})/g;
+
+        trim = pastry.trim,
+
+        RE_parser = /([\s'\\])(?!(?:[^{]|\{(?!%))*%\})|(?:\{%(=|#)([\s\S]+?)%\})|(?:(\{%)([\s\S]+?)(%\}))/g;
         // defaultOpitons = {}; // TODO add grammar aliases, etc.
 
-    function render (s, p1, p2, p3, p4, p5) {
+    function replacer (s, p1, p2, p3, p4, p5, p6) {
         if (p1) { // whitespace, quote and backspace in HTML context
             return {
                 "\n": "\\n",
@@ -2412,27 +2415,30 @@ define('pastry/text/template', [
             }[p1] || "\\" + p1;
         }
         if (p2) { // interpolation: {%=prop%}, or unescaped: {%#prop%}
-            p3 = pastry.trim(p3);
+            p3 = trim(p3);
             if (p2 === "=") {
                 return "'+_e(" + p3 + ")+'";
             }
             return "'+(" + p3 + "==null?'':" + p3 + ")+'";
         }
-        if (p4) { // evaluation start tag: {%
-            return "';";
+        if (p4 && p5 && p6) { // evaluation two matched tags: {% * %}
+            // COMMENT: this is for fixing bug mentioned in test/jasmine/text/template.spec.js
+            return "';" + trim(p5) + " _s+='";
         }
-        if (p5) { // evaluation end tag: %}
-            return "_s+='";
-        }
+    }
+    function parse (str) {
+        return str
+            .replace(RE_parser, replacer)
+            .replace(/\\n\s*/g, ''); // 要是存在回车符号，会引起多解释一个 #text 对象的 bug
     }
 
     // add helpers to pastry to pass to compiled functions, can be extended {
-        // helper.escape = htmlEscape.escape;
         pastry.extend(helper, htmlEscape);
     // }
 
     return pastry.template = template = {
-        helper: helper,
+        helper : helper,
+        parse  : parse,
         compile: function (str) {
             if (!pastry.isString(str)) {
                 return str;
@@ -2451,9 +2457,7 @@ define('pastry/text/template', [
                             //     "_s += tmpl(s, d);}" + "," +
                         // }
                         "_s='" +
-                        str
-                            .replace(RE_parser, render)
-                            .replace(/\\n\s*/g, '') + // 要是存在回车符号，会引起多解释一个 #text 对象的 bug
+                        parse(str) +
                         "';" +
                     "}" +
                     "return _s;"
