@@ -45,13 +45,13 @@ module.exports = function (grunt) {
             },
 
             build: {
-                core       : '<%= path.src %>/pastry/pastry.js',
-                amd        : '<%= path.src %>/amd-loader.js',
-                nodejs     : '<%= path.build %>/nodejs.js',
-                components : '<%= path.build %>/components.js',
+                core   : '<%= path.src %>/pastry/pastry.js',
+                amd    : '<%= path.src %>/amd-loader.js',
+                nodejs : '<%= path.build %>/nodejs.js',
+                ui     : '<%= path.build %>/ui.js',
                 css: {
                     '<%= path.build %>/pastry.css'        : '<%= path.src %>/pastry/stylesheet/pastry.less',
-                    '<%= path.build %>/components.css'    : '<%= path.src %>/pastry/stylesheet/components.less',
+                    '<%= path.build %>/ui.css'            : '<%= path.src %>/pastry/stylesheet/ui.less',
                     '<%= path.build %>/theme/default.css' : '<%= path.src %>/pastry/stylesheet/theme/default.less',
                 },
                 font: {
@@ -64,14 +64,14 @@ module.exports = function (grunt) {
 
             dist: {
                 js: {
-                   '<%= path.dist %>/pastry.components.min.js' : '<%= build.components %>',
-                   '<%= path.dist %>/pastry.amd.min.js'        : '<%= build.nodejs %>',
-                   '<%= path.dist %>/pastry.min.js'            : '<%= build.core %>',
-                   '<%= path.dist %>/pastry.nodejs.min.js'     : '<%= build.amd %>'
+                   '<%= path.dist %>/pastry.ui.min.js'     : '<%= build.ui %>',
+                   '<%= path.dist %>/pastry.amd.min.js'    : '<%= build.nodejs %>',
+                   '<%= path.dist %>/pastry.min.js'        : '<%= build.core %>',
+                   '<%= path.dist %>/pastry.nodejs.min.js' : '<%= build.amd %>'
                 },
                 css: {
-                   '<%= path.dist %>/pastry.min.css'               : '<%= path.build %>/pastry.css',
-                   '<%= path.dist %>/pastry.components.min.css'    : '<%= path.build %>/components.css',
+                   '<%= path.dist %>/pastry.min.css'    : '<%= path.build %>/pastry.css',
+                   '<%= path.dist %>/pastry.ui.min.css' : '<%= path.build %>/ui.css',
                    '<%= path.dist %>/pastry.theme-default.min.css' : '<%= path.build %>/theme/default.css',
                 },
                 font: {
@@ -84,3 +84,4 @@ module.exports = function (grunt) {
         }
     });
 };
+

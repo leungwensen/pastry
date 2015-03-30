@@ -1,6 +1,6 @@
 
 source:
-  src: <%= build.components %>
+  src: <%= build.ui %>
   options:
     specs   : <%= path.test %>/jasmine/**/*.spec.js
     summary : true

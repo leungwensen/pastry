@@ -133,9 +133,7 @@ define('pastry/ui/Tree', [
                 _setLabel: function () {
                     var node = this,
                         label;
-                    if (node.getLabel) {
-                        label = node.getLabel();
-                    } else if (node.tree.getLabel) {
+                    if (node.tree.getLabel) {
                         label = node.tree.getLabel(node);
                     } else {
                         // alias
@@ -152,9 +150,7 @@ define('pastry/ui/Tree', [
                         iconClass;
 
                     if (node.hasIcon) {
-                        if (node.getIconClass) {
-                            iconClass = node.getIconClass();
-                        } else if (node.tree.getIconClass) {
+                        if (node.tree.getIconClass) {
                             iconClass = node.tree.getIconClass(node);
                         } else {
                             if (node.isBranch) {
@@ -185,9 +181,7 @@ define('pastry/ui/Tree', [
                         expanderIconClass;
 
                     if (node.isExpandable && node.hasExpanderIcon) {
-                        if (node.getExpanderIconClass) {
-                            expanderIconClass = node.getExpanderIconClass();
-                        } else if (node.tree.getExpanderIconClass) {
+                        if (node.tree.getExpanderIconClass) {
                             expanderIconClass = node.tree.getExpanderIconClass(node);
                         } else {
                             expanderIconClass = node.isExpanded ?
@@ -206,9 +200,7 @@ define('pastry/ui/Tree', [
                         expanderText;
 
                     if (node.isExpandable && !node.hasExpanderIcon) {
-                        if (node.getExpanderText) {
-                            expanderText = node.getExpanderText();
-                        } else if (node.tree.getExpanderText) {
+                        if (node.tree.getExpanderText) {
                             expanderText = node.tree.getExpanderText(node);
                         } else {
                             expanderText = node.isExpanded ?
@@ -560,9 +552,6 @@ define('pastry/ui/Tree', [
                             tree.on('node-selected'    , function (node) { tree.onNodeSelected(node);    });
                         // }
                         // dom events {
-                            // domEvent.on(container, 'contextmenu', function () {
-                            //     return false;
-                            // });
                             domEvent.on(container, 'click', '.tree-node-expander', function (e) {
                                 getTreeNodeFromDelegateEventAndTree(e, tree).toggle();
                             });
@@ -589,7 +578,6 @@ define('pastry/ui/Tree', [
                                 tree.trigger('node-selected', treeNode);
                             });
                         // }
-
                     // }
                     return tree;
                 },

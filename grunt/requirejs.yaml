@@ -21,11 +21,11 @@ nodejs:
     wrap:
       startFile: <%= rjsOption.wrap.startFile %>
 
-components:
+ui:
   options:
-    name      : all-components-modules
+    name      : all-ui-modules
     baseUrl   : <%= path.src %>
-    out       : <%= build.components %>
+    out       : <%= build.ui %>
     optimize  : none
     useStrict : true
     paths     : <%= rjsOption.paths %>

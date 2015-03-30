@@ -11,8 +11,6 @@ var fs     = require('fs'),
 
     RE_acceptSuffix = /\.(html|htm|ptmpl)$/;
 
-// console.log(pastry);
-
 function getFilename (path) {
     var result = path.replace(RE_acceptSuffix, '');
     return result.match(/(\w*)$/)[0];
@@ -49,11 +47,11 @@ function compileTemplates () {
 
             console.log(
                 file,
-                outputFilename,
-                outputFileId,
-                content,
-                pastry.template.compile(content),
-                resultStr
+                outputFilename// ,
+                // outputFileId,
+                // content,
+                // pastry.template.compile(content),
+                // resultStr
             );
 
             fs.writeFileSync(outputFilename, pastry.sprintf(moduleStr, outputFileId, resultStr));
