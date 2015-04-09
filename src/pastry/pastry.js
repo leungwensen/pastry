@@ -645,7 +645,7 @@
                  * @description : 绑定函数运行上下文
                  * @parameter*  : {Function} func, 目标函数
                  * @parameter*  : {Object  } oThis, 上下文
-                 * @syntax      : pastry.uuid(func Function, oThis Object);
+                 * @syntax      : pastry.bind(func Function, oThis Object);
                  */
                 function (func) {
                     return applyNativeFunction(FP.bind, func, arguments);
@@ -714,6 +714,16 @@
                         return result;
                     });
             };
+            // TODO 约定一种生成guid的方法
+                //pastry.guid = function (prefix) {
+                    /*
+                     * @description : 生成guid
+                     * @parameter   : {String} prefix, 前缀
+                     * @syntax      : pastry.guid(prefix String);
+                     */
+                    //prefix = prefix || '';
+                //};
+            // };
         // }
     // }
     // 增加 pastry 函数 {

@@ -44,12 +44,12 @@ define('pastry/ui/Tooltip', [
     //     tooltip.hide();
     //     tooltip.hide();
      */
-    var
-        NS = '__tooltip__',
+    var NS = 'p_u_tooltip',
 
-        extend = pastry.extend,
+        body = document.body,
+
         each   = pastry.each,
-        body   = document.body,
+        extend = pastry.extend,
 
         Tooltip = declare('Tooltip', [Component], {
             constructor: function (option) {
@@ -187,6 +187,6 @@ define('pastry/ui/Tooltip', [
                 return Component.prototype.hide.call(tooltip);
             }
         });
-    return pastry.Tooltip = Tooltip;
+    return Tooltip;
 });
 

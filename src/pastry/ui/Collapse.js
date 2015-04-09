@@ -30,13 +30,20 @@ define('pastry/ui/Collapse', [
      * @description : Collapse component
      */
 
-    var
-        NS         = '__collapse__',
-        NS_SECTION = '__collapse_section__',
+    var NS         = 'p_u_collapse',
+        NS_SECTION = 'p_u_collapse_section',
+
+        each       = pastry.each,
+        extend     = pastry.extend,
+        isArray    = pastry.isArray,
+        isFunction = pastry.isFunction,
+        isString   = pastry.isString,
+        uuid       = pastry.uuid,
+
         Section = declare('CollapseSection', [Component], {
             constructor: function (option) {
                 var instance = this;
-                pastry.extend(instance, {
+                extend(instance, {
                     isOpen: false
                 }, option);
                 domEvent.on(instance.head, 'click', function () {
@@ -86,21 +93,21 @@ define('pastry/ui/Collapse', [
                 } else {
                     option = element;
                 }
-                pastry.extend(instance, {
+                extend(instance, {
                     isAccordion : true,
                     _sections   : {}
                 }, option);
-                instance.id = instance.id || pastry.uuid(NS);
+                instance.id = instance.id || uuid(NS);
                 if (!instance.container) {
                     instance.container = domConstruct.toDom(templateWrapper(instance));
                 } else {
                     instance.id = instance.container.id || instance.id;
                 }
-                pastry.each(domQuery.all('.panel', instance.container), function (element) {
+                each(domQuery.all('.panel', instance.container), function (element) {
                     instance.addSection(element);
                 });
-                if (pastry.isArray(instance.sections)) {
-                    pastry.each(instance.sections, function (section) {
+                if (isArray(instance.sections)) {
+                    each(instance.sections, function (section) {
                         instance.addSection(section);
                     });
                 }
@@ -108,7 +115,7 @@ define('pastry/ui/Collapse', [
             },
             eachSection: function (callback) {
                 var instance = this;
-                pastry.each(instance._sections, function (section) {
+                each(instance._sections, function (section) {
                     runIfIsFunction(callback, section);
                 });
                 return instance;
@@ -127,15 +134,15 @@ define('pastry/ui/Collapse', [
                     return instance;
                 }
 
-                if (domUtils.isNode(option) || pastry.isString(option)) {
+                if (domUtils.isNode(option) || isString(option)) {
                     container = domQuery.one(option);
                     option = {
                         container : container
                     };
                 } else {
-                    if (option.head && pastry.isString(option.head)) {
+                    if (option.head && isString(option.head)) {
                         container = domConstruct.toDom(templateSection(option));
-                        pastry.extend(option, {
+                        extend(option, {
                             container: container
                         });
                     } else if (option.container) {
@@ -143,10 +150,10 @@ define('pastry/ui/Collapse', [
                     }
                 }
                 if (!option.id) {
-                    option.id = container.id || pastry.uuid(NS_SECTION);
+                    option.id = container.id || uuid(NS_SECTION);
                 }
                 id = option.id;
-                pastry.extend(option, {
+                extend(option, {
                     head : domQuery.one('.panel-title [data-toggle=collapse]', container),
                     body : domQuery.one('.panel-collapse.collapse', container)
                 });
@@ -208,11 +215,11 @@ define('pastry/ui/Collapse', [
     };
 
     function runIfIsFunction (func, args) {
-        if (pastry.isFunction(func)) {
+        if (isFunction(func)) {
             func.call(null, args);
         }
     }
 
-    return pastry.Collapse = Collapse;
+    return Collapse;
 });
 

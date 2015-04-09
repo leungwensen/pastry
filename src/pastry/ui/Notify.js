@@ -23,8 +23,8 @@ define('pastry/ui/Notify', [
      * @author      : 绝云（wensen.lws）
      * @description : Notify component
      */
-    var NS         = '__notify__',
-        NS_MESSAGE = '__notify_message__',
+    var NS         = 'p_u_notify',
+        NS_MESSAGE = 'p_u_notify_message',
 
         defaultOption = {
             type     : 'info',
@@ -33,13 +33,17 @@ define('pastry/ui/Notify', [
             lifetime : 5000,
         },
 
+        extend     = pastry.extend,
+        isFunction = pastry.isFunction,
+        uuid       = pastry.uuid,
+
         Notify = declare('Notify', [Component], {
             constructor: function (option) {
                 var instance = this;
                 option = option || {};
 
-                pastry.extend(instance, {
-                    id           : pastry.uuid(NS),
+                extend(instance, {
+                    id           : uuid(NS),
                     message      : {},
                     messageCount : 0,
                     messageQueue : [],
@@ -55,7 +59,7 @@ define('pastry/ui/Notify', [
             },
             _initMessage: function (option) {
                 var instance = this,
-                    message  = pastry.extend({}, option, {
+                    message  = extend({}, option, {
                         domNode: domConstruct.toDom(templateMessage(option))
                     });
 
@@ -71,7 +75,7 @@ define('pastry/ui/Notify', [
                 if (message) {
                     domConstruct.place(message.domNode, instance.container, 'first');
                     instance.messageCount ++;
-                    if (pastry.isFunction(message.onShow)) {
+                    if (isFunction(message.onShow)) {
                         message.onShow();
                     }
                     message.timeout = setTimeout(function () {
@@ -91,7 +95,7 @@ define('pastry/ui/Notify', [
                     instance.messageCount --;
                     clearTimeout(message.timeout);
                     instance._showNext();
-                    if (pastry.isFunction(message.onHide)) {
+                    if (isFunction(message.onHide)) {
                         message.onHide();
                     }
                     Component.prototype.destroy.apply(message);
@@ -109,16 +113,16 @@ define('pastry/ui/Notify', [
             },
             config: function (option) {
                 var instance = this;
-                pastry.extend(instance.option, option);
+                extend(instance.option, option);
                 return instance;
             },
             log: function (option) {
                 var instance = this,
-                    id = option.id || pastry.uuid(NS_MESSAGE),
+                    id = option.id || uuid(NS_MESSAGE),
                     message;
 
                 // instance.show();
-                option = pastry.extend({
+                option = extend({
                     id: id
                 }, instance.option, option);
 
@@ -131,6 +135,6 @@ define('pastry/ui/Notify', [
             }
         });
 
-    return pastry.Notify = Notify;
+    return Notify;
 });
 

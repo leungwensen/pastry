@@ -20,11 +20,15 @@ define('pastry/ui/Component', [
      * @description : base constructor for ui components
      */
     var body = document.body,
+
+        extend  = pastry.extend,
+        destroy = pastry.destroy,
+
         Component = declare('pastry-Component', [], {
             initialise: function (info) {
                 var instance = this;
 
-                pastry.extend(instance, {
+                extend(instance, {
                     container : null, // DOM 相关操作
                     // events    : {},
                     // methods   : {}
@@ -35,7 +39,7 @@ define('pastry/ui/Component', [
                 var instance = this;
 
                 domConstruct.destroy(instance.container);
-                pastry.destroy(instance);
+                destroy(instance);
                 return instance;
             },
             placeAt: function (refNode, position) {
