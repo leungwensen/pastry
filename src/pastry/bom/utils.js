@@ -1,5 +1,5 @@
 /* jshint strict: true, undef: true, unused: true */
-/* global define, location, navigator, ActiveXObject */
+/* global window, define, location, navigator, ActiveXObject */
 
 define('pastry/bom/utils', [
     'pastry/pastry'
@@ -12,7 +12,8 @@ define('pastry/bom/utils', [
      * @description : 记录各种浏览器相关的版本号
      * @note        : browser only
      */
-    var nav       = navigator || {},
+    var win       = window,
+        nav       = navigator || {},
         userAgent = nav.userAgent,
         platform  = nav.platform,
         plugins   = nav.plugins,
@@ -156,6 +157,7 @@ define('pastry/bom/utils', [
         versions  : versions,
         isWebkit  : !!versions.webkit,
         isIE      : !!versions.msie,
+        isOpera   : !!win.opera,
         isApple   : (
             detectedPlatform.mac    ||
             detectedPlatform.ipad   ||
