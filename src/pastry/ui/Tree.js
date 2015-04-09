@@ -34,8 +34,8 @@ define('pastry/ui/Tree', [
      * @description : Tree
      */
 
-    var NS      = '__tree__',
-        NS_NODE = '__tree_node__',
+    var NS      = 'p_u_tree',
+        NS_NODE = 'p_u_tree_node',
 
         INDENT_LENGTH = 16, // indent for one level
 
@@ -121,13 +121,13 @@ define('pastry/ui/Tree', [
                 return node;
             },
             // attributes {
-                id                : null  ,
-                label             : null  , // label
-                indent            : 0     , // indent of the node
-                parentId          : null  ,
-                iconClass         : null  ,
-                expanderIconClass : null  ,
-                expanderText      : null  ,
+                id                : null ,
+                label             : null , // label
+                indent            : 0    , // indent of the node
+                parentId          : null ,
+                iconClass         : null ,
+                expanderIconClass : null ,
+                expanderText      : null ,
             // }
             // private methods {
                 _setLabel: function () {
@@ -145,10 +145,19 @@ define('pastry/ui/Tree', [
                     }
                     return node;
                 },
+                _setTitle: function() {
+                    var node = this,
+                        title;
+                    if (node.tree.getTitle) {
+                        title = node.tree.getTitle(node);
+                    } else {
+                        title = node.title || '';
+                    }
+                    return node;
+                },
                 _setIconClass: function () {
                     var node = this,
                         iconClass;
-
                     if (node.hasIcon) {
                         if (node.tree.getIconClass) {
                             iconClass = node.tree.getIconClass(node);
@@ -179,7 +188,6 @@ define('pastry/ui/Tree', [
                 _setExpanderIconClass: function () {
                     var node = this,
                         expanderIconClass;
-
                     if (node.isExpandable && node.hasExpanderIcon) {
                         if (node.tree.getExpanderIconClass) {
                             expanderIconClass = node.tree.getExpanderIconClass(node);
@@ -198,7 +206,6 @@ define('pastry/ui/Tree', [
                 _setExpanderText: function () {
                     var node = this,
                         expanderText;
-
                     if (node.isExpandable && !node.hasExpanderIcon) {
                         if (node.tree.getExpanderText) {
                             expanderText = node.tree.getExpanderText(node);
@@ -216,7 +223,6 @@ define('pastry/ui/Tree', [
                 _setIndent: function () {
                     var node = this,
                         indent;
-
                     indent = INDENT_LENGTH * node.getLevel(); // 计算缩进
                     node.indent = indent;
                     if (node.indenterElement) {
@@ -226,7 +232,6 @@ define('pastry/ui/Tree', [
                 },
                 _setLoaded: function () {
                     var node = this;
-
                     node.isLoaded = true;
                     node.eachChild(function (child) {
                         child.load();
@@ -253,6 +258,7 @@ define('pastry/ui/Tree', [
                 _updateLayout: function () {
                     return this
                         ._setLabel()
+                        ._setTitle()
                         ._setIconClass()
                         ._setSelectedClass()
                         ._setExpanderIconClass()
@@ -424,7 +430,6 @@ define('pastry/ui/Tree', [
                      */
                     var node = this,
                         container;
-
                     // get attributes {
                         if (!node.parent) {
                             node.isRoot = true;
@@ -458,7 +463,6 @@ define('pastry/ui/Tree', [
                      * @description: load the node to the tree;
                      */
                     var node = this;
-
                     if (!node.isLoaded) {
                         if (node.isRoot) {
                             node.placeAt(node.tree.bodyElement, 'first');
@@ -624,7 +628,9 @@ define('pastry/ui/Tree', [
                                     node.parent = parent;
                                     parent.addChild(node);
                                 } else {
-                                    pastry.ERROR('node with id ' + parentId + ' does not exists');
+                                    // TODO 统一走i18n，用msgid {
+                                        pastry.ERROR('node with id ' + parentId + ' does not exists');
+                                    // }
                                 }
                             }
                         // }
@@ -743,13 +749,15 @@ define('pastry/ui/Tree', [
         });
 
     function queryFilter (target, queryObj) {
-        return pastry.every(queryObj, function (value, key) {
+        return every(queryObj, function (value, key) {
             return target[key] === value;
         });
     }
 
-    // Tree.render = function (/* container, option */) {
-    // };
+    // TODO 根据dom结构render树 {
+        // Tree.render = function (/* container, option */) {
+        // };
+    // }
 
     Tree.Node = TreeNode;
     return Tree;

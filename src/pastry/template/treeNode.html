@@ -17,7 +17,7 @@
         {% if (hasIcon) { %}
             <span class="tree-node-icon {%= iconClass %}"></span>
         {% } %}
-        <span class="tree-node-label">{%= label %}</span>
+        <span class="tree-node-label" {% if (title) { %} title="{%= title %}" {% } %}>{%= label %}</span>
     </td>
     {% if (extraColumns) { %}
         {% helper.each(extraColumns, function (col) { %}
