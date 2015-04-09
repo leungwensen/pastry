@@ -41,9 +41,16 @@ function compileTemplates () {
                         'return %s' +
                     '});' +
                     '\n/* jshint ignore:end */',
+
+                // bugfix for node.js version 0.12.0 {
+                //     * new Function(){} => toString() :
+                //         * additional line break;
+                //         * additional `/**/`;
+                // }
                 resultStr = pastry.template.compile(content).toString()
-                    .replace(/^\s*function\s+anonymous\(\s*obj\,\s*helper\s*\,\s*ne\s*\)\s*\{/, 'function(obj, ne){')
-                    .replace(/\\n\s*/g, '');
+                    .replace(/function\s+anonymous\s*\([^){]*\)\s*\{/, 'function(obj, ne){')
+                    .replace(/\\n\s+/g, '')
+                    .replace(/\/\*\*\//g, '');
 
             console.log(
                 file,
