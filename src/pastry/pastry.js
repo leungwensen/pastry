@@ -71,7 +71,8 @@
             },
 
             each,
-            hasValue;
+            hasValue,
+            uc;
         // }
 
     // }
@@ -374,7 +375,7 @@
                  */
                 return (str + '').toLowerCase();
             };
-            pastry.uc = function (str) {
+            uc = pastry.uc = function (str) {
                 /*
                  * @syntax: pastry.uc(str String);
                  */
@@ -388,7 +389,7 @@
             };
             pastry.capitalize = function (str) {
                 str = str + '';
-                return str.charAt(0).toUpperCase() + str.substr(1);
+                return uc(str.charAt(0)) + str.substr(1);
             };
         // }
         // 其它类型判断 pastry.is$Type(obj) {
@@ -675,7 +676,7 @@
                 'log',
                 'warn'
             ], function (type) {
-                pastry[type.toUpperCase()] = (typeof console === US) ? noop : pastry.bind(console[type], console);
+                pastry[uc(type)] = (typeof console === US) ? noop : pastry.bind(console[type], console);
             });
             pastry.ERROR = function (err) {
                 pastry.WARN(err);

@@ -1,4 +1,4 @@
-<tr class="tree-node {% if (isSelected) { %}selected{% } %}" data-id="{%= id %}">
+<tr data-id="{%= id %}" class="tree-node {% if (isSelected) { %}selected{% } %}" {% if (isDraggable) { %} draggable="true" {% } %} {% if (isDroppable) { %} droppable="true" {% } %}>
     <td>
         <span class="tree-node-indenter" style="margin-left: {%= indent %}px;">
             {% if (isBranch) { %}

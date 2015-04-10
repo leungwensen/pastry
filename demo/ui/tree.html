@@ -30,6 +30,7 @@
         var body = document.body,
             tree = new Tree({
                 hasHead        : true,
+                canDnD         : true,
                 treeColumnName : '树表格',
                 extraColumns: [{
                     label: 'id',
@@ -93,7 +94,9 @@
             type   : 'json',
             success : function (data) {
                 secondTree = new Tree({
+                    canDnD         : true,
                     hasHead        : true,
+                    hasIcon        : true,
                     treeColumnName : '单一根节点树',
                     data           : data
                 }).placeAt(body);

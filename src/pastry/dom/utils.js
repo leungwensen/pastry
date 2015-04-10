@@ -20,7 +20,7 @@ define('pastry/dom/utils', [
         hasTextContent : 'textContent' in testDiv,
         hasClassList   : 'classList'   in testDiv,
         hasDataSet     : 'dataset'     in testDiv,
-        canDnd         : 'draggable'   in testDiv,
+        canDnD         : 'draggable'   in testDiv,
         isQuirks       : pastry.lc(doc.compatMode) === 'backcompat' || doc.documentMode === 5, // 怪异模式
         testDiv        : testDiv,
 
@@ -34,6 +34,7 @@ define('pastry/dom/utils', [
                 return container !== element &&
                     container.contains(element);
             },
+
         isNode: function (element) {
             var t;
             return element &&

@@ -71,7 +71,8 @@
             },
 
             each,
-            hasValue;
+            hasValue,
+            uc;
         // }
 
     // }
@@ -374,7 +375,7 @@
                  */
                 return (str + '').toLowerCase();
             };
-            pastry.uc = function (str) {
+            uc = pastry.uc = function (str) {
                 /*
                  * @syntax: pastry.uc(str String);
                  */
@@ -388,7 +389,7 @@
             };
             pastry.capitalize = function (str) {
                 str = str + '';
-                return str.charAt(0).toUpperCase() + str.substr(1);
+                return uc(str.charAt(0)) + str.substr(1);
             };
         // }
         // 其它类型判断 pastry.is$Type(obj) {
@@ -645,7 +646,7 @@
                  * @description : 绑定函数运行上下文
                  * @parameter*  : {Function} func, 目标函数
                  * @parameter*  : {Object  } oThis, 上下文
-                 * @syntax      : pastry.uuid(func Function, oThis Object);
+                 * @syntax      : pastry.bind(func Function, oThis Object);
                  */
                 function (func) {
                     return applyNativeFunction(FP.bind, func, arguments);
@@ -675,7 +676,7 @@
                 'log',
                 'warn'
             ], function (type) {
-                pastry[type.toUpperCase()] = (typeof console === US) ? noop : pastry.bind(console[type], console);
+                pastry[uc(type)] = (typeof console === US) ? noop : pastry.bind(console[type], console);
             });
             pastry.ERROR = function (err) {
                 pastry.WARN(err);
@@ -714,6 +715,16 @@
                         return result;
                     });
             };
+            // TODO 约定一种生成guid的方法
+                //pastry.guid = function (prefix) {
+                    /*
+                     * @description : 生成guid
+                     * @parameter   : {String} prefix, 前缀
+                     * @syntax      : pastry.guid(prefix String);
+                     */
+                    //prefix = prefix || '';
+                //};
+            // };
         // }
     // }
     // 增加 pastry 函数 {
