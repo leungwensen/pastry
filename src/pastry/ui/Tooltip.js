@@ -55,7 +55,7 @@ define('pastry/ui/Tooltip', [
             constructor: function (option) {
                 option = option || {};
                 var tooltip = this,
-                    container;
+                    domNode;
 
                 tooltip.option = extend({
                     gravity : 'n',   // 方向
@@ -64,10 +64,10 @@ define('pastry/ui/Tooltip', [
                 }, option);
                 tooltip.id = option.id || pastry.uuid(NS);
 
-                container = tooltip.container = domConstruct.toDom(templateWrapper(tooltip));
+                domNode = tooltip.domNode = domConstruct.toDom(templateWrapper(tooltip));
                 tooltip.placeAt(body);
-                tooltip.wrapArrow = domQuery.one('.tooltip-arrow', container);
-                tooltip.wrapBody  = domQuery.one('.tooltip-body' , container);
+                tooltip.wrapArrow = domQuery.one('.tooltip-arrow', domNode);
+                tooltip.wrapBody  = domQuery.one('.tooltip-body' , domNode);
                 tooltip.hide();
                 tooltip.isShown = false;
                 return tooltip;
@@ -84,7 +84,7 @@ define('pastry/ui/Tooltip', [
                  *     option.offset  : tooltip 显示偏移量
                  */
                 var tooltip = this,
-                    container = tooltip.container,
+                    domNode = tooltip.domNode,
                     wrapArrow = tooltip.wrapArrow,
                     wrapBody  = tooltip.wrapBody,
                     showOpt   = extend({}, tooltip.option, option),
@@ -108,10 +108,10 @@ define('pastry/ui/Tooltip', [
                     domClass.clear(wrapArrow);
                     domClass.add(wrapArrow, 'tooltip-arrow tooltip-arrow-' + gravity.charAt(0));
 
-                    domClass.clear(container);
-                    domClass.add(container, 'tooltip tooltip-' + gravity);
+                    domClass.clear(domNode);
+                    domClass.add(domNode, 'tooltip tooltip-' + gravity);
                     if (showOpt.className) {
-                        domClass.add(container, 'tooltip-' + showOpt.className);
+                        domClass.add(domNode, 'tooltip-' + showOpt.className);
                     }
                     Component.prototype.show.call(tooltip);
                     tooltip.isShown = true;
@@ -176,7 +176,7 @@ define('pastry/ui/Tooltip', [
                 // }
                 // 定位 {
                     each(tPos, function (value, key) {
-                        domStyle.set(container, key, value + 'px');
+                        domStyle.set(domNode, key, value + 'px');
                     });
                 // }
                 return tooltip;

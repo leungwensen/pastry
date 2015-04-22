@@ -29,7 +29,7 @@ define('pastry/ui/Component', [
                 var instance = this;
 
                 extend(instance, {
-                    container : null, // DOM 相关操作
+                    domNode : null, // DOM 相关操作
                     // events    : {},
                     // methods   : {}
                 }, info);
@@ -38,35 +38,35 @@ define('pastry/ui/Component', [
             destroy: function () {
                 var instance = this;
 
-                domConstruct.destroy(instance.container);
+                domConstruct.destroy(instance.domNode);
                 destroy(instance);
                 return instance;
             },
             placeAt: function (refNode, position) {
                 var instance = this,
-                    container;
+                    domNode;
 
                 refNode = domQuery.one(refNode) || body;
-                if (container = instance.container) {
-                    domConstruct.place(container, refNode, position);
+                if (domNode = instance.domNode) {
+                    domConstruct.place(domNode, refNode, position);
                 }
                 return instance;
             },
             show: function () {
                 var instance = this,
-                    container;
+                    domNode;
 
-                if (container = instance.container) {
-                    domStyle.show(container);
+                if (domNode = instance.domNode) {
+                    domStyle.show(domNode);
                 }
                 return instance;
             },
             hide: function () {
                 var instance = this,
-                    container;
+                    domNode;
 
-                if (container = instance.container) {
-                    domStyle.hide(container);
+                if (domNode = instance.domNode) {
+                    domStyle.hide(domNode);
                 }
                 return instance;
             }

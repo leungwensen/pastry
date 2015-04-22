@@ -167,7 +167,7 @@ var define;
         define('pastry/pastry', function () {
             return pastry;
         });
-        define('pastry/event', function () {
+        define('pastry/event/event', function () {
             return pastry.event;
         });
     // }

@@ -19,7 +19,7 @@ define('pastry/dom/query', [
             toArray   = pastry.toArray,
             arrayLike = pastry.isArrayLike,
             isString  = pastry.isString,
-            isNode    = domUtils.isNode,
+            isDomNode = domUtils.isDomNode,
             contains  = domUtils.contains,
             testDiv   = domUtils.testDiv,
         // }
@@ -60,8 +60,8 @@ define('pastry/dom/query', [
         if (!root || !selector) {
             return [];
         }
-        if (selector === win || isNode(selector)) {
-            return !optRoot || (selector !== win && isNode(root) && contains(selector, root)) ?
+        if (selector === win || isDomNode(selector)) {
+            return !optRoot || (selector !== win && isDomNode(root) && contains(selector, root)) ?
                 [selector] : [];
         }
         if (selector.nodeType === 11) { // document fragment

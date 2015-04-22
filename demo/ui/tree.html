@@ -29,31 +29,31 @@
     ) {
         var body = document.body,
             tree = new Tree({
-                hasHead        : true,
-                canDnD         : true,
-                treeColumnName : '树表格',
+                hasHead: true,
+                canDnD: true,
+                treeColumnName: '树表格',
                 extraColumns: [{
                     label: 'id',
-                    key  : 'id'
+                    key: 'id'
                 }, {
                     label: '描述',
-                    key  : 'name'
+                    key: 'name'
                 }],
                 hasIcon: true,
                 hasCheckbox: true,
                 hasExpanderIcon: true,
                 // getExpanderIconClass: function (node) {
                 // },
-                onNodeExpanded: function (node) {
+                onExpand: function (node) {
                     console.log(node);
                 },
-                onNodeContextmenu: function (node) {
+                onContextmenu: function (node) {
                     alert('contextmenu ', node.name);
                 },
-                onNodeClicked: function (node) {
+                onClick: function (node) {
                     // alert('clicked ', node.name);
                 },
-                onNodeDblclicked: function (node) {
+                onDblclick: function (node) {
                     alert('dblclicked ', node.name);
                 },
             });

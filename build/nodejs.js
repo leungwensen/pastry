@@ -1024,7 +1024,7 @@ var define;
         define('pastry/pastry', function () {
             return pastry;
         });
-        define('pastry/event', function () {
+        define('pastry/event/event', function () {
             return pastry.event;
         });
     // }
@@ -1572,7 +1572,7 @@ define('pastry/oop/declare', [
 /* jshint strict: true, undef: true, unused: true */
 /* global define */
 
-define('pastry/Color', [
+define('pastry/color/Color', [
     'pastry/pastry',
     'pastry/color/hexByName',
     'pastry/oop/declare'
@@ -1798,7 +1798,7 @@ define('pastry/Color', [
         }
     });
 
-    return pastry.Color = declare('Color', classMaker);
+    return pastry.Color = declare('pastry/color/Color', classMaker);
 });
 
 
@@ -2156,7 +2156,7 @@ define('all-nodejs-modules',[
         'pastry/fmt/camelCase',
     // }
     // Color {
-        'pastry/Color',
+        'pastry/color/Color',
     // }
     // encoding {
         'pastry/encoding/json',

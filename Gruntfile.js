@@ -38,7 +38,7 @@ module.exports = function (grunt) {
                 wrap: {
                     startFile: [
                         '<%= path.src %>/pastry/pastry.js',
-                        '<%= path.src %>/pastry/event.js',
+                        '<%= path.src %>/pastry/event/event.js',
                         '<%= path.src %>/pastry/module/define.js'
                     ]
                 }

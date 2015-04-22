@@ -50,7 +50,7 @@ define('pastry/ui/Notify', [
                     status       : {},
                     option       : defaultOption,
                 }, option);
-                option.container = option.container || domConstruct.toDom(templateWrapper({
+                option.domNode = option.domNode || domConstruct.toDom(templateWrapper({
                     id: instance.id
                 }));
                 instance.initialise(option);
@@ -73,7 +73,7 @@ define('pastry/ui/Notify', [
                     message  = instance.message[id];
 
                 if (message) {
-                    domConstruct.place(message.domNode, instance.container, 'first');
+                    domConstruct.place(message.domNode, instance.domNode, 'first');
                     instance.messageCount ++;
                     if (isFunction(message.onShow)) {
                         message.onShow();

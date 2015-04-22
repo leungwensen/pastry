@@ -1,7 +1,7 @@
 /* jshint strict: true, undef: true, unused: true */
 /* global define */
 
-define('pastry/Color', [
+define('pastry/color/Color', [
     'pastry/pastry',
     'pastry/color/hexByName',
     'pastry/oop/declare'
@@ -227,6 +227,6 @@ define('pastry/Color', [
         }
     });
 
-    return pastry.Color = declare('Color', classMaker);
+    return pastry.Color = declare('pastry/color/Color', classMaker);
 });
 

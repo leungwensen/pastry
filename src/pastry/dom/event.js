@@ -103,7 +103,7 @@ define('pastry/dom/event', [
             return;
         }
         element = domQuery.one(element); // delegation is only for one element
-        if (!domUtils.isNode(element)) {
+        if (!domUtils.isDomNode(element)) {
             pastry.ERROR('cannot bind events to non-elements: ' + element);
         }
         function wrapper (e) {

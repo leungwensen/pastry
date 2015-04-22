@@ -36,11 +36,12 @@ define('pastry/ui/Collapse', [
         each       = pastry.each,
         extend     = pastry.extend,
         isArray    = pastry.isArray,
+        isDomNode  = domUtils.isString,
         isFunction = pastry.isFunction,
         isString   = pastry.isString,
         uuid       = pastry.uuid,
 
-        Section = declare('CollapseSection', [Component], {
+        Section = declare('pastry/ui/CollapseSection', [Component], {
             constructor: function (option) {
                 var instance = this;
                 extend(instance, {
@@ -84,12 +85,12 @@ define('pastry/ui/Collapse', [
                 return instance;
             }
         }),
-        Collapse = declare('Collapse', [Component], {
+        Collapse = declare('pastry/ui/Collapse', [Component], {
             constructor: function (element, option) {
                 var instance = this;
                 option = option || {};
-                if (domUtils.isNode(element)) {
-                    option.container = element;
+                if (isDomNode(element)) {
+                    option.domNode = element;
                 } else {
                     option = element;
                 }
@@ -98,12 +99,12 @@ define('pastry/ui/Collapse', [
                     _sections   : {}
                 }, option);
                 instance.id = instance.id || uuid(NS);
-                if (!instance.container) {
-                    instance.container = domConstruct.toDom(templateWrapper(instance));
+                if (!instance.domNode) {
+                    instance.domNode = domConstruct.toDom(templateWrapper(instance));
                 } else {
-                    instance.id = instance.container.id || instance.id;
+                    instance.id = instance.domNode.id || instance.id;
                 }
-                each(domQuery.all('.panel', instance.container), function (element) {
+                each(domQuery.all('.panel', instance.domNode), function (element) {
                     instance.addSection(element);
                 });
                 if (isArray(instance.sections)) {
@@ -124,7 +125,7 @@ define('pastry/ui/Collapse', [
                 /*
                  * option can be an element(or string) or object
                  */
-                var container,
+                var domNode,
                     id,
                     section,
                     onClick,
@@ -134,28 +135,28 @@ define('pastry/ui/Collapse', [
                     return instance;
                 }
 
-                if (domUtils.isNode(option) || isString(option)) {
-                    container = domQuery.one(option);
+                if (isDomNode(option) || isString(option)) {
+                    domNode = domQuery.one(option);
                     option = {
-                        container : container
+                        domNode : domNode
                     };
                 } else {
                     if (option.head && isString(option.head)) {
-                        container = domConstruct.toDom(templateSection(option));
+                        domNode = domConstruct.toDom(templateSection(option));
                         extend(option, {
-                            container: container
+                            domNode: domNode
                         });
-                    } else if (option.container) {
-                        container = option.container;
+                    } else if (option.domNode) {
+                        domNode = option.domNode;
                     }
                 }
                 if (!option.id) {
-                    option.id = container.id || uuid(NS_SECTION);
+                    option.id = domNode.id || uuid(NS_SECTION);
                 }
                 id = option.id;
                 extend(option, {
-                    head : domQuery.one('.panel-title [data-toggle=collapse]', container),
-                    body : domQuery.one('.panel-collapse.collapse', container)
+                    head : domQuery.one('.panel-title [data-toggle=collapse]', domNode),
+                    body : domQuery.one('.panel-collapse.collapse', domNode)
                 });
 
                 onClick = option.onClick;
@@ -166,8 +167,8 @@ define('pastry/ui/Collapse', [
 
                 section = new Section(option);
                 instance._sections[id] = section;
-                if (!domUtils.contains(section.container, instance.container)) {
-                    section.placeAt(instance.container);
+                if (!domUtils.contains(section.domNode, instance.domNode)) {
+                    section.placeAt(instance.domNode);
                 }
                 return instance;
             },
@@ -209,9 +210,9 @@ define('pastry/ui/Collapse', [
         });
 
     Collapse.Section = Section;
-    Collapse.render  = function (container, option) {
-        container = domQuery.one(container);
-        return new Collapse(container, option);
+    Collapse.render  = function (domNode, option) {
+        domNode = domQuery.one(domNode);
+        return new Collapse(domNode, option);
     };
 
     function runIfIsFunction (func, args) {

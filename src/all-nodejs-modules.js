@@ -7,7 +7,7 @@ define([
         'pastry/fmt/camelCase',
     // }
     // Color {
-        'pastry/Color',
+        'pastry/color/Color',
     // }
     // encoding {
         'pastry/encoding/json',
