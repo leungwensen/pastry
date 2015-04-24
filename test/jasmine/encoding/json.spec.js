@@ -6,11 +6,11 @@ require([
     'pastry/encoding/json'
 ], function (
     pastry,
-    JSON
+    json
 ) {
     'use strict';
 
-    describe('json', function () {
+    describe('pastry/encoding/json', function () {
         var strJSON = '{"kitcambridge":"Kit","contributors":{"jdalton":"John-David","mathias":"Mathias"},"list":[1,2,3],"number":5,"date":"2012-04-25T14:08:36.879Z","boolean":true,"nil":null}';
         var objJSON = {
             "kitcambridge":"Kit",
@@ -25,16 +25,16 @@ require([
             "nil":null
         };
         it('json.parse(str, strict)', function () {
-            expect(JSON.parse(strJSON)).toEqual(objJSON);
+            expect(json.parse(strJSON)).toEqual(objJSON);
         });
 
         it('json.stringify(value, replacer, spacer)', function () {
-            expect(JSON.stringify(objJSON)).toEqual(strJSON);
+            expect(json.stringify(objJSON)).toEqual(strJSON);
         });
 
         it('bug in Firefox 3.5/Gecko 1.9', function () {
             expect(
-                JSON.stringify({
+                json.stringify({
                     x   : 1,
                     arr : [1]
                 }, function (k, v) {
