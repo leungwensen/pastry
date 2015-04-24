@@ -82,9 +82,9 @@ module.exports = function (grunt) {
             dist: {
                 js: {
                    '<%= path.dist %>/pastry.ui.min.js'     : '<%= build.ui %>',
-                   '<%= path.dist %>/pastry.amd.min.js'    : '<%= build.nodejs %>',
+                   '<%= path.dist %>/pastry.amd.min.js'    : '<%= build.amd %>',
                    '<%= path.dist %>/pastry.min.js'        : '<%= build.core %>',
-                   '<%= path.dist %>/pastry.nodejs.min.js' : '<%= build.amd %>'
+                   '<%= path.dist %>/pastry.nodejs.min.js' : '<%= build.nodejs %>'
                 },
                 css: {
                    '<%= path.dist %>/pastry.min.css'    : '<%= path.build %>/pastry.css',
