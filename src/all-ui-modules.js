@@ -24,8 +24,15 @@ define([
     // html {
         'pastry/html/escape',
     // }
+    // promise {
+        //'pastry/promise/Promise',
+    // }
     // dom {
         'pastry/dom/hotkey',
+    // }
+    // io {
+        //'pastry/io/ajax',
+        'pastry/io/fetch',
     // }
     // all ui components {
         'pastry/ui/Collapse',

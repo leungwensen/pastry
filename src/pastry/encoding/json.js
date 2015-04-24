@@ -21,12 +21,17 @@ define('pastry/encoding/json', [
          */
         pastry.json = obj;
         pastry.setGLOBAL('JSON', obj);
+        return obj;
     }
 
-    if (JSON && !!JSON.parse && !!JSON.stringify) {
-        exportJSON(JSON);
-        return JSON;
-    }
+    // 注释掉这一段来测试shim代码 {
+        if (
+            typeof JSON !== 'undefined' && JSON &&
+            !!JSON.parse && !!JSON.stringify
+        ) {
+            return exportJSON(JSON);
+        }
+    // }
 
     var D2JSON = Date.prototype.toJSON,
         // saving codes {
@@ -150,7 +155,6 @@ define('pastry/encoding/json', [
             }
         };
 
-    exportJSON(shim);
-    return shim;
+    return exportJSON(shim);
 });
 

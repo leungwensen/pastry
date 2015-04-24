@@ -666,7 +666,7 @@
                     }
                 };
         // }
-        // debug {
+        // debug TODO 废弃，只保留一个i18n的wrapper {
             /*
              * @description : debug 相关函数
              * @syntax      : pastry.[INFO|LOG|WARN|ERROR]

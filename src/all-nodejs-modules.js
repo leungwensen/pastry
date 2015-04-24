@@ -21,6 +21,9 @@ define([
     // html {
         'pastry/html/escape',
     // }
+    // promise {
+        'pastry/promise/Promise',
+    // }
 ], function() {
     /*
      * @author      : 绝云（wensen.lws）
