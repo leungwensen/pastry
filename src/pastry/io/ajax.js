@@ -28,7 +28,9 @@ define('pastry/io/ajax', [
         ]);
     }
 
-    var ajax = function (uri, option) {
+    var noCacheCounter = 0,
+        hasSubString = pastry.hasSubString,
+        ajax = function (uri, option) {
         /*
          * @description : ajax.
          * @syntax      : [pastry.]ajax(uri[, option])[.error(callback)][.success(callback)]..
@@ -99,8 +101,14 @@ define('pastry/io/ajax', [
         // }
         // progress ajax {
             if (method === 'GET') {
+                if (option.noCache) {
+                    uri += (
+                        (hasSubString(uri, '?') ? '&' : '?') +
+                        '_PASTRY_NO_CACHE_=' + (noCacheCounter ++)
+                    );
+                }
                 if (data) {
-                    uri += (uri.indexOf('?') > -1 ? '&' : '?') + data;
+                    uri += (hasSubString(uri, '?') ? '&' : '?') + data;
                 }
                 xhr.open(method, uri, isAsync, username, password);
                 xhr.setRequestHeader(
