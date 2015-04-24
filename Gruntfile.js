@@ -2,12 +2,29 @@
 module.exports = function (grunt) {
     'use strict';
 
-    var exec = require('child_process').exec,
-        pkg  = grunt.file.readJSON('package.json');
+    var spawn = require( "child_process" ).spawn,
+        pkg   = grunt.file.readJSON('package.json');
 
     grunt.registerTask('compileTemplates', function () {
-        exec('./bin/js/compileTemplate.js', function (error, stdout, stderr) {
-            console.log(error, stdout, stderr);
+        var done = this.async();
+        spawn('node', [
+            './bin/js/compileTemplate.js',
+        ], {
+            stdio: "inherit"
+        }).on("close", function(code) {
+            done(code === 0);
+        });
+    });
+
+    grunt.registerTask('promiseAPlusTests', function () {
+        var done = this.async();
+        spawn('node', [
+            'node_modules/.bin/promises-aplus-tests',
+            'test/promise/promise.adapter.js',
+        ], {
+            stdio: "inherit"
+        }).on("close", function(code) {
+            done(code === 0);
         });
     });
 

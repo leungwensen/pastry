@@ -4,6 +4,7 @@ build:
   - compileTemplates
   - requirejs
   - jasmine
+  - promiseAPlusTests
   - less
   - copy:build
 
@@ -19,6 +20,10 @@ travis:
   - compileTemplates
   - requirejs
   - jasmine
+  - promiseAPlusTests
+
+test:
+  - travis
 
 demo:
   - connect:demo

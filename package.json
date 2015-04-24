@@ -4,7 +4,7 @@
     "title"       : "pastry",
     "description" : "easing SPA(single page application) development.",
     "homepage"    : "https://github.com/leungwensen/pastry",
-    "version"     : "0.3.20150422",
+    "version"     : "0.3.20150424",
     "main"        : "build/nodejs",
 
     "author": {
@@ -40,6 +40,7 @@
         "grunt-html-validation"   : "*",
         "grunt-jekyll"            : "*",
         "load-grunt-config"       : "*",
+        "promises-aplus-tests"    : "*",
         "time-grunt"              : "*"
     },
 
@@ -65,7 +66,7 @@
     },
 
     "scripts" : {
-        "test" : "grunt travis --verbose"
+        "test" : "grunt travis --verbose && promises-aplus-tests test/promise/promise.adapter.js"
     }
 }
 
