@@ -7,11 +7,13 @@ build:
   - promiseAPlusTests
   - less
   - copy:build
+  - copy:locale
 
 dist:
   - build
   - clean
   - copy:dist
+  - copy:locale
   - uglify
   - cssmin
 

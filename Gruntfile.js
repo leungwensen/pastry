@@ -33,24 +33,25 @@ module.exports = function (grunt) {
     require('load-grunt-config')(grunt, {
         init: true,
         data: {
-            pkg        : pkg,
-            banner     : '/*! <%= pkg.name %> - v<%= pkg.version %> */',
-            host       : '127.0.0.1',
-            port       : 9090,
-            livereload : 32599,
+            pkg: pkg,
+            banner: '/*! <%= pkg.name %> - v<%= pkg.version %> */',
+            host: '127.0.0.1',
+            port: 9090,
+            livereload: 32599,
 
             path: {
-                build : 'build',
-                dist  : 'dist/<%= pkg.version %>',
-                src   : 'src',
-                test  : 'test'
+                build: 'build',
+                dist: 'dist/<%= pkg.version %>',
+                src: 'src',
+                test: 'test'
             },
 
             rjsOption: {
                 paths: {
-                    'pastry/pastry' : 'empty:',
-                    'pastry/event'  : 'empty:',
-                    'pastry/Module' : 'empty:'
+                    'pastry/pastry': 'empty:',
+                    'pastry/event': 'empty:',
+                    'pastry/locale/*': 'empty:',
+                    'pastry/Module': 'empty:'
                 },
                 wrap: {
                     startFile: [
@@ -62,40 +63,40 @@ module.exports = function (grunt) {
             },
 
             build: {
-                core   : '<%= path.src %>/pastry/pastry.js',
-                amd    : '<%= path.src %>/amd-loader.js',
-                nodejs : '<%= path.build %>/nodejs.js',
-                ui     : '<%= path.build %>/ui.js',
+                core: '<%= path.src %>/pastry/pastry.js',
+                amd: '<%= path.src %>/amd-loader.js',
+                nodejs: '<%= path.build %>/nodejs.js',
+                ui: '<%= path.build %>/ui.js',
                 css: {
-                    '<%= path.build %>/pastry.css'        : '<%= path.src %>/pastry/stylesheet/pastry.less',
-                    '<%= path.build %>/ui.css'            : '<%= path.src %>/pastry/stylesheet/ui.less',
-                    '<%= path.build %>/theme/default.css' : '<%= path.src %>/pastry/stylesheet/theme/default.less',
+                    '<%= path.build %>/pastry.css': '<%= path.src %>/pastry/stylesheet/pastry.less',
+                    '<%= path.build %>/ui.css': '<%= path.src %>/pastry/stylesheet/ui.less',
+                    '<%= path.build %>/theme/default.css': '<%= path.src %>/pastry/stylesheet/theme/default.less',
                 },
                 font: {
-                    expand : true,
-                    cwd    : '<%= path.src %>/pastry/stylesheet/',
-                    src    : 'font/**',
-                    dest   : '<%= path.build %>/',
+                    expand: true,
+                    cwd: '<%= path.src %>/pastry/stylesheet/',
+                    src: 'font/**',
+                    dest: '<%= path.build %>/',
                 }
             },
 
             dist: {
                 js: {
-                   '<%= path.dist %>/pastry.ui.min.js'     : '<%= build.ui %>',
-                   '<%= path.dist %>/pastry.amd.min.js'    : '<%= build.amd %>',
-                   '<%= path.dist %>/pastry.min.js'        : '<%= build.core %>',
-                   '<%= path.dist %>/pastry.nodejs.min.js' : '<%= build.nodejs %>'
+                   '<%= path.dist %>/pastry.ui.min.js': '<%= build.ui %>',
+                   '<%= path.dist %>/pastry.amd.min.js': '<%= build.amd %>',
+                   '<%= path.dist %>/pastry.min.js': '<%= build.core %>',
+                   '<%= path.dist %>/pastry.nodejs.min.js': '<%= build.nodejs %>'
                 },
                 css: {
-                   '<%= path.dist %>/pastry.min.css'    : '<%= path.build %>/pastry.css',
-                   '<%= path.dist %>/pastry.ui.min.css' : '<%= path.build %>/ui.css',
-                   '<%= path.dist %>/pastry.theme-default.min.css' : '<%= path.build %>/theme/default.css',
+                   '<%= path.dist %>/pastry.min.css': '<%= path.build %>/pastry.css',
+                   '<%= path.dist %>/pastry.ui.min.css': '<%= path.build %>/ui.css',
+                   '<%= path.dist %>/pastry.theme-default.min.css': '<%= path.build %>/theme/default.css',
                 },
                 font: {
-                    expand : true,
-                    cwd    : '<%= path.src %>/pastry/stylesheet/',
-                    src    : 'font/**',
-                    dest   : '<%= path.dist %>/',
+                    expand: true,
+                    cwd: '<%= path.src %>/pastry/stylesheet/',
+                    src: 'font/**',
+                    dest: '<%= path.dist %>/',
                 }
             }
         }

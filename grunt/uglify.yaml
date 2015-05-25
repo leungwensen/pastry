@@ -2,6 +2,13 @@
 options:
   banner: <%= banner %>
 
+locale:
+  expand: true
+  filter: isFile
+  cwd: <%= path.build %>/pastry/locale
+  src: '*.js'
+  dest: <%= path.dist %>/pastry/locale
+
 dist:
   files: <%= dist.js %>
 

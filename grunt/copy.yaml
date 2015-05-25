@@ -1,3 +1,9 @@
+locale:
+  expand: true
+  filter: isFile
+  cwd: <%= path.src %>/pastry/locale
+  src: '*.js'
+  dest: <%= path.build %>/pastry/locale
 
 build: <%= build.font %>
 

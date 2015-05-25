@@ -1,50 +1,50 @@
-
 {
-    "name"        : "pastry",
-    "title"       : "pastry",
-    "description" : "easing SPA(single page application) development.",
-    "homepage"    : "https://github.com/leungwensen/pastry",
-    "version"     : "0.3.20150424",
-    "main"        : "build/nodejs",
+    "name": "pastry",
+    "title": "pastry",
+    "description": "easing SPA(single page application) development.",
+    "homepage": "https://github.com/leungwensen/pastry",
+    "version": "0.3.20150525",
+    "main": "build/nodejs",
 
     "author": {
-        "description" : "team of pastry",
-        "url"         : "https://github.com/leungwensen/pastry/graphs/contributors"
+        "description": "team of pastry",
+        "url": "https://github.com/leungwensen/pastry/graphs/contributors"
     },
 
     "bugs": {
-        "url" : "https://github.com/leungwensen/pastry/issues"
+        "url": "https://github.com/leungwensen/pastry/issues"
     },
 
     "dependencies": {
         "optimist": "*"
     },
 
-    "devDependencies" : {
-        "assert"                  : "*",
-        "browserstack-runner"     : "*",
-        "commander"               : "*",
-        "graphviz"                : "*",
-        "grunt"                   : "*",
-        "grunt-contrib-clean"     : "*",
-        "grunt-contrib-concat"    : "*",
-        "grunt-contrib-connect"   : "*",
-        "grunt-contrib-copy"      : "*",
-        "grunt-contrib-cssmin"    : "*",
-        "grunt-contrib-jasmine"   : "*",
-        "grunt-contrib-jshint"    : "*",
-        "grunt-contrib-less"      : "*",
-        "grunt-contrib-requirejs" : "*",
-        "grunt-contrib-uglify"    : "*",
-        "grunt-contrib-watch"     : "*",
-        "grunt-html-validation"   : "*",
-        "grunt-jekyll"            : "*",
-        "load-grunt-config"       : "*",
-        "promises-aplus-tests"    : "*",
-        "time-grunt"              : "*"
+    "devDependencies": {
+        "assert": "*",
+        "browserstack-runner": "*",
+        "commander": "*",
+        "graphviz": "*",
+        "grunt": "*",
+        "grunt-contrib-clean": "*",
+        "grunt-contrib-concat": "*",
+        "grunt-contrib-connect": "*",
+        "grunt-contrib-copy": "*",
+        "grunt-contrib-cssmin": "*",
+        "grunt-contrib-jasmine": "*",
+        "grunt-contrib-jshint": "*",
+        "grunt-contrib-less": "*",
+        "grunt-contrib-requirejs": "*",
+        "grunt-contrib-uglify": "*",
+        "grunt-contrib-watch": "*",
+        "grunt-html-validation": "*",
+        "grunt-jekyll": "*",
+        "load-grunt-config": "*",
+        "promises-aplus-tests": "*",
+        "requirejs": "*",
+        "time-grunt": "*"
     },
 
-    "engines" : {
+    "engines": {
         "node": ">=0.8.0"
     },
 
@@ -56,17 +56,16 @@
     ],
 
     "licenses": [{
-        "type" : "MIT",
-        "url"  : "https://github.com/leungwensen/pastry/blob/master/LICENSE.md"
+        "type": "MIT",
+        "url": "https://github.com/leungwensen/pastry/blob/master/LICENSE.md"
     }],
 
-    "repository" : {
-        "type" : "git",
-        "url"  : "https://github.com/leungwensen/pastry.git"
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/leungwensen/pastry.git"
     },
 
-    "scripts" : {
-        "test" : "grunt travis --verbose && promises-aplus-tests test/promise/promise.adapter.js"
+    "scripts": {
+        "test": "grunt travis --verbose && promises-aplus-tests test/promise/promise.adapter.js"
     }
 }
-
