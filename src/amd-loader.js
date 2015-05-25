@@ -369,14 +369,11 @@
     // }
     // helper 函数集 {
         // 类型转换 {
-            pastry.lc = function (value, base) {
-                return parseInt(value, base || 10);
-            };
-        // }
-        // 数字相关 {
             pastry.toInt = function (str, base) {
                 return parseInt(str, base || 10);
             };
+        // }
+        // 数字相关 {
         // }
         // 字符串相关 {
             pastry.lc = function (str) {

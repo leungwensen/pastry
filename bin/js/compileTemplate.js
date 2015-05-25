@@ -2,11 +2,11 @@
 
 'use strict';
 
-var fs     = require('fs'),
-    path   = require('path'),
+var fs = require('fs'),
+    path = require('path'),
 
     pastry = require('../../build/nodejs.js'),
-    utils  = require('./utils.js'),
+    utils = require('./utils.js'),
     prefix = 'src/pastry/template/',
 
     RE_acceptSuffix = /\.(html|htm|ptmpl)$/;
