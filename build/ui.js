@@ -373,8 +373,6 @@
                 return parseInt(str, base || 10);
             };
         // }
-        // 数字相关 {
-        // }
         // 字符串相关 {
             pastry.lc = function (str) {
                 /*
