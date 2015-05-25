@@ -13,38 +13,39 @@ define('pastry/fmt/sprintf', [
      * @description : fmt 模块 - sprintf
      */
 
-    function toInt (str, base) {
-        return parseInt(str, base || 10);
-    }
-
     var reg = /%(\+)?([0 ]|'(.))?(-)?([0-9]+)?(\.([0-9]+))?([%bcdfosxX])/g,
+
+        isUndefined = pastry.isUndefined,
+        some = pastry.some,
+        abs = Math.abs,
+        toInt = pastry.toInt,
 
         sprintf = function (format) {
             if (!pastry.isString(format)) {
-                pastry.ERROR('sprintf: The first arguments need to be a valid format string.');
+                throw 'sprintf: The first arguments need to be a valid format string.';
             }
 
             var part,
-                parts      = [],
+                parts = [],
                 paramIndex = 1,
-                args       = pastry.toArray(arguments);
+                args = pastry.toArray(arguments);
 
             while (part = reg.exec(format)) {
                 if ((paramIndex >= args.length) && (part[8] !== '%')) {
-                    pastry.ERROR('sprintf: At least one argument was missing.');
+                    throw 'sprintf: At least one argument was missing.';
                 }
 
                 parts[parts.length] = {
-                    begin     : part.index,
-                    end       : part.index + part[0].length,
-                    sign      : (part[1] === '+'),
-                    negative  : (parseFloat(args[paramIndex]) < 0) ? true : false,
-                    padding   : (pastry.isUndefined(part[2])) ? (' ') : ((part[2].substring(0, 1) === "'") ? (part[3]) : (part[2])),
-                    alignLeft : (part[4] === '-'),
-                    width     : (!pastry.isUndefined(part[5])) ? part[5] : false,
-                    precision : (!pastry.isUndefined(part[7])) ? part[7] : false,
-                    type      : part[8],
-                    data      : (part[8] !== '%') ? String(args[paramIndex++]) : false
+                    begin: part.index,
+                    end: part.index + part[0].length,
+                    sign: (part[1] === '+'),
+                    negative: (parseFloat(args[paramIndex]) < 0) ? true : false,
+                    padding: (isUndefined(part[2])) ? (' ') : ((part[2].substring(0, 1) === "'") ? (part[3]) : (part[2])),
+                    alignLeft: (part[4] === '-'),
+                    width: (!isUndefined(part[5])) ? part[5] : false,
+                    precision: (!isUndefined(part[7])) ? part[7] : false,
+                    type: part[8],
+                    data: (part[8] !== '%') ? String(args[paramIndex++]) : false
                 };
             }
 
@@ -63,33 +64,33 @@ define('pastry/fmt/sprintf', [
                         preSubStr = '%';
                         break;
                     case 'b':
-                        preSubStr = Math.abs(toInt(parts[i].data)).toString(2);
+                        preSubStr = abs(toInt(parts[i].data)).toString(2);
                         break;
                     case 'c':
-                        preSubStr = String.fromCharCode(Math.abs(toInt(parts[i].data)));
+                        preSubStr = String.fromCharCode(abs(toInt(parts[i].data)));
                         break;
                     case 'd':
-                        preSubStr = String(Math.abs(toInt(parts[i].data)));
+                        preSubStr = String(abs(toInt(parts[i].data)));
                         break;
                     case 'f':
                         preSubStr = (parts[i].precision === false) ?
-                            (String((Math.abs(parseFloat(parts[i].data))))) :
-                            (Math.abs(parseFloat(parts[i].data)).toFixed(parts[i].precision));
+                            (String((abs(parseFloat(parts[i].data))))) :
+                            (abs(parseFloat(parts[i].data)).toFixed(parts[i].precision));
                         break;
                     case 'o':
-                        preSubStr = Math.abs(toInt(parts[i].data)).toString(8);
+                        preSubStr = abs(toInt(parts[i].data)).toString(8);
                         break;
                     case 's':
                         preSubStr = parts[i].data.substring(0, parts[i].precision ? parts[i].precision : parts[i].data.length);
                         break;
                     case 'x':
-                        preSubStr = Math.abs(toInt(parts[i].data)).toString(16).toLowerCase();
+                        preSubStr = abs(toInt(parts[i].data)).toString(16).toLowerCase();
                         break;
                     case 'X':
-                        preSubStr = Math.abs(toInt(parts[i].data)).toString(16).toUpperCase();
+                        preSubStr = abs(toInt(parts[i].data)).toString(16).toUpperCase();
                         break;
                     default:
-                        pastry.ERROR('sprintf: Unknown type "' + parts[i].type + '" detected. This should never happen. Maybe the regex is wrong.');
+                        throw 'sprintf: Unknown type "' + parts[i].type + '" detected. This should never happen. Maybe the regex is wrong.';
                 }
 
                 if (parts[i].type === '%') {
@@ -102,18 +103,24 @@ define('pastry/fmt/sprintf', [
                         origLength = preSubStr.length;
                         for(j = 0; j < parts[i].width - origLength; ++j) {
                             preSubStr = (parts[i].alignLeft === true) ?
-                                (preSubStr + parts[i].padding) : (parts[i].padding + preSubStr);
+                                (preSubStr + parts[i].padding) :
+                                (parts[i].padding + preSubStr);
                         }
                     }
                 }
 
+                /*jshint -W083 */ // make function in loop
                 if (
-                    parts[i].type === 'b' ||
-                    parts[i].type === 'd' ||
-                    parts[i].type === 'o' ||
-                    parts[i].type === 'f' ||
-                    parts[i].type === 'x' ||
-                    parts[i].type === 'X'
+                    some([
+                        'b',
+                        'd',
+                        'o',
+                        'f',
+                        'x',
+                        'X'
+                    ], function(type) {
+                        return type === parts[i].type;
+                    })
                 ) {
                     if (parts[i].negative === true) {
                         preSubStr = '-' + preSubStr;
@@ -130,3 +137,4 @@ define('pastry/fmt/sprintf', [
 
     return pastry.sprintf = sprintf;
 });
+

@@ -104,7 +104,7 @@ define('pastry/dom/event', [
         }
         element = domQuery.one(element); // delegation is only for one element
         if (!domUtils.isDomNode(element)) {
-            pastry.ERROR('cannot bind events to non-elements: ' + element);
+            throw 'cannot bind events to non-elements: ' + element;
         }
         function wrapper (e) {
             // if this event has a delegateTarget, then we add it to the event

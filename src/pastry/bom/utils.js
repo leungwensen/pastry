@@ -12,18 +12,16 @@ define('pastry/bom/utils', [
      * @description : 记录各种浏览器相关的版本号
      * @note        : browser only
      */
-    var win       = window,
-        nav       = navigator || {},
+    var win = window,
+        nav = navigator || {},
         userAgent = nav.userAgent,
-        platform  = nav.platform,
-        plugins   = nav.plugins,
-        versions  = {},
+        platform = nav.platform,
+        plugins = nav.plugins,
+        versions = {},
+        toInt = pastry.toInt,
         detectedPlatform,
         detectedPlugins;
 
-    function toInt (value, base) {
-        return parseInt(value, base || 10);
-    }
     function setVerInt (versions, key, strVal) {
         versions[key] = toInt(strVal);
     }
@@ -95,11 +93,11 @@ define('pastry/bom/utils', [
 
         // browser result {
             pastry.each([
-                /msie ([\d.]+)/     ,
-                /firefox\/([\d.]+)/ ,
-                /chrome\/([\d.]+)/  ,
-                /crios\/([\d.]+)/   ,
-                /opera.([\d.]+)/    ,
+                /msie ([\d.]+)/,
+                /firefox\/([\d.]+)/,
+                /chrome\/([\d.]+)/,
+                /crios\/([\d.]+)/,
+                /opera.([\d.]+)/,
                 /adobeair\/([\d.]+)/
             ], function (reg) {
                 setVer(result, str, reg);
@@ -124,10 +122,10 @@ define('pastry/bom/utils', [
         // }
         // engine result {
             pastry.each([
-                /trident\/([\d.]+)/     ,
-                /gecko\/([\d.]+)/       ,
-                /applewebkit\/([\d.]+)/ ,
-                /webkit\/([\d.]+)/      , // 单独存储 webkit 字段
+                /trident\/([\d.]+)/,
+                /gecko\/([\d.]+)/,
+                /applewebkit\/([\d.]+)/,
+                /webkit\/([\d.]+)/, // 单独存储 webkit 字段
                 /presto\/([\d.]+)/
             ], function (reg) {
                 setVer(result, str, reg);
@@ -144,24 +142,24 @@ define('pastry/bom/utils', [
         return result;
     }
 
-    detectedPlugins  = detectPlugin(plugins);
+    detectedPlugins = detectPlugin(plugins);
     detectedPlatform = detectPlatform(platform) || detectPlatform(userAgent) || 'unknown';
 
     pastry.extend(versions, detectVersion(userAgent), detectedPlugins);
 
     return {
-        host      : location.host,
-        platform  : detectPlatform,
-        plugins   : detectedPlugins,
-        userAgent : userAgent,
-        versions  : versions,
-        isWebkit  : !!versions.webkit,
-        isIE      : !!versions.msie,
-        isOpera   : !!win.opera,
-        isApple   : (
-            detectedPlatform.mac    ||
-            detectedPlatform.ipad   ||
-            detectedPlatform.ipod   ||
+        host: location.host,
+        platform: detectPlatform,
+        plugins: detectedPlugins,
+        userAgent: userAgent,
+        versions: versions,
+        isWebkit: !!versions.webkit,
+        isIE: !!versions.msie,
+        isOpera: !!win.opera,
+        isApple: (
+            detectedPlatform.mac ||
+            detectedPlatform.ipad ||
+            detectedPlatform.ipod ||
             detectedPlatform.iphone
         )
     };

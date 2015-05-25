@@ -1,5 +1,5 @@
 /* jshint strict: true, undef: true, unused: true */
-/* global exports, module */
+/* global exports, module, PASTRY_CONFIG */
 
 (function (GLOBAL) {
     'use strict';
@@ -31,7 +31,7 @@
         // OP = O[PS],
         SP = S[PS],
 
-        noop = function () { },
+        //noop = function () { },
 
         // helpers {
             toStr = {}.toString,
@@ -368,6 +368,16 @@
             };
     // }
     // helper 函数集 {
+        // 类型转换 {
+            pastry.lc = function (value, base) {
+                return parseInt(value, base || 10);
+            };
+        // }
+        // 数字相关 {
+            pastry.toInt = function (str, base) {
+                return parseInt(str, base || 10);
+            };
+        // }
         // 字符串相关 {
             pastry.lc = function (str) {
                 /*
@@ -447,6 +457,7 @@
                 /*
                  * @description: 扁平化二维数组
                  */
+                array = array || [];
                 for (var r = [], i = 0, l = array.length; i < l; ++i) {
                     if (isArrayLike(array[i])) {
                         r = r.concat(array[i]);
@@ -600,7 +611,7 @@
                 return pastry.uniq(resultArr);
             };
             pastry.difference = function (arr) {
-                var rest = pastry.flatten(arrayFromSecondElement(arguments), true, true, []);
+                var rest = pastry.flatten(arrayFromSecondElement(arguments));
                 return pastry.filter(arr, function(value){
                     return !hasValue(rest, value);
                 });
@@ -666,31 +677,15 @@
                     }
                 };
         // }
-        // debug TODO 废弃，只保留一个i18n的wrapper {
-            /*
-             * @description : debug 相关函数
-             * @syntax      : pastry.[INFO|LOG|WARN|ERROR]
-             */
-            each([
-                'info',
-                'log',
-                'warn'
-            ], function (type) {
-                pastry[uc(type)] = (typeof console === US) ? noop : pastry.bind(console[type], console);
-            });
-            pastry.ERROR = function (err) {
-                pastry.WARN(err);
-                throw new Error(err);
-            };
-        // }
         // 其它 {
-            pastry.getAny = function (callbackList) {
+            pastry.getAny = function () {
                 /*
                  * @description : 从一系列 callback 函数里按顺序尝试取值，并返回第一个可用值
                  * @parameter*  : {Array} callbackList, 回调函数列表
                  * @syntax      : pastry.getAny([func1 Function, func2 Function, ...]);
                  */
-                var i, returnValue;
+                var i, returnValue,
+                    callbackList = pastry.flatten(toArray(arguments));
                 for (i = 0; i < callbackList.length; i ++) {
                     try {
                         returnValue = callbackList[i]();
@@ -715,16 +710,6 @@
                         return result;
                     });
             };
-            // TODO 约定一种生成guid的方法
-                //pastry.guid = function (prefix) {
-                    /*
-                     * @description : 生成guid
-                     * @parameter   : {String} prefix, 前缀
-                     * @syntax      : pastry.guid(prefix String);
-                     */
-                    //prefix = prefix || '';
-                //};
-            // };
         // }
     // }
     // 增加 pastry 函数 {
@@ -737,7 +722,7 @@
         pastry.mixin = function (obj, override) {
             each(obj, function (value, key) {
                 if (pastry[key] && !override) {
-                    pastry.ERROR('pastry.' + key + ' already exists');
+                    throw 'pastry.' + key + ' already exists';
                 } else {
                     pastry[key] = value;
                 }
@@ -771,6 +756,12 @@
                 module.exports = pastry;
             }
         }
+    // }
+    // 配置项 {
+        pastry.CONFIG = pastry.merge({
+            defaultLocale: 'en_us',
+            locale: 'en_us'
+        }, (typeof PASTRY_CONFIG !== 'undefined' ? PASTRY_CONFIG : {}));
     // }
 }(this));
 
@@ -834,8 +825,8 @@
                         list = events[args.shift()] || [];
                     pastry.each(list, function (evt) {
                         if (!evt.callback) {
-                            pastry.LOG(evt, list);
-                            pastry.ERROR('event callback is not defined');
+                            console.error(evt, list);
+                            throw 'event callback is not defined';
                         }
                         evt.callback.apply(evt.context, args);
                     });
@@ -866,7 +857,6 @@ var define;
      * @author      : wensen.lws
      * @description : 模块加载
      * @note        : 和 seajs、requirejs 的不同之一：define 的模块即时运行
-     * @TODO        : id 重复定义报错
      */
     if (define) { // 避免反复执行以及和其它模块加载器冲突
         return;
@@ -1330,7 +1320,7 @@ define('pastry/module/loader', [
             }
             if (src === '' || (pastry.isString(src) && src === data.cwd)) {
                 if (meta.id) { // script tag 中的具名模块
-                    // meta.id = './' + meta.id; // @FIXME 去掉这个处理
+                    // meta.id = './' + meta.id;
                 } else { // script tag 中的匿名模块
                     meta.uri = data.cwd + ('#' + pastry.uuid());
                 }

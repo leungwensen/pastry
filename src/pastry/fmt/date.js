@@ -43,7 +43,7 @@ define('pastry/fmt/date', [
                 return prop === 'Milliseconds' ? lms(num) : doubleDigit(num);
             });
         } else {
-            pastry.ERROR('not a Date instance');
+            throw 'not a Date instance';
         }
     };
 });

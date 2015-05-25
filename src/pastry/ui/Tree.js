@@ -39,6 +39,7 @@ define('pastry/ui/Tree', [
      * @TODO :
      *   i18n
      *   loading
+     *   moveTo implement optimizing
      */
 
     var NS      = 'p_u_tree',
@@ -62,6 +63,7 @@ define('pastry/ui/Tree', [
             EXPANDER_EXPANDED_TEXT       = '&blacktriangledown;',
         // }
         // helpers {
+            difference = pastry.difference,
             each       = pastry.each,
             every      = pastry.every,
             extend     = pastry.extend,
@@ -623,7 +625,7 @@ define('pastry/ui/Tree', [
                                     return false;
                                 });
                             } else {
-                                pastry.WARN('drag and drop feature not supported');
+                                console.warn('drag and drop feature not supported');
                             }
                         // }
                     // }
@@ -676,9 +678,7 @@ define('pastry/ui/Tree', [
                                     node.parent = parent;
                                     parent.addChild(node);
                                 } else {
-                                    // TODO 统一走i18n，用msgid {
-                                        pastry.ERROR('node with id ' + parentId + ' does not exists');
-                                    // }
+                                    throw 'node with id ' + parentId + ' does not exists';
                                 }
                             }
                         // }
@@ -738,19 +738,21 @@ define('pastry/ui/Tree', [
                         nodes = [nodes];
                     }
                     tree.eachNode(nodes, function (node) {
-                        var treeNodeIndex = indexOf(tree.nodes, node);
-                        if (treeNodeIndex > -1) {
-                            remove(tree.nodes, treeNodeIndex);
-                        }
                         delete tree.nodeById[node.id];
                         if (parent = node.parent) {
                             parent.removeChild(node);
                         }
-                        node.eachChild(function (child) {
-                            child.destroy();
-                        });
-                        node.destroy();
                     });
+                    // remove nodes from selectedNodes and nodes {
+                        tree.nodes = difference(tree.nodes, nodes);
+                        tree.selectedNodes = difference(tree.selectedNodes, nodes);
+                    // }
+                    // destroy nodes and their children {
+                        each(nodes, function(node) {
+                            tree.removeNodes(node.children);
+                            node.destroy();
+                        });
+                    // }
                     return tree;
                 },
                 queryNodes: function (query) {

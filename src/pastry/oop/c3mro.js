@@ -49,7 +49,7 @@ define('pastry/oop/c3mro', [
             } else {
                 badLinearization += 1;
                 if (badLinearization === bases.length) {
-                    pastry.ERROR('Bad Linearization');
+                    throw 'Bad Linearization';
                 }
             }
             if (base.length) {

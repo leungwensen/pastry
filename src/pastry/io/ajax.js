@@ -21,11 +21,11 @@ define('pastry/io/ajax', [
      */
 
     function getXHR () {
-        return pastry.getAny([
-            function () { return new XMLHttpRequest();                   },
-            function () { return new ActiveXObject('MSXML2.XMLHTTP');    },
+        return pastry.getAny(
+            function () { return new XMLHttpRequest(); },
+            function () { return new ActiveXObject('MSXML2.XMLHTTP'); },
             function () { return new ActiveXObject('Microsoft.XMLHTTP'); }
-        ]);
+        );
     }
 
     var noCacheCounter = 0,
@@ -39,24 +39,24 @@ define('pastry/io/ajax', [
          * @return      : {this  } return itself for chain operations.
          */
         option = option || {};
-        var xhr         = getXHR(),
-            method      = option.method ? pastry.uc(option.method)           : 'GET',
-            type        = option.type   ? pastry.lc(option.type)             : 'xml',
-            data        = option.data   ? querystring.stringify(option.data) : null,
+        var xhr = getXHR(),
+            method = option.method ? pastry.uc(option.method) : 'GET',
+            type = option.type ? pastry.lc(option.type) : 'xml',
+            data = option.data ? querystring.stringify(option.data) : null,
             contentType = option.contentType,
-            isAsync     = true, // https://xhr.spec.whatwg.org/ 不设置成 true，新版 chrome 会发飙
-            username    = option.username,
-            password    = option.password;
+            isAsync = true, // https://xhr.spec.whatwg.org/ 不设置成 true，新版 chrome 会发飙
+            username = option.username,
+            password = option.password;
 
         // add handlers {
             pastry.each([
-                'abort'     ,
-                'error'     ,
-                'load'      ,
-                'loadend'   ,
-                'loadstart' ,
-                'progress'  ,
-                'success'   ,
+                'abort',
+                'error',
+                'load',
+                'loadend',
+                'loadstart',
+                'progress',
+                'success',
                 'timeout'
             ], function (handler) {
                 /*
@@ -76,8 +76,8 @@ define('pastry/io/ajax', [
                  * @return      : {Boolean} is ajax request successfully porformed
                  */
                 var status = xhr.status;
-                return (status >= 200 && status < 300)            ||
-                       (status === 304)                           ||
+                return (status >= 200 && status < 300) ||
+                       (status === 304) ||
                        (!status && location.protocol === 'file:') ||
                        (!status && bomUtils.versions.safari);
             };
@@ -87,9 +87,9 @@ define('pastry/io/ajax', [
                         if (option.success) {
                             var response = xhr.responseText;
                             if (type === 'json') {
-                                response = pastry.getAny([
+                                response = pastry.getAny(
                                     function () { return json.parse(response); }
-                                ]) || response;
+                                ) || response;
                             }
                             xhr.onsuccess(response);
                         }

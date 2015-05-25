@@ -12,7 +12,6 @@ define('pastry/promise/Promise', [
     /*
      * @author      : 绝云（wensen.lws）
      * @description : promise shim
-     * @TODO i18n
      */
     function exportPromise (constructor) {
         pastry.Promise = constructor;
@@ -29,18 +28,18 @@ define('pastry/promise/Promise', [
         }
     // }
 
-    var extend     = pastry.extend,
-        each       = pastry.each,
-        isArray    = pastry.isArray,
+    var extend = pastry.extend,
+        each = pastry.each,
+        isArray = pastry.isArray,
         isFunction = pastry.isFunction,
-        isObject   = pastry.isObject,
+        isObject = pastry.isObject,
         Resolver = declare('pastry/promise/Resolver', [], {
             constructor: function() {
                 extend(this, {
                     _callbacks: [],
-                    _errbacks : [],
-                    _status   : 'pending',
-                    _result   : null
+                    _errbacks: [],
+                    _status: 'pending',
+                    _result: null
                 });
             },
             fulfill: function (value) {
@@ -119,7 +118,7 @@ define('pastry/promise/Promise', [
             _addCallbacks: function (callback, errback) {
                 var me = this,
                     callbackList = me._callbacks,
-                    errbackList  = me._errbacks;
+                    errbackList = me._errbacks;
 
                 if (callbackList) {
                     callbackList.push(callback);
@@ -153,7 +152,7 @@ define('pastry/promise/Promise', [
     function Constructor(fn) {
         var me = this;
         if (!isFunction(fn)) {
-            throw new TypeError('Promise resolver ' + fn + ' is not a function');
+            throw 'Promise resolver ' + fn + ' is not a function';
         }
 
         var resolver = me._resolver = new Resolver();
@@ -189,14 +188,14 @@ define('pastry/promise/Promise', [
         all: function(values) {
             return new Constructor(function (resolve, reject) {
                 if (!isArray(values)) {
-                    reject(new TypeError('Promise.all expects an array of values or promises'));
+                    reject(new Error('Promise.all expects an array of values or promises'));
                     return;
                 }
 
                 var remaining = values.length,
-                    i         = 0,
-                    length    = values.length,
-                    results   = [];
+                    i = 0,
+                    length = values.length,
+                    results = [];
 
                 function oneDone(index) {
                     return function (value) {
@@ -220,7 +219,7 @@ define('pastry/promise/Promise', [
         race: function(values) {
             return new Constructor(function (resolve, reject) {
                 if (!isArray(values)) {
-                    reject(new TypeError('Promise.race expects an array of values or promises'));
+                    reject(new Error('Promise.race expects an array of values or promises'));
                     return;
                 }
                 each(values, function(value) {
@@ -228,11 +227,11 @@ define('pastry/promise/Promise', [
                 });
             });
         },
-        async: pastry.getAny([
+        async: pastry.getAny(
             function() { if (setImmediate) { return function (fn) {setImmediate(fn);}; } },
             function() { return process.nextTick; },
             function() { return function (fn) {setTimeout(fn, 0);}; }
-        ]),
+        ),
         _makeCallback: function(promise, resolve, reject, fn) {
             return function (valueOrReason) {
                 var result;
@@ -244,7 +243,7 @@ define('pastry/promise/Promise', [
                     return;
                 }
                 if (result === promise) {
-                    reject(new TypeError('Cannot resolve a promise with itself'));
+                    reject(new Error('Cannot resolve a promise with itself'));
                     return;
                 }
                 resolve(result);
@@ -258,7 +257,7 @@ define('pastry/promise/Promise', [
             var resolve, reject,
                 promise = new Constructor(function (res, rej) {
                     resolve = res;
-                    reject  = rej;
+                    reject = rej;
                 });
 
             this._resolver._addCallbacks(

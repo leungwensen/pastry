@@ -57,8 +57,8 @@
                         list = events[args.shift()] || [];
                     pastry.each(list, function (evt) {
                         if (!evt.callback) {
-                            pastry.LOG(evt, list);
-                            pastry.ERROR('event callback is not defined');
+                            console.error(evt, list);
+                            throw 'event callback is not defined';
                         }
                         evt.callback.apply(evt.context, args);
                     });

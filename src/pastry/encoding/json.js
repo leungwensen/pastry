@@ -72,7 +72,7 @@ define('pastry/encoding/json', [
                  * @description: 从 JSON 字符串得到一个数据结构
                  */
                 if (strict && !/^([\s\[\{]*(?:"(?:\\.|[^"])*"|-?\d[\d\.]*(?:[Ee][+-]?\d+)?|null|true|false|)[\s\]\}]*(?:,|:|$))+$/.test(str)) {
-                    pastry.ERROR('Invalid characters in JSON');
+                    throw 'Invalid characters in JSON';
                 }
                 /* jshint -W061 */
                 return eval('(' + str + ')');
