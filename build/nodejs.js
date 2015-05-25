@@ -1,5 +1,5 @@
 /* jshint strict: true, undef: true, unused: true */
-/* global exports, module */
+/* global exports, module, PASTRY_CONFIG */
 
 (function (GLOBAL) {
     'use strict';
@@ -31,7 +31,7 @@
         // OP = O[PS],
         SP = S[PS],
 
-        noop = function () { },
+        //noop = function () { },
 
         // helpers {
             toStr = {}.toString,
@@ -368,6 +368,13 @@
             };
     // }
     // helper 函数集 {
+        // 类型转换 {
+            pastry.toInt = function (str, base) {
+                return parseInt(str, base || 10);
+            };
+        // }
+        // 数字相关 {
+        // }
         // 字符串相关 {
             pastry.lc = function (str) {
                 /*
@@ -447,6 +454,7 @@
                 /*
                  * @description: 扁平化二维数组
                  */
+                array = array || [];
                 for (var r = [], i = 0, l = array.length; i < l; ++i) {
                     if (isArrayLike(array[i])) {
                         r = r.concat(array[i]);
@@ -600,7 +608,7 @@
                 return pastry.uniq(resultArr);
             };
             pastry.difference = function (arr) {
-                var rest = pastry.flatten(arrayFromSecondElement(arguments), true, true, []);
+                var rest = pastry.flatten(arrayFromSecondElement(arguments));
                 return pastry.filter(arr, function(value){
                     return !hasValue(rest, value);
                 });
@@ -666,31 +674,15 @@
                     }
                 };
         // }
-        // debug TODO 废弃，只保留一个i18n的wrapper {
-            /*
-             * @description : debug 相关函数
-             * @syntax      : pastry.[INFO|LOG|WARN|ERROR]
-             */
-            each([
-                'info',
-                'log',
-                'warn'
-            ], function (type) {
-                pastry[uc(type)] = (typeof console === US) ? noop : pastry.bind(console[type], console);
-            });
-            pastry.ERROR = function (err) {
-                pastry.WARN(err);
-                throw new Error(err);
-            };
-        // }
         // 其它 {
-            pastry.getAny = function (callbackList) {
+            pastry.getAny = function () {
                 /*
                  * @description : 从一系列 callback 函数里按顺序尝试取值，并返回第一个可用值
                  * @parameter*  : {Array} callbackList, 回调函数列表
                  * @syntax      : pastry.getAny([func1 Function, func2 Function, ...]);
                  */
-                var i, returnValue;
+                var i, returnValue,
+                    callbackList = pastry.flatten(toArray(arguments));
                 for (i = 0; i < callbackList.length; i ++) {
                     try {
                         returnValue = callbackList[i]();
@@ -715,16 +707,6 @@
                         return result;
                     });
             };
-            // TODO 约定一种生成guid的方法
-                //pastry.guid = function (prefix) {
-                    /*
-                     * @description : 生成guid
-                     * @parameter   : {String} prefix, 前缀
-                     * @syntax      : pastry.guid(prefix String);
-                     */
-                    //prefix = prefix || '';
-                //};
-            // };
         // }
     // }
     // 增加 pastry 函数 {
@@ -737,7 +719,7 @@
         pastry.mixin = function (obj, override) {
             each(obj, function (value, key) {
                 if (pastry[key] && !override) {
-                    pastry.ERROR('pastry.' + key + ' already exists');
+                    throw 'pastry.' + key + ' already exists';
                 } else {
                     pastry[key] = value;
                 }
@@ -771,6 +753,12 @@
                 module.exports = pastry;
             }
         }
+    // }
+    // 配置项 {
+        pastry.CONFIG = pastry.merge({
+            defaultLocale: 'en_us',
+            locale: 'en_us'
+        }, (typeof PASTRY_CONFIG !== 'undefined' ? PASTRY_CONFIG : {}));
     // }
 }(this));
 
@@ -834,8 +822,8 @@
                         list = events[args.shift()] || [];
                     pastry.each(list, function (evt) {
                         if (!evt.callback) {
-                            pastry.LOG(evt, list);
-                            pastry.ERROR('event callback is not defined');
+                            console.error(evt, list);
+                            throw 'event callback is not defined';
                         }
                         evt.callback.apply(evt.context, args);
                     });
@@ -866,7 +854,6 @@ var define;
      * @author      : wensen.lws
      * @description : 模块加载
      * @note        : 和 seajs、requirejs 的不同之一：define 的模块即时运行
-     * @TODO        : id 重复定义报错
      */
     if (define) { // 避免反复执行以及和其它模块加载器冲突
         return;
@@ -1048,38 +1035,39 @@ define('pastry/fmt/sprintf', [
      * @description : fmt 模块 - sprintf
      */
 
-    function toInt (str, base) {
-        return parseInt(str, base || 10);
-    }
-
     var reg = /%(\+)?([0 ]|'(.))?(-)?([0-9]+)?(\.([0-9]+))?([%bcdfosxX])/g,
+
+        isUndefined = pastry.isUndefined,
+        some = pastry.some,
+        abs = Math.abs,
+        toInt = pastry.toInt,
 
         sprintf = function (format) {
             if (!pastry.isString(format)) {
-                pastry.ERROR('sprintf: The first arguments need to be a valid format string.');
+                throw 'sprintf: The first arguments need to be a valid format string.';
             }
 
             var part,
-                parts      = [],
+                parts = [],
                 paramIndex = 1,
-                args       = pastry.toArray(arguments);
+                args = pastry.toArray(arguments);
 
             while (part = reg.exec(format)) {
                 if ((paramIndex >= args.length) && (part[8] !== '%')) {
-                    pastry.ERROR('sprintf: At least one argument was missing.');
+                    throw 'sprintf: At least one argument was missing.';
                 }
 
                 parts[parts.length] = {
-                    begin     : part.index,
-                    end       : part.index + part[0].length,
-                    sign      : (part[1] === '+'),
-                    negative  : (parseFloat(args[paramIndex]) < 0) ? true : false,
-                    padding   : (pastry.isUndefined(part[2])) ? (' ') : ((part[2].substring(0, 1) === "'") ? (part[3]) : (part[2])),
-                    alignLeft : (part[4] === '-'),
-                    width     : (!pastry.isUndefined(part[5])) ? part[5] : false,
-                    precision : (!pastry.isUndefined(part[7])) ? part[7] : false,
-                    type      : part[8],
-                    data      : (part[8] !== '%') ? String(args[paramIndex++]) : false
+                    begin: part.index,
+                    end: part.index + part[0].length,
+                    sign: (part[1] === '+'),
+                    negative: (parseFloat(args[paramIndex]) < 0) ? true : false,
+                    padding: (isUndefined(part[2])) ? (' ') : ((part[2].substring(0, 1) === "'") ? (part[3]) : (part[2])),
+                    alignLeft: (part[4] === '-'),
+                    width: (!isUndefined(part[5])) ? part[5] : false,
+                    precision: (!isUndefined(part[7])) ? part[7] : false,
+                    type: part[8],
+                    data: (part[8] !== '%') ? String(args[paramIndex++]) : false
                 };
             }
 
@@ -1098,33 +1086,33 @@ define('pastry/fmt/sprintf', [
                         preSubStr = '%';
                         break;
                     case 'b':
-                        preSubStr = Math.abs(toInt(parts[i].data)).toString(2);
+                        preSubStr = abs(toInt(parts[i].data)).toString(2);
                         break;
                     case 'c':
-                        preSubStr = String.fromCharCode(Math.abs(toInt(parts[i].data)));
+                        preSubStr = String.fromCharCode(abs(toInt(parts[i].data)));
                         break;
                     case 'd':
-                        preSubStr = String(Math.abs(toInt(parts[i].data)));
+                        preSubStr = String(abs(toInt(parts[i].data)));
                         break;
                     case 'f':
                         preSubStr = (parts[i].precision === false) ?
-                            (String((Math.abs(parseFloat(parts[i].data))))) :
-                            (Math.abs(parseFloat(parts[i].data)).toFixed(parts[i].precision));
+                            (String((abs(parseFloat(parts[i].data))))) :
+                            (abs(parseFloat(parts[i].data)).toFixed(parts[i].precision));
                         break;
                     case 'o':
-                        preSubStr = Math.abs(toInt(parts[i].data)).toString(8);
+                        preSubStr = abs(toInt(parts[i].data)).toString(8);
                         break;
                     case 's':
                         preSubStr = parts[i].data.substring(0, parts[i].precision ? parts[i].precision : parts[i].data.length);
                         break;
                     case 'x':
-                        preSubStr = Math.abs(toInt(parts[i].data)).toString(16).toLowerCase();
+                        preSubStr = abs(toInt(parts[i].data)).toString(16).toLowerCase();
                         break;
                     case 'X':
-                        preSubStr = Math.abs(toInt(parts[i].data)).toString(16).toUpperCase();
+                        preSubStr = abs(toInt(parts[i].data)).toString(16).toUpperCase();
                         break;
                     default:
-                        pastry.ERROR('sprintf: Unknown type "' + parts[i].type + '" detected. This should never happen. Maybe the regex is wrong.');
+                        throw 'sprintf: Unknown type "' + parts[i].type + '" detected. This should never happen. Maybe the regex is wrong.';
                 }
 
                 if (parts[i].type === '%') {
@@ -1137,18 +1125,24 @@ define('pastry/fmt/sprintf', [
                         origLength = preSubStr.length;
                         for(j = 0; j < parts[i].width - origLength; ++j) {
                             preSubStr = (parts[i].alignLeft === true) ?
-                                (preSubStr + parts[i].padding) : (parts[i].padding + preSubStr);
+                                (preSubStr + parts[i].padding) :
+                                (parts[i].padding + preSubStr);
                         }
                     }
                 }
 
+                /*jshint -W083 */ // make function in loop
                 if (
-                    parts[i].type === 'b' ||
-                    parts[i].type === 'd' ||
-                    parts[i].type === 'o' ||
-                    parts[i].type === 'f' ||
-                    parts[i].type === 'x' ||
-                    parts[i].type === 'X'
+                    some([
+                        'b',
+                        'd',
+                        'o',
+                        'f',
+                        'x',
+                        'X'
+                    ], function(type) {
+                        return type === parts[i].type;
+                    })
                 ) {
                     if (parts[i].negative === true) {
                         preSubStr = '-' + preSubStr;
@@ -1165,6 +1159,7 @@ define('pastry/fmt/sprintf', [
 
     return pastry.sprintf = sprintf;
 });
+
 
 /* jshint strict: true, undef: true, unused: true */
 /* global define */
@@ -1484,7 +1479,7 @@ define('pastry/oop/c3mro', [
             } else {
                 badLinearization += 1;
                 if (badLinearization === bases.length) {
-                    pastry.ERROR('Bad Linearization');
+                    throw 'Bad Linearization';
                 }
             }
             if (base.length) {
@@ -1847,7 +1842,7 @@ define('pastry/fmt/date', [
                 return prop === 'Milliseconds' ? lms(num) : doubleDigit(num);
             });
         } else {
-            pastry.ERROR('not a Date instance');
+            throw 'not a Date instance';
         }
     };
 });
@@ -1927,7 +1922,7 @@ define('pastry/encoding/json', [
                  * @description: 从 JSON 字符串得到一个数据结构
                  */
                 if (strict && !/^([\s\[\{]*(?:"(?:\\.|[^"])*"|-?\d[\d\.]*(?:[Ee][+-]?\d+)?|null|true|false|)[\s\]\}]*(?:,|:|$))+$/.test(str)) {
-                    pastry.ERROR('Invalid characters in JSON');
+                    throw 'Invalid characters in JSON';
                 }
                 /* jshint -W061 */
                 return eval('(' + str + ')');
@@ -2165,7 +2160,6 @@ define('pastry/promise/Promise', [
     /*
      * @author      : 绝云（wensen.lws）
      * @description : promise shim
-     * @TODO i18n
      */
     function exportPromise (constructor) {
         pastry.Promise = constructor;
@@ -2182,18 +2176,18 @@ define('pastry/promise/Promise', [
         }
     // }
 
-    var extend     = pastry.extend,
-        each       = pastry.each,
-        isArray    = pastry.isArray,
+    var extend = pastry.extend,
+        each = pastry.each,
+        isArray = pastry.isArray,
         isFunction = pastry.isFunction,
-        isObject   = pastry.isObject,
+        isObject = pastry.isObject,
         Resolver = declare('pastry/promise/Resolver', [], {
             constructor: function() {
                 extend(this, {
                     _callbacks: [],
-                    _errbacks : [],
-                    _status   : 'pending',
-                    _result   : null
+                    _errbacks: [],
+                    _status: 'pending',
+                    _result: null
                 });
             },
             fulfill: function (value) {
@@ -2272,7 +2266,7 @@ define('pastry/promise/Promise', [
             _addCallbacks: function (callback, errback) {
                 var me = this,
                     callbackList = me._callbacks,
-                    errbackList  = me._errbacks;
+                    errbackList = me._errbacks;
 
                 if (callbackList) {
                     callbackList.push(callback);
@@ -2306,7 +2300,7 @@ define('pastry/promise/Promise', [
     function Constructor(fn) {
         var me = this;
         if (!isFunction(fn)) {
-            throw new TypeError('Promise resolver ' + fn + ' is not a function');
+            throw 'Promise resolver ' + fn + ' is not a function';
         }
 
         var resolver = me._resolver = new Resolver();
@@ -2342,14 +2336,14 @@ define('pastry/promise/Promise', [
         all: function(values) {
             return new Constructor(function (resolve, reject) {
                 if (!isArray(values)) {
-                    reject(new TypeError('Promise.all expects an array of values or promises'));
+                    reject(new Error('Promise.all expects an array of values or promises'));
                     return;
                 }
 
                 var remaining = values.length,
-                    i         = 0,
-                    length    = values.length,
-                    results   = [];
+                    i = 0,
+                    length = values.length,
+                    results = [];
 
                 function oneDone(index) {
                     return function (value) {
@@ -2373,7 +2367,7 @@ define('pastry/promise/Promise', [
         race: function(values) {
             return new Constructor(function (resolve, reject) {
                 if (!isArray(values)) {
-                    reject(new TypeError('Promise.race expects an array of values or promises'));
+                    reject(new Error('Promise.race expects an array of values or promises'));
                     return;
                 }
                 each(values, function(value) {
@@ -2381,11 +2375,11 @@ define('pastry/promise/Promise', [
                 });
             });
         },
-        async: pastry.getAny([
+        async: pastry.getAny(
             function() { if (setImmediate) { return function (fn) {setImmediate(fn);}; } },
             function() { return process.nextTick; },
             function() { return function (fn) {setTimeout(fn, 0);}; }
-        ]),
+        ),
         _makeCallback: function(promise, resolve, reject, fn) {
             return function (valueOrReason) {
                 var result;
@@ -2397,7 +2391,7 @@ define('pastry/promise/Promise', [
                     return;
                 }
                 if (result === promise) {
-                    reject(new TypeError('Cannot resolve a promise with itself'));
+                    reject(new Error('Cannot resolve a promise with itself'));
                     return;
                 }
                 resolve(result);
@@ -2411,7 +2405,7 @@ define('pastry/promise/Promise', [
             var resolve, reject,
                 promise = new Constructor(function (res, rej) {
                     resolve = res;
-                    reject  = rej;
+                    reject = rej;
                 });
 
             this._resolver._addCallbacks(
