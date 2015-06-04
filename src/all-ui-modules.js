@@ -14,6 +14,7 @@ define([
     // }
     // encoding {
         'pastry/encoding/json',
+        'pastry/encoding/cron',
     // }
     // text {
         'pastry/text/template',
