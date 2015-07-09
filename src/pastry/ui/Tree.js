@@ -52,27 +52,28 @@ define('pastry/ui/Tree', [
         SELECTOR_NODE = '.tree-node',
 
         // icon {
-            BRANCH_ICON_CLASS          = 'fa fa-folder',
+            BRANCH_ICON_CLASS = 'fa fa-folder',
             BRANCH_EXPANDED_ICON_CLASS = 'fa fa-folder-open',
-            LEAF_ICON_CLASS            = 'fa fa-file',
+            LEAF_ICON_CLASS = 'fa fa-file',
         // }
         // expander {
-            EXPANDER_ICON_CLASS          = 'fa fa-plus-square-o',
+            EXPANDER_ICON_CLASS = 'fa fa-plus-square-o',
             EXPANDER_EXPANDED_ICON_CLASS = 'fa fa-minus-square-o',
-            EXPANDER_TEXT                = '&blacktriangleright;',
-            EXPANDER_EXPANDED_TEXT       = '&blacktriangledown;',
+            EXPANDER_TEXT = '&blacktriangleright;',
+            EXPANDER_EXPANDED_TEXT = '&blacktriangledown;',
         // }
         // helpers {
+            destroy = pastry.destroy,
             difference = pastry.difference,
-            each       = pastry.each,
-            every      = pastry.every,
-            extend     = pastry.extend,
-            hasKey     = pastry.hasKey,
-            indexOf    = pastry.indexOf,
-            isArray    = pastry.isArray,
+            each = pastry.each,
+            every = pastry.every,
+            extend = pastry.extend,
+            hasKey = pastry.hasKey,
+            indexOf = pastry.indexOf,
+            isArray = pastry.isArray,
             onDomEvent = domEvent.on,
-            remove     = pastry.remove,
-            uuid       = pastry.uuid,
+            remove = pastry.remove,
+            uuid = pastry.uuid,
         // }
 
         TreeNode = declare('pastry/ui/tree/Node', [Component], {
@@ -84,28 +85,28 @@ define('pastry/ui/Tree', [
                 // initialize private attributes {
                     extend(node, {
                         // attributes {
-                            isRoot       : false ,
-                            isBranch     : false ,
-                            isLeaf       : true  ,
-                            isExpanded   : true  ,
-                            isExpandable : false ,
-                            isSelected   : false ,
-                            isChecked    : false ,
-                            isFocused    : false ,
-                            isLoaded     : false ,
-                            isDraggable  : false ,
-                            isDroppable  : false ,
+                            isRoot: false ,
+                            isBranch: false ,
+                            isLeaf: true  ,
+                            isExpanded: true  ,
+                            isExpandable: false ,
+                            isSelected: false ,
+                            isChecked: false ,
+                            isFocused: false ,
+                            isLoaded: false ,
+                            isDraggable: false ,
+                            isDroppable: false ,
                         // }
                         // elements {
-                            domNode       : null,
-                            indenterElement : null,
-                            expanderElement : null,
-                            labelElement    : null,
-                            iconElement     : null,
+                            domNode: null,
+                            indenterElement: null,
+                            expanderElement: null,
+                            labelElement: null,
+                            iconElement: null,
                         // }
                         // connections {
-                            children : [],
-                            parent   : null
+                            children: [],
+                            parent: null
                         // }
                     }, data);
 
@@ -123,14 +124,14 @@ define('pastry/ui/Tree', [
                 return node;
             },
             // attributes {
-                id                : null ,
-                label             : null , // label
-                title             : null , // title
-                indent            : 0    , // indent of the node
-                parentId          : null ,
-                iconClass         : null ,
-                expanderIconClass : null ,
-                expanderText      : null ,
+                id: null ,
+                label: null , // label
+                title: null , // title
+                indent: 0    , // indent of the node
+                parentId: null ,
+                iconClass: null ,
+                expanderIconClass: null ,
+                expanderText: null ,
             // }
             // private methods {
                 _setLabel: function () {
@@ -531,6 +532,12 @@ define('pastry/ui/Tree', [
                 update: function (option) {
                     return extend(this, option).render();
                 },
+                destroy: function() {
+                    var node = this;
+                    domConstruct.destroy(node.container);
+                    destroy(node);
+                    node = null;
+                }
             // }
         }),
 
