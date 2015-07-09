@@ -434,9 +434,8 @@ define('pastry/ui/Tree', [
                     node.eachChild(function (child) {
                         child.show();
                     });
-                    node._updateLayout();
                     node.tree.onExpand(node);
-                    return node;
+                    return node._updateLayout();
                 },
                 collapse: function () {
                     /*
@@ -447,7 +446,7 @@ define('pastry/ui/Tree', [
                     node.eachChild(function (child) {
                         child.hide();
                     });
-                    node.tree.trigger('node-collapsed', node);
+                    node.tree.onCollapse(node);
                     return node._updateLayout();
                 },
                 toggle: function () {
@@ -814,7 +813,7 @@ define('pastry/ui/Tree', [
                     onDblclick: function (/* node, e */) { },
                     onRightClick: function (/* node, e */) { },
                     onExpand: function (/* node */) { },
-                    onCollapsed: function (/* node */) { },
+                    onCollapse: function (/* node */) { },
                     onSelect: function (/* node */) { },
                     onMove: function (/* fromNode, toNode */) { }
                 // }
