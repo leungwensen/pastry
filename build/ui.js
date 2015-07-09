@@ -153,11 +153,10 @@
              */
             function (obj, callback, thisObj) {
                 if (isArrayLike(obj)) {
-                    return applyNativeFunction(AP.forEach, obj, arguments);
+                    applyNativeFunction(AP.forEach, toArray(obj), arguments);
                 } else if (isPlainObject(obj)) {
                     objForEach(obj, callback, thisObj);
                 }
-                return obj;
             } : function (obj, callback, thisObj) {
                 if (isArrayLike(obj)) {
                     var len = obj.length;
@@ -169,7 +168,6 @@
                 } else if (isPlainObject(obj)) {
                     objForEach(obj, callback, thisObj);
                 }
-                return obj;
             };
 
         pastry.eachReverse = function (arr, callback, thisObj) {
@@ -4268,10 +4266,7 @@ define('pastry/io/fetch', [
     var isFunction = pastry.isFunction;
 
     // 注释掉这一段来测试shim代码 {
-        if (
-            typeof fetch !== 'undefined' && fetch &&
-            isFunction(fetch)
-        ) {
+        if (typeof fetch !== 'undefined' && isFunction(fetch)) {
             return exportFetch(fetch);
         }
     // }
@@ -5741,27 +5736,28 @@ define('pastry/ui/Tree', [
         SELECTOR_NODE = '.tree-node',
 
         // icon {
-            BRANCH_ICON_CLASS          = 'fa fa-folder',
+            BRANCH_ICON_CLASS = 'fa fa-folder',
             BRANCH_EXPANDED_ICON_CLASS = 'fa fa-folder-open',
-            LEAF_ICON_CLASS            = 'fa fa-file',
+            LEAF_ICON_CLASS = 'fa fa-file',
         // }
         // expander {
-            EXPANDER_ICON_CLASS          = 'fa fa-plus-square-o',
+            EXPANDER_ICON_CLASS = 'fa fa-plus-square-o',
             EXPANDER_EXPANDED_ICON_CLASS = 'fa fa-minus-square-o',
-            EXPANDER_TEXT                = '&blacktriangleright;',
-            EXPANDER_EXPANDED_TEXT       = '&blacktriangledown;',
+            EXPANDER_TEXT = '&blacktriangleright;',
+            EXPANDER_EXPANDED_TEXT = '&blacktriangledown;',
         // }
         // helpers {
+            destroy = pastry.destroy,
             difference = pastry.difference,
-            each       = pastry.each,
-            every      = pastry.every,
-            extend     = pastry.extend,
-            hasKey     = pastry.hasKey,
-            indexOf    = pastry.indexOf,
-            isArray    = pastry.isArray,
+            each = pastry.each,
+            every = pastry.every,
+            extend = pastry.extend,
+            hasKey = pastry.hasKey,
+            indexOf = pastry.indexOf,
+            isArray = pastry.isArray,
             onDomEvent = domEvent.on,
-            remove     = pastry.remove,
-            uuid       = pastry.uuid,
+            remove = pastry.remove,
+            uuid = pastry.uuid,
         // }
 
         TreeNode = declare('pastry/ui/tree/Node', [Component], {
@@ -5773,28 +5769,28 @@ define('pastry/ui/Tree', [
                 // initialize private attributes {
                     extend(node, {
                         // attributes {
-                            isRoot       : false ,
-                            isBranch     : false ,
-                            isLeaf       : true  ,
-                            isExpanded   : true  ,
-                            isExpandable : false ,
-                            isSelected   : false ,
-                            isChecked    : false ,
-                            isFocused    : false ,
-                            isLoaded     : false ,
-                            isDraggable  : false ,
-                            isDroppable  : false ,
+                            isRoot: false ,
+                            isBranch: false ,
+                            isLeaf: true  ,
+                            isExpanded: true  ,
+                            isExpandable: false ,
+                            isSelected: false ,
+                            isChecked: false ,
+                            isFocused: false ,
+                            isLoaded: false ,
+                            isDraggable: false ,
+                            isDroppable: false ,
                         // }
                         // elements {
-                            domNode       : null,
-                            indenterElement : null,
-                            expanderElement : null,
-                            labelElement    : null,
-                            iconElement     : null,
+                            domNode: null,
+                            indenterElement: null,
+                            expanderElement: null,
+                            labelElement: null,
+                            iconElement: null,
                         // }
                         // connections {
-                            children : [],
-                            parent   : null
+                            children: [],
+                            parent: null
                         // }
                     }, data);
 
@@ -5812,14 +5808,14 @@ define('pastry/ui/Tree', [
                 return node;
             },
             // attributes {
-                id                : null ,
-                label             : null , // label
-                title             : null , // title
-                indent            : 0    , // indent of the node
-                parentId          : null ,
-                iconClass         : null ,
-                expanderIconClass : null ,
-                expanderText      : null ,
+                id: null ,
+                label: null , // label
+                title: null , // title
+                indent: 0    , // indent of the node
+                parentId: null ,
+                iconClass: null ,
+                expanderIconClass: null ,
+                expanderText: null ,
             // }
             // private methods {
                 _setLabel: function () {
@@ -6008,13 +6004,27 @@ define('pastry/ui/Tree', [
                 },
                 removeChild: function (child) {
                     var node = this,
+                        tree = node.tree,
                         index;
                     if ((index = indexOf(node.children, child)) !== -1) {
                         remove(node.children, index);
                         if (child.isLoaded && node.isExpanded) {
                             child.hide();
                         }
+                        child.eachChild(function(c) {
+                            child.removeChild(c);
+                        });
+                        // remove nodes from selectedNodes and nodes {
+                            tree.nodes = difference(tree.nodes, [child]);
+                            tree.selectedNodes = difference(tree.selectedNodes, [child]);
+                        // }
+                        child.destroy();
                     }
+                    return node;
+                },
+                removeChildren: function() {
+                    var node = this;
+                    node.tree.removeNodes(node.children);
                     return node;
                 },
                 moveTo: function (target) {
@@ -6109,9 +6119,8 @@ define('pastry/ui/Tree', [
                     node.eachChild(function (child) {
                         child.show();
                     });
-                    node._updateLayout();
                     node.tree.onExpand(node);
-                    return node;
+                    return node._updateLayout();
                 },
                 collapse: function () {
                     /*
@@ -6122,6 +6131,7 @@ define('pastry/ui/Tree', [
                     node.eachChild(function (child) {
                         child.hide();
                     });
+                    node.tree.onCollapse(node);
                     return node._updateLayout();
                 },
                 toggle: function () {
@@ -6139,6 +6149,9 @@ define('pastry/ui/Tree', [
                      */
                     var node = this,
                         domNode;
+                    if (node._rendered) {
+                        return;
+                    }
                     // get attributes {
                         if (!node.parent) {
                             node.isRoot = true;
@@ -6166,6 +6179,7 @@ define('pastry/ui/Tree', [
                             domQuery.one('.tree-node-icon', domNode);
                     // }
                     node._updateLayout();
+                    node._rendered = true;
                     if (!node._isAncestorsExpanded()) {
                         node.hide();
                     }
@@ -6192,7 +6206,7 @@ define('pastry/ui/Tree', [
                     if (!node.isLoaded) {
                         node.load();
                     } else {
-                        node._updateLayout();
+                        //node._updateLayout();
                         if (node.isRoot) {
                             node.placeAt(node.tree.bodyElement, 'first');
                             node._reload();
@@ -6206,6 +6220,12 @@ define('pastry/ui/Tree', [
                 update: function (option) {
                     return extend(this, option).render();
                 },
+                destroy: function() {
+                    var node = this;
+                    domConstruct.destroy(node.domNode);
+                    destroy(node);
+                    node = null;
+                }
             // }
         }),
 
@@ -6432,16 +6452,6 @@ define('pastry/ui/Tree', [
                             parent.removeChild(node);
                         }
                     });
-                    // remove nodes from selectedNodes and nodes {
-                        tree.nodes = difference(tree.nodes, nodes);
-                        tree.selectedNodes = difference(tree.selectedNodes, nodes);
-                    // }
-                    // destroy nodes and their children {
-                        each(nodes, function(node) {
-                            tree.removeNodes(node.children);
-                            node.destroy();
-                        });
-                    // }
                     return tree;
                 },
                 queryNodes: function (query) {
@@ -6498,6 +6508,7 @@ define('pastry/ui/Tree', [
                     onDblclick: function (/* node, e */) { },
                     onRightClick: function (/* node, e */) { },
                     onExpand: function (/* node */) { },
+                    onCollapse: function (/* node */) { },
                     onSelect: function (/* node */) { },
                     onMove: function (/* fromNode, toNode */) { }
                 // }

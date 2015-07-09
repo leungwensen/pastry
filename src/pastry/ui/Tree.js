@@ -465,6 +465,9 @@ define('pastry/ui/Tree', [
                      */
                     var node = this,
                         domNode;
+                    if (node._rendered) {
+                        return;
+                    }
                     // get attributes {
                         if (!node.parent) {
                             node.isRoot = true;
@@ -492,6 +495,7 @@ define('pastry/ui/Tree', [
                             domQuery.one('.tree-node-icon', domNode);
                     // }
                     node._updateLayout();
+                    node._rendered = true;
                     if (!node._isAncestorsExpanded()) {
                         node.hide();
                     }
@@ -518,7 +522,7 @@ define('pastry/ui/Tree', [
                     if (!node.isLoaded) {
                         node.load();
                     } else {
-                        node._updateLayout();
+                        //node._updateLayout();
                         if (node.isRoot) {
                             node.placeAt(node.tree.bodyElement, 'first');
                             node._reload();
@@ -534,7 +538,7 @@ define('pastry/ui/Tree', [
                 },
                 destroy: function() {
                     var node = this;
-                    domConstruct.destroy(node.container);
+                    domConstruct.destroy(node.domNode);
                     destroy(node);
                     node = null;
                 }
