@@ -319,13 +319,27 @@ define('pastry/ui/Tree', [
                 },
                 removeChild: function (child) {
                     var node = this,
+                        tree = node.tree,
                         index;
                     if ((index = indexOf(node.children, child)) !== -1) {
                         remove(node.children, index);
                         if (child.isLoaded && node.isExpanded) {
                             child.hide();
                         }
+                        child.eachChild(function(c) {
+                            child.removeChild(c);
+                        });
+                        // remove nodes from selectedNodes and nodes {
+                            tree.nodes = difference(tree.nodes, [child]);
+                            tree.selectedNodes = difference(tree.selectedNodes, [child]);
+                        // }
+                        child.destroy();
                     }
+                    return node;
+                },
+                removeChildren: function() {
+                    var node = this;
+                    node.tree.removeNodes(node.children);
                     return node;
                 },
                 moveTo: function (target) {
@@ -433,6 +447,7 @@ define('pastry/ui/Tree', [
                     node.eachChild(function (child) {
                         child.hide();
                     });
+                    node.tree.trigger('node-collapsed', node);
                     return node._updateLayout();
                 },
                 toggle: function () {
@@ -743,16 +758,6 @@ define('pastry/ui/Tree', [
                             parent.removeChild(node);
                         }
                     });
-                    // remove nodes from selectedNodes and nodes {
-                        tree.nodes = difference(tree.nodes, nodes);
-                        tree.selectedNodes = difference(tree.selectedNodes, nodes);
-                    // }
-                    // destroy nodes and their children {
-                        each(nodes, function(node) {
-                            tree.removeNodes(node.children);
-                            node.destroy();
-                        });
-                    // }
                     return tree;
                 },
                 queryNodes: function (query) {
@@ -809,6 +814,7 @@ define('pastry/ui/Tree', [
                     onDblclick: function (/* node, e */) { },
                     onRightClick: function (/* node, e */) { },
                     onExpand: function (/* node */) { },
+                    onCollapsed: function (/* node */) { },
                     onSelect: function (/* node */) { },
                     onMove: function (/* fromNode, toNode */) { }
                 // }

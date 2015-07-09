@@ -9,6 +9,15 @@ build:
   - copy:build
   - copy:locale
 
+buildWithoutPromiseTests:
+  - jshint
+  - compileTemplates
+  - requirejs
+  - jasmine
+  - less
+  - copy:build
+  - copy:locale
+
 dist:
   - build
   - clean
@@ -32,7 +41,7 @@ demo:
   - watch
 
 default:
-  - build
+  - buildWithoutPromiseTests
 
 dev:
   - build
