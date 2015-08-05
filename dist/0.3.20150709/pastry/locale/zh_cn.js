@@ -1,1 +1,0 @@
-/*! pastry - v0.3.20150709 */define("pastry/locale/zh_cn",{});
