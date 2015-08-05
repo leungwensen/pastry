@@ -82,6 +82,16 @@ require([
             });
             expect(arrB).toEqual([2, 3, 4, 4, 5, 5, 5, 6]);
         });
+        it('pastry.every(obj, callback, thisObj)', function () { // alias
+            expect(pastry.every(arrA, function(item) {
+                return item === 4;
+            })).toEqual(false);
+        });
+        it('pastry.some(obj, callback, thisObj)', function () { // alias
+            expect(pastry.some(arrA, function(item) {
+                return item === 4;
+            })).toEqual(true);
+        });
         it('pastry.each(obj, callback, thisObj)', function () { // alias
             pastry.each(arrA, function (a) {
                 a += 0;
@@ -157,6 +167,16 @@ require([
         it('pastry.reduce', function () {
             var sum = pastry.reduce([1, 2, 3], function(sum, num){ return sum + num; }, 0);
             expect(sum).toBe(6);
+        });
+        it('pastry.union', function () {
+            expect(pastry.union([1, 2], [0, 1, 2, 4], [4, 5])).toEqual([
+                1, 2, 0, 4, 5
+            ]);
+        });
+        it('pastry.uniq', function () {
+            expect(pastry.uniq([1, 2, 2, 3, 4, 5, 5, 5, 6])).toEqual([
+                1, 2, 3, 4, 5, 6
+            ]);
         });
     });
 
