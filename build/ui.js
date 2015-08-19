@@ -625,9 +625,7 @@
                  * @syntax      : pastry.destroy(obj);
                  */
                 for (var p in obj) {
-                    if (obj.hasOwnProperty(p)) {
-                        delete obj[p];
-                    }
+                    delete obj[p];
                 }
                 obj.prototype = obj['__proto__'] = null;
                 obj = null;
@@ -3878,6 +3876,12 @@ define('pastry/io/ajax', [
             username = option.username,
             password = option.password;
 
+        // response type {
+            if ('responseType' in xhr && option.responseType) {
+                xhr.responseType = option.responseType; // like 'arraybuffer'
+            }
+        // }
+
         // add handlers {
             pastry.each([
                 'abort',
@@ -5725,7 +5729,7 @@ define('pastry/ui/Tree', [
      *   moveTo implement optimizing
      */
 
-    var NS      = 'p_u_tree',
+    var NS = 'p_u_tree',
         NS_NODE = 'p_u_tree_node';
 
     var INDENT_LENGTH = 16; // indent for one level
@@ -6216,12 +6220,22 @@ define('pastry/ui/Tree', [
                  * @description: load the node to the tree;
                  */
                 var node = this;
+                var parent = node.parent;
                 if (!node.isLoaded) {
                     if (node.isRoot) {
-                        node.placeAt(node.tree.bodyElement, 'first');
+                        node.placeAt(node.tree.bodyElement, 'last');
                         node._setLoaded();
-                    } else if (node.parent.isLoaded) {
-                        node.placeAt(node.parent.domNode, 'after');
+                    } else if (parent && parent.isLoaded) {
+                        var lastChildIndex = parent.children.length - 1;
+                        var lastChild = parent.children[lastChildIndex];
+                        if (lastChild === node) {
+                            lastChild = parent.children[lastChildIndex - 1];
+                        }
+                        if (lastChild && lastChild.isLoaded) {
+                            node.placeAt(lastChild.domNode, 'after');
+                        } else {
+                            node.placeAt(parent.domNode, 'after');
+                        }
                         node._setLoaded();
                     }
                 }

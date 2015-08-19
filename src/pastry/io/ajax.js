@@ -48,6 +48,12 @@ define('pastry/io/ajax', [
             username = option.username,
             password = option.password;
 
+        // response type {
+            if ('responseType' in xhr && option.responseType) {
+                xhr.responseType = option.responseType; // like 'arraybuffer'
+            }
+        // }
+
         // add handlers {
             pastry.each([
                 'abort',
